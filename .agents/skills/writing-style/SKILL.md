@@ -1,18 +1,18 @@
 ---
 name: writing-style
-description: Writing style guide for Nutgraf documentation. Use whenever creating, editing, or reviewing any MDX page in this docs project. Covers product identity, tone, page anatomy, section headings, sentence construction, and length calibration — modelled on manus.im/docs. Always activate this skill before writing any documentation page.
+description: Writing style guide for the Kamarkat documentation of zero-ops. Use whenever creating, editing, or reviewing any MDX page in this docs project. Covers product identity, terminology, tone, page anatomy, section headings, sentence construction, and length calibration. Always activate this skill before writing any documentation page.
 ---
 
-# Nutgraf Documentation Writing Style
+# Kamarkat Documentation Writing Style
 
-Nutgraf's documentation follows the writing conventions established by [manus.im/docs](https://manus.im/docs). The goal is prose that is direct and informative — not too sparse, not over-explained. Every sentence earns its place.
+Kamarkat documents zero-ops. The goal is prose that is direct and informative — not too sparse, not over-explained. Every sentence earns its place.
 
 ## Tone and voice
 
-- Second person throughout: "you", "your brand", "your team".
-- Active voice. Avoid passive constructions ("the video is generated" → "Nutgraf generates the video").
+- Second person throughout: "you", "your box", "your team".
+- Active voice. Avoid passive constructions ("the cluster is provisioned" → "your control plane provisions the cluster").
 - Present tense. State what things do, not what they "will" do.
-- Confident but not promotional. State facts about the product; let the feature speak for itself.
+- Confident but not promotional. State facts about the platform; let the capability speak for itself.
 - No filler phrases: "easily", "seamlessly", "powerful", "robust", "cutting-edge", "leverage".
 
 ## Terminology rules
@@ -21,73 +21,85 @@ These are hard constraints — never deviate.
 
 | Avoid | Use instead |
 | :- | :- |
-| sandbox | computer |
-| "running in a sandbox" | "using a computer" |
-| multi-agents in a sandbox | multi-agents using a computer |
-| channel-builders, video-builders, code-builders | the high-level customer-facing name (e.g. Creative Studio, Product Development) |
-| internal builder names | customer-facing capability names only |
-| channel (as workspace) | Brand |
-| channels (plural workspace) | Brands |
-| A2A, Agent-to-Agent protocol, JSON-RPC, REST APIs | background agent collaboration, autonomous coordination |
-| technical plumbing, schemas, wire protocols | brand guidelines, verified assets, structured brand rules |
+| hub | management cluster |
+| spoke | workload cluster |
+| fleet | application (or app) |
+| catalogue, catalog (of components) | capability, bundle |
+| zero-ops deploys / applies / pushes to your cluster | zero-ops publishes a version; your control plane applies it |
+| zero-ops manages / operates your box | zero-ops maintains the platform in your box |
+| upgrade (as something zero-ops does) | upgrade proposal you accept |
+| SaaS, hosted platform | delivered into your box |
+| internal component names (`hub-operator`, `kube-sbt`, `mcp-server`) | the capability they provide (platform operator, tenant provisioning, control-plane API) |
 
-### No internal technical or protocol details
+### No vendor names
 
-Customer documentation must never expose internal architecture, engineering specs, or wire protocols.
-- **Never mention protocols like A2A (Agent-to-Agent protocol)**, JSON-RPC, LangGraph, DAGs, or internal endpoints.
-- Focus strictly on the **customer experience and outcomes**: what the agents do for the brand, how they coordinate autonomously in the background, and how brand context propagates without manual effort.
-- Frame collaboration around capabilities: *"agents coordinate autonomously in the background"* rather than *"agents communicate over the A2A protocol"*.
+Name the capability, never the third-party project behind it: "the GitOps engine", "the identity provider", "the secret store", "the database", "observability". The exception is a literal value the reader must type or set — a secret name, a URL, a CLI tool — where the vendor name is part of the value.
+
+### No internal references
+
+Customer documentation never cites ADR numbers, internal file paths of the platform repository, ticket ids or design history. Describe only the current design, never what it replaced.
 
 ## Page anatomy
 
-Every feature page follows this structure — in this order. Do not invent new sections or reorder them.
+### Feature pages
+
+Every page under **Features** follows this structure — in this order. Do not invent new sections or reorder them.
 
 ```
-# Page Title
+---
+title: "Page Title"
+description: "One sentence for the page header."
+---
 
-> One or two sentences. What the feature does and why it matters. Plain statement — no marketing copy.
+> One or two sentences. What the capability does and why it matters. Plain statement — no marketing copy.
 
 ## What it is
 
-3–5 sentences. Explain the concept. What problem it solves and how it fits into the broader product.
-A table is appropriate here when comparing modes, types, or options.
+3–5 sentences. Explain the concept and how it fits the box.
+A table is appropriate here when comparing kinds, modes or owners.
 
-## How to use it   (or: Getting Started: [Outcome] in [Time])
+## Getting started   (or: How it works)
 
-Numbered walkthrough with ### sub-steps. Imperative phrasing ("Click...", "Select...", "Review...").
-Each sub-step: 3–6 sentences. Enough to be actionable; not a full tutorial.
+Numbered walkthrough with ### sub-steps. Imperative phrasing.
 
-### 1. Sub-step title
-### 2. Sub-step title
-...
+## What you need to know
 
-## What You Need to Know
-
-Operating semantics: inheritance rules, what propagates and when, credit behaviour, limits, isolation boundaries.
+Operating semantics: ownership, isolation boundaries, what propagates and when, limits.
 Use ### sub-headings for distinct concerns.
 
 ## Tips
 
 4–6 bullet points. Bold the key action or principle, then one sentence of explanation.
 
-## Frequently Asked Questions
+## Frequently asked questions
 
-Blockquote format. Real questions a user would actually ask. 4–6 questions. 2–4 sentence answers. Grounded and specific — no deflection.
+<AccordionGroup> of 2–6 questions a user would actually ask. 2–4 sentence answers.
 ```
+
+### Quickstart pages
+
+Every page under **Quickstart** is a procedure:
+
+- A one-paragraph introduction saying what the page achieves.
+- `## Step 1: ...`, `## Step 2: ...` headings, each with the exact command in a fenced `bash` block.
+- A flag or field table after the first command that introduces it.
+- `<Note>`, `<Warning>` or `<Tip>` only where a reader would otherwise fail.
+- A closing `## Next` with one `<Card>` linking to the following page.
+
+Commands and flags must exist in the `soloz` CLI at the documented version. Verify each one against the CLI source before writing it.
 
 ## Section heading conventions
 
-Follow the exact casing and phrasing from manus.im/docs.
+Use sentence case for every heading.
 
 | Section | Exact heading text |
 | :- | :- |
 | Concept | `## What it is` |
-| Walkthrough | `## How to use it` OR `## Getting Started: [Outcome] in [Time]` |
-| Semantics | `## What You Need to Know` |
+| Walkthrough | `## Getting started` or `## How it works` |
+| Semantics | `## What you need to know` |
 | Best practices | `## Tips` |
-| Q&A | `## Frequently Asked Questions` |
-
-Sub-steps under How/Getting Started use `### 1.`, `### 2.`, etc.
+| Q&A | `## Frequently asked questions` |
+| Procedure step | `## Step N: Verb phrase` |
 
 ## Length calibration
 
@@ -96,18 +108,18 @@ Sub-steps under How/Getting Started use `### 1.`, `### 2.`, etc.
 | Lead blockquote | 1–2 sentences |
 | What it is | 3–5 sentences, optionally 1 table |
 | Each ### sub-step | 3–6 sentences |
-| What You Need to Know (each sub-section) | 3–6 sentences |
+| What you need to know (each sub-section) | 3–6 sentences |
 | Tips | 4–6 bullets |
 | Each FAQ answer | 2–4 sentences |
 
-Do not pad to fill space. Do not truncate to save space. Match the calibration above.
+Do not pad to fill space. Do not truncate to save space.
 
 ## Sentence construction
 
 - One idea per sentence.
 - Short sentences for key facts. Slightly longer sentences to explain relationships or sequence.
-- Start sentences with the subject, not a clause: "Nutgraf generates..." not "Once the topic is approved, Nutgraf generates..."
-- When describing a sequence of events, prefer numbered lists or `### N.` sub-steps over long compound sentences.
+- Start sentences with the subject, not a clause: "Your control plane reconciles..." not "Once the proposal is merged, your control plane reconciles..."
+- When describing a sequence of events, prefer numbered lists or `<Steps>` over long compound sentences.
 
 ## What to avoid
 
@@ -116,68 +128,62 @@ Do not pad to fill space. Do not truncate to save space. Match the calibration a
 - Bold text used decoratively. Bold only key terms or actions the reader needs to find quickly.
 - Phrases that inflate without adding information: "It is important to note that...", "In order to...", "Please be aware that..."
 - Ellipsis or em-dash overuse in body copy.
-- Describing the UI in minute detail (exact button coordinates, pixel sizes). Refer to UI elements by their visible label in **bold**.
+- Claims the platform does not make. If a design is decided but not yet built, say so rather than describing it as available.
 
 ## Product identity — read this before writing anything
 
 This is the most important section. Get this wrong and all the writing will be wrong.
 
-**What Nutgraf is:**
-Nutgraf is an agentic multi-brand building platform. It builds the agentic capabilities a brand needs — and those capabilities grow over time as the platform evolves.
+**What zero-ops is:**
+zero-ops is an open-source platform a startup runs its business on. It delivers a complete, maintained platform into a box in the customer's own cloud account, for organisations that want a golden path and cannot yet staff a platform team. The software is free; what a customer buys is maintenance.
 
-**What Nutgraf is NOT:**
-- Not a "media studio" — that is too narrow and defines the platform by its current outputs
-- Not a "content production tool" — same problem
-- Not a task runner or operations tool — building comes before running
+**What zero-ops is NOT:**
+- Not a hosted or managed service — zero-ops operates no customer infrastructure and holds no customer credential
+- Not a platform for platform engineers to customise — it is a maintained golden path
+- Not responsible for the customer's applications — the customer owns their code, images, data and how they use each capability
 
 **The correct mental model:**
-- The **Brand** is the constant — the persistent unit a customer owns and grows
-- **Agentic capabilities** are what Nutgraf builds for that Brand
-- Today those capabilities include video production and app development — but these are the first two, not the definition of the platform
-- The platform grows: as Nutgraf adds more capabilities, every Brand gains access to them
+- The **box** is the constant — a management cluster and its workload clusters, in the customer's account
+- The **tenant repository** is the only source of desired state for the box
+- zero-ops **publishes versions**; the customer's own automation proposes them and the customer's control plane applies them
+- zero-ops **maintains capability health**; the customer **owns capability usage**
 
 **Core vocabulary:**
-- Use **"build"** as the primary verb — Nutgraf builds agentic capabilities for brands
-- Use **"capabilities"** — not "features", not "tools", not "modules"
-- Use **"Brand"** — the top-level unit. Not "project", not "workspace" as the primary label, not "channel"
-- Avoid framing the product around any specific Computer (video, code) — these are capabilities, not the product identity
+- Use **"box"** for what a customer owns, **"tenant"** for the organisation, **"application"** for a product running on it
+- Use **"capability"** — not "feature", not "service", not "module" — for what the platform provides
+- Use **"maintain"** as zero-ops' verb, **"propose"** for upgrades, **"reconcile"** for what the control plane does
 
 ---
 
-## Nutgraf-specific concepts to use accurately
+## Concepts to use accurately
 
-Use these explanations as reference when writing about each concept.
+**Box**
+A management cluster running the customer's control plane, plus the workload clusters it provisions. It runs in the customer's cloud account under credentials only the customer holds, belongs to one tenant, and keeps running whether or not zero-ops is reachable.
 
-**Brand**
-A persistent workspace for one brand business. Holds the master brand brief, creative direction, target audience, and digital presenter configurations. A customer can run multiple Brands under a single account — each Brand is fully isolated. The Brand is the core unit of Nutgraf: agentic capabilities are built for it and scoped to it.
+**Tenant and application**
+The tenant is the organisation that owns the box (`tenantId`). An application is a product running on it (`appId`), and the unit of isolation: its own namespace `tenant-<tenantId>-<appId>`, database, identity project, secret path and network policy. Being in the same tenant never grants access; only a declaration does.
 
-**Stories**
-The daily session bar inside a Brand. Shows all active and completed computer runs for the day, grouped by date. Each story tab corresponds to a conversation with the Brand agent or with a specific Computer (Video, Code, etc.).
+**Cell**
+A workload cluster's name, chosen by the customer and fixed for life. Applications name the cell they run on. Policy attaches to cells.
 
-**Computer**
-A specialized multi-agent system that uses a computer to complete a defined, priced outcome. Multi-agents using a computer handle the work end to end. The customer directs the outcome; the Computer executes it. Many Computers can run under a single Brand, all drawing from the same credit pool.
+**Tenant repository**
+`<tenant>-gitops` in the customer's git organisation. For each cluster it holds the bundle version and the customer's values; for each application, its declaration and the chart version of each workload.
 
-**Credits**
-The unit of payment for outcome runs. Each Computer run has a fixed credit price shown before execution begins. The full price is reserved upfront — runs never start without sufficient balance and never charge unpredictably mid-run. Monthly included credits reset each period; purchased add-on credits carry over.
+**Bundle**
+The whole platform at one immutable version, published as one artefact and mirrored into infrastructure the customer controls. Upgrades change one version field per cluster.
 
-**Creative Studio / Video**
-The Computer that produces broadcast-ready video from a topic or brief. Multi-agents using a computer handle scripting, voice synthesis, digital presenter animation, scene assembly, and rendering. First draft delivered in approximately 15 minutes.
+**Capability**
+What the platform provides and maintains. Machinery runs on every box; selectable capabilities (database, observability, on-premises capacity) are chosen in the cluster's values. Selecting a capability never makes it the customer's to maintain.
 
-**Product Development / Code**
-The Computer that builds interactive web and mobile applications from a natural-language description. An orchestrator and a coder agent collaborate using a computer, with the result rendered live on the interactive preview canvas.
+**Day-0**
+The one-time creation of the management cluster, run from the customer's own CI. After Day-0 the tenant repository is the only authority.
 
-**Conversational editing**
-The director-mode experience inside the video player drawer. After a first draft is delivered, the customer reviews individual scenes and requests changes in natural language within the same session.
+**Support Agent**
+An open-source agent on every cluster that does nothing until the customer enrols. It sends an allowlisted set of control-plane facts outward, and the customer can preview the exact payload first.
 
-**Digital presenters**
-AI-generated on-screen personas created from a single uploaded photograph. Each presenter is styled and calibrated with a voiceprint for a specific show format or audience.
+**Escrow**
+A secret manager the customer controls, outside the box, holding the box's master keys and each cluster's break-glass admin kubeconfig.
 
-## References
+## Diagrams
 
-Read these only when your task requires them:
-
-- [manus.im/docs/introduction/welcome.md](https://manus.im/docs/introduction/welcome.md) — reference for the Welcome page tone and length
-- [manus.im/docs/features/projects.md](https://manus.im/docs/features/projects.md) — reference for a full feature page using the standard anatomy
-- [manus.im/docs/website-builder/getting-started.md](https://manus.im/docs/website-builder/getting-started.md) — reference for the "Getting Started: X in Y Minutes" walkthrough pattern
-- [manus.im/docs/introduction/plans.md](https://manus.im/docs/introduction/plans.md) — reference for the Plans and Pricing page
-- [manus.im/docs/automations.md](https://manus.im/docs/automations.md) — reference for a longer feature page with tables, tips, and FAQ
+Architecture diagrams use the `arch-*` classes in `style.css`, written as JSX in the page. Interactive layer stacks use the `BoundaryStack` component in `snippets/`. Every element in a diagram must trace to the platform's decisions or its running configuration — never draw a component or a flow that is assumed.

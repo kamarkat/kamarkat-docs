@@ -1,0 +1,70 @@
+---
+title: "Observability"
+description: "Every cluster collects its own metrics and logs, stores them and evaluates its own alerts. One set of dashboards on your management cluster shows every cluster in the box."
+---
+
+> Your telemetry stays in your box. No vendor account is needed for observability to work.
+
+## What it is
+
+Observability is split into two parts.
+
+**Collection is machinery.** Every cluster runs agents that gather node, container, cluster-state and platform metrics, plus logs. Collection always runs, whatever else you select, because the Support Agent depends on it.
+
+**The backend is selectable.** With `capabilities.observability.enabled`, each cluster also runs its own highly available stores for metrics and logs, its own alert evaluation and its own alert routing. The management cluster adds the dashboards.
+
+No telemetry is copied between clusters. The dashboards query each cluster's own endpoint, and a **cluster** selector switches between them.
+
+## Getting started
+
+### 1. Open the dashboards
+
+Sign in to the dashboards on your management cluster with your box identity. Access requires the **viewer** role in the box's observability project.
+
+### 2. Send your application's telemetry
+
+Opt your application's namespace in, then either expose a metrics endpoint for scraping or send metrics and logs over OTLP. Both paths follow one contract.
+
+### 3. Add your own dashboards and alerts
+
+Write dashboards and alert rules in your tenant repository. They are reconciled into your box like everything else, and tenant rules run inside enforced limits. Platform alerts are enabled one at a time.
+
+### 4. Route alerts
+
+You supply the receivers in your values. The platform owns the route tree and generates the alert-routing configuration from your values.
+
+## What you need to know
+
+### Each cluster evaluates its own alerts
+
+Alerts are evaluated where the data is, so a cluster keeps alerting even if the management cluster is unreachable.
+
+### The pipeline reports its own failure
+
+Each cluster sends a heartbeat to an external check, so a silent observability stack is noticed from outside the cluster.
+
+### Sending telemetry elsewhere is additive
+
+You can forward telemetry to your own external destination as well. It is added alongside the in-box backend, never in its place.
+
+### Application teams are not isolated from each other
+
+Anyone with the viewer role can query every application's telemetry in the box. If you need query isolation between teams, it is not provided.
+
+### Observability is not metering
+
+Usage records for billing never pass through the observability stack, and switching observability off cannot affect them.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="If I turn off the observability backend, does the Support Agent stop working?">
+    No. Collection is machinery and keeps running. The Support Agent never depends on the observability backend.
+  </Accordion>
+  <Accordion title="Can I switch off observability on a running box?">
+    Not by changing the value. The setting decides what a new cluster is provisioned with. Decommissioning a running backend is a separate, deliberate operation.
+  </Accordion>
+  <Accordion title="Is my telemetry backed up?">
+    No. Metrics and logs have short retention, which the bundle sets and you can override in your values. The data regenerates from the next collection, so neither store is backed up. Treat it as operational data, not a record.
+  </Accordion>
+</AccordionGroup>

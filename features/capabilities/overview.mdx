@@ -1,0 +1,82 @@
+---
+title: "Capabilities"
+description: "The platform is the set of capabilities it provides and maintains. Some run on every box; others you select. zero-ops maintains both, and you own how you use them."
+---
+
+> zero-ops maintains the capability. You own the use you make of it.
+
+## What it is
+
+A capability is something the platform provides that contains none of your own logic: a database engine, an identity provider, a gateway, a certificate authority, a metrics store. The schemas in the database, the users in the identity provider and the routes through the gateway are yours.
+
+Capabilities come in two kinds.
+
+**Machinery** runs on every box, because without it a box cannot reconcile anything. You cannot turn it off.
+
+**Selectable capabilities** are ones you choose in your cluster's values. A box runs what you need and does not carry the rest.
+
+Selecting a capability does not make it yours to maintain. zero-ops maintains everything your box runs.
+
+## What is available
+
+| Capability | Kind | How to select |
+| :- | :- | :- |
+| GitOps engine | Machinery | — |
+| Cluster lifecycle | Machinery | — |
+| Secret delivery | Machinery | — |
+| Certificate issuance | Machinery | — |
+| DNS | Machinery | — |
+| Gateway and login | Machinery | — |
+| Identity provider | Machinery | — |
+| Admission policy | Machinery | — |
+| Capacity lifecycle | Machinery | — |
+| Telemetry collection | Machinery | — |
+| Database | Selectable | `capabilities.database.enabled` |
+| Observability | Selectable | `capabilities.observability.enabled` |
+| On-premises capacity | Selectable | `onPrem.enabled` |
+| Support Agent | Selectable | Enrolment |
+
+Every selectable capability defaults to **on**, so an upgrade can never remove one from a running box.
+
+## Key capabilities
+
+### Database
+
+You declare that an application needs a database and receive an **empty database and a role** that it owns. Everything inside it belongs to the application: tables, functions, migrations and data. zero-ops maintains the engine underneath, including replicas, backups and failover.
+
+### Identity
+
+Each application is its own **project** in your organisation's identity provider. Your users sign in through the gateway, so login is part of the platform and not something each application builds.
+
+- An application's API accepts **access tokens**, never ID tokens.
+- An application calling another on its own behalf uses **client credentials**.
+- An application acting for a user carries **that user's own access token** for the target.
+
+### Gateway
+
+Every application's traffic passes through a gateway that handles TLS and login. Routes that need no login, such as static assets or share links, are declared explicitly. See [Deploying Applications](/features/capabilities/workloads).
+
+## What you need to know
+
+### Capabilities have a lifecycle
+
+A capability moves through **declared**, **supported**, **deprecated** (maintained, with an end date), **end-of-life** and **removed**. A capability is never removed from a running box. Before end-of-life you receive notice and, where one exists, a migration path.
+
+### Selecting is set up at provisioning
+
+Turning a capability off in your values stops new clusters getting it. On a box that already runs it, the capability keeps running: removing platform state is never a side effect of changing a value.
+
+### Each capability is tested on the machinery
+
+A bundle version certifies the machinery as a unit and each capability against it. Capabilities that genuinely interact are certified as a named pair.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Who handles an incident caused by a slow query?">
+    You do. If the database is healthy and working as shipped, the incident is in how it is used. zero-ops confirms that the capability is healthy and helps you.
+  </Accordion>
+  <Accordion title="Can I bring my own database or identity provider?">
+    The platform's own components authenticate against the box's identity provider, so it is machinery. Your applications can call any external service you declare.
+  </Accordion>
+</AccordionGroup>

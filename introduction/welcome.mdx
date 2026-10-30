@@ -1,29 +1,41 @@
 ---
 title: "Welcome"
-description: "Nutgraf is an agentic multi-brand building platform. It builds the agentic capabilities your brands need — and grows as those needs evolve."
+description: "zero-ops is an open-source platform a startup runs its business on. It ships a complete, maintained stack into a box you own, on infrastructure you pay for directly."
 ---
 
-> Nutgraf builds the agentic capabilities your brands need. You run the brand; Nutgraf builds what powers it.
+> zero-ops gives you the platform a platform team would build, without the platform team. You own the box; zero-ops keeps what runs in it maintained.
 
-## What Nutgraf is
+## What zero-ops is
 
-Nutgraf is a platform for building agentic capabilities for brands. Every brand business has production needs — content, products, tools, workflows. Nutgraf gives each of your brands its own set of agentic capabilities to handle those needs, with more capabilities added as the platform evolves.
+zero-ops is a complete platform stack for startups that want a golden path and cannot yet staff a platform engineering team. It runs on affordable infrastructure in your own cloud account rather than on a hyperscaler's managed services, and it covers everything your applications need to run: cluster lifecycle, GitOps delivery, secrets, certificates, DNS, a gateway with login, a database, an identity provider and observability.
 
-The foundational unit in Nutgraf is the **Brand**. Each Brand is a persistent, isolated workspace for one brand business — holding its brief, voice, creative direction, and the history of everything built inside it. You can run multiple Brands from a single account, and nothing crosses between them.
+The foundational unit is the **box**. A box is your control plane and the workload clusters it manages, all running in your cloud account under credentials only you hold. The control plane is not hosted for you. It is delivered to you, and it keeps running whether or not zero-ops is reachable.
 
-Inside a Brand, you invoke **Computers** — agentic systems that use a computer to complete a defined task and deliver a specific outcome. Two Computers are available today: one for producing video, one for building apps. More are coming as Nutgraf expands what it can build for your brands.
+zero-ops is free and open source. What you can buy is **maintenance**: the stack is tested as one set, published as one version, and proposed to your repository as an upgrade you accept.
 
-## What you can do with Nutgraf
+## What you can do with zero-ops
 
-- **Run multiple brand businesses** from one account. Each Brand is fully isolated with its own brief, creative direction, and build history.
-- **Build brand video.** The video Computer takes a topic or brief and delivers a broadcast-ready first draft — scripting, narration, animation, and rendering — in approximately 15 minutes.
-- **Build brand apps.** The code Computer takes a natural-language description and builds an interactive web or mobile app, with the result visible on a live preview canvas as it works.
-- **Direct the output conversationally.** Review what was built, describe changes in plain language, and see revisions in the same session.
+- **Run a production platform in your own cloud account.** Your bill, your credentials, your clusters.
+- **Ship applications without operating infrastructure.** Publish a chart from your application's build; the platform renders its namespace, gateway, login, database, secrets and network policy.
+- **Use maintained capabilities.** A database, an identity provider and an observability stack are kept available, current and recoverable. You own what you do with them.
+- **Upgrade by accepting a pull request.** A new platform version arrives as a one-line change to your repository. Nothing changes until you merge it.
+- **Leave without migrating.** Every artefact your box runs is mirrored into infrastructure you control, so stopping maintenance stops nothing that is running.
 
-## How Nutgraf is organised
+## How zero-ops is organised
 
-Everything starts with a **Brand**. A Brand holds the context — brief, voice, presenter setup — that every Computer inherits when you invoke it. You define the brand once; every Computer run inside it starts from that foundation.
+Everything starts with a **box**. Each box belongs to one **tenant**, the organisation that owns it, and holds one management cluster plus any number of workload clusters.
 
-**Computers** are the agentic systems that do the building. Each Computer is designed for a specific type of outcome. When you invoke a Computer inside a Brand, it takes the brief from the workspace and goes to work.
+A **tenant repository**, `<tenant>-gitops`, is the single source of desired state for the box. For each cluster it records two things: the platform version that cluster runs, and the values it runs with.
 
-**Stories** is the daily session bar inside each Brand. Every Computer run and Brand conversation appears here, organised by date. You can track active runs, review completed builds, and continue any session from where you left off.
+The **bundle** is the platform itself: every component, at versions tested together, published as one versioned artefact.
+
+**Capabilities** are what the bundle provides. Some are machinery every box runs; others, such as the database and observability, you select. Your **applications** run on top of them, each in its own isolated namespace.
+
+<CardGroup cols={2}>
+  <Card title="The box" icon="box" href="/features/box/overview">
+    What runs in your account, and what zero-ops never holds.
+  </Card>
+  <Card title="Capabilities" icon="layer-group" href="/features/capabilities/overview">
+    What the platform provides and maintains.
+  </Card>
+</CardGroup>

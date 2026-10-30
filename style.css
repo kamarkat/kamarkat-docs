@@ -1,0 +1,370 @@
+/* Architecture diagrams: zones, groups, boxes and animated wires. */
+
+:root {
+  --arch-accent: #7c3aed;
+  --arch-accent-fg: #ffffff;
+  --arch-subtle: #f5f3ff;
+  --arch-subtle-border: #ddd6fe;
+  --arch-surface: #ffffff;
+  --arch-panel: #fafafa;
+  --arch-border: #e4e4e7;
+  --arch-text: #18181b;
+  --arch-text-2: #52525b;
+  --arch-text-3: #8a8a93;
+}
+
+.dark {
+  --arch-accent: #a78bfa;
+  --arch-accent-fg: #17141f;
+  --arch-subtle: rgba(167, 139, 250, 0.08);
+  --arch-subtle-border: rgba(167, 139, 250, 0.24);
+  --arch-surface: #141218;
+  --arch-panel: #1b1920;
+  --arch-border: rgba(255, 255, 255, 0.1);
+  --arch-text: #f4f4f5;
+  --arch-text-2: #b5b5b5;
+  --arch-text-3: #8a8a8a;
+}
+
+/* Canvas */
+
+.arch-sys {
+  margin: 24px 0 8px;
+  padding: 28px 20px 20px;
+  border: 1px solid var(--arch-border);
+  border-radius: 12px;
+  background-color: var(--arch-panel);
+  background-image: radial-gradient(var(--arch-border) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.arch-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) 120px minmax(0, 1fr);
+  align-items: center;
+}
+
+/* Zones */
+
+.arch-zone {
+  position: relative;
+  border: 1px solid var(--arch-border);
+  border-radius: 10px;
+  background: var(--arch-surface);
+}
+
+.arch-zone-key {
+  border: 1.5px solid var(--arch-accent);
+}
+
+.arch-zone-tab {
+  position: absolute;
+  top: -11px;
+  left: 12px;
+  padding: 2px 8px;
+  border: 1px solid var(--arch-border);
+  border-radius: 9999px;
+  background: var(--arch-surface);
+  color: var(--arch-text-2);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.arch-zone-key .arch-zone-tab {
+  border-color: var(--arch-accent);
+  background: var(--arch-accent);
+  color: var(--arch-accent-fg);
+}
+
+.arch-zone-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 12px 12px;
+}
+
+.arch-zone-key .arch-zone-body {
+  border-radius: 9px;
+  background: var(--arch-subtle);
+}
+
+.arch-zone-body > .arch-label:not(:first-child),
+.arch-group > .arch-label:not(:first-child) {
+  margin-top: 4px;
+}
+
+/* Groups */
+
+.arch-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px dashed var(--arch-border);
+  border-radius: 8px;
+}
+
+.arch-group-managed {
+  border-color: var(--arch-accent);
+  background: var(--arch-subtle);
+}
+
+.arch-group-managed > .arch-label {
+  color: var(--arch-accent);
+}
+
+.arch-label {
+  color: var(--arch-text-3);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.arch-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+/* Boxes and chips */
+
+.arch-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--arch-border);
+  border-radius: 8px;
+  background: var(--arch-surface);
+  color: var(--arch-text);
+}
+
+.arch-box > span:last-child:not(.arch-icon) {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.arch-box strong {
+  color: var(--arch-text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.arch-muted {
+  color: var(--arch-text-3);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.arch-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: var(--arch-subtle);
+  color: var(--arch-accent);
+}
+
+.arch-icon svg {
+  width: 13px;
+  height: 13px;
+  background-color: currentColor !important;
+}
+
+.arch-icon-neutral {
+  background: var(--arch-panel);
+  color: var(--arch-text-2);
+}
+
+.arch-pipe {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.arch-chip {
+  padding: 4px 9px;
+  border: 1px solid var(--arch-border);
+  border-radius: 6px;
+  background: var(--arch-surface);
+  color: var(--arch-text);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.arch-pipe-arrow {
+  padding-left: 14px;
+  color: var(--arch-accent);
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+/* Wires: a dashed line whose dashes travel in the direction of flow. */
+
+@keyframes arch-dash {
+  to { background-position: 0 10px; }
+}
+
+@keyframes arch-dash-h {
+  to { background-position: 10px 0; }
+}
+
+.arch-wire {
+  position: relative;
+  display: block;
+  width: 2px;
+  height: 40px;
+  margin: 8px 0;
+  background-image: repeating-linear-gradient(180deg, var(--arch-accent) 0 5px, transparent 5px 10px);
+  background-size: 2px 10px;
+  animation: arch-dash 0.9s linear infinite;
+}
+
+.arch-wire::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: -4px;
+  border: 5px solid transparent;
+  border-top-color: var(--arch-accent);
+}
+
+.arch-wire-label {
+  color: var(--arch-text-2);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.arch-inline-wire {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 24px;
+}
+
+.arch-links {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0 4px;
+}
+
+.arch-link {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.arch-link .arch-wire-label {
+  font-size: 10.5px;
+  text-align: center;
+}
+
+.arch-wire-h {
+  width: auto;
+  height: 2px;
+  margin: 0 8px;
+  background-image: repeating-linear-gradient(90deg, var(--arch-accent) 0 5px, transparent 5px 10px);
+  background-size: 10px 2px;
+  animation-name: arch-dash-h;
+}
+
+.arch-wire-h::after {
+  top: -4px;
+  bottom: auto;
+  left: auto;
+  right: -8px;
+  border-color: transparent;
+  border-left-color: var(--arch-accent);
+}
+
+.arch-wire-h.arch-wire-rev {
+  animation-direction: reverse;
+}
+
+.arch-wire-h.arch-wire-rev::after {
+  right: auto;
+  left: -8px;
+  border-left-color: transparent;
+  border-right-color: var(--arch-accent);
+}
+
+.arch-lock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--arch-text-3);
+  font-size: 10.5px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.arch-lock svg {
+  width: 14px;
+  height: 14px;
+  background-color: currentColor !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arch-wire { animation: none; }
+}
+
+/* Narrow screens: zones stack and the middle wires turn vertical. */
+
+@media (max-width: 768px) {
+  .arch-split { grid-template-columns: 1fr; }
+  .arch-row { grid-template-columns: 1fr; }
+
+  .arch-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 16px;
+    padding: 8px 0 18px;
+  }
+
+  .arch-link {
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .arch-link .arch-wire-label {
+    max-width: 110px;
+    text-align: left;
+  }
+
+  .arch-wire-h {
+    width: 2px;
+    height: 36px;
+    margin: 8px 0;
+    background-image: repeating-linear-gradient(180deg, var(--arch-accent) 0 5px, transparent 5px 10px);
+    background-size: 2px 10px;
+    animation-name: arch-dash;
+  }
+
+  .arch-wire-h::after {
+    top: auto;
+    bottom: -8px;
+    left: -4px;
+    right: auto;
+    border-color: transparent;
+    border-top-color: var(--arch-accent);
+  }
+
+  .arch-wire-h.arch-wire-rev::after {
+    top: -8px;
+    bottom: auto;
+    border-top-color: transparent;
+    border-bottom-color: var(--arch-accent);
+  }
+}

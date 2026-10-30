@@ -1,0 +1,96 @@
+---
+title: "Tenants and Applications"
+sidebarTitle: "Tenants and Apps"
+description: "A tenant is the organisation that owns a box. An application is a product running on it. They are separate axes, and the application is the unit of isolation."
+---
+
+> Being in the same tenant never grants access. Only a declaration does.
+
+## What it is
+
+zero-ops names two things separately:
+
+| | `tenantId` | `appId` |
+| :- | :- | :- |
+| **Names** | The organisation that owns the box | A product running on it |
+| **Identity** | An organisation in the identity provider | A project within that organisation |
+| **Namespace** | — | `tenant-<tenantId>-<appId>` |
+| **Repository** | One `<tenant>-gitops` per tenant | One directory per application |
+| **Cost attribution** | `tenant-id` label | `app-id` label |
+
+For example, a tenant `acme` running two products, `web` and `agents`, gets the namespaces `tenant-acme-web` and `tenant-acme-agents`. Both are billed to `acme`, and costs split by product.
+
+A tenant may hold several clusters. Each cluster has a **cell id**, its own name, which never stands in for the tenant.
+
+## Applications are isolated by default
+
+Each application gets its own namespace, service account, network policy, logical database and secret path. Network traffic is **default-deny**. Two applications of the same tenant are as separated from each other as two applications of different tenants.
+
+## Connecting applications
+
+### Calling another application's service
+
+An application declares the workloads it calls. From one entry the platform renders both the network rule and the URL the caller uses:
+
+```yaml
+dependsOn:
+  - app: agents
+    workload: agents-serve
+    port: 3005
+    urlEnv: [AGENTS_URL]
+```
+
+You never write a namespace. It is derived from the tenant and application, so a rename moves both ends of the call together.
+
+### Calling another application's API
+
+When one application calls another's authenticated API, **both sides declare it**:
+
+```yaml
+# caller
+identity:
+  backendDependencies: [web]
+# target
+identity:
+  allowedConsumers: [agents]
+```
+
+The platform renders the network rules in both directions and the token audience the caller needs. A build fails if only one side declares.
+
+### Sharing data
+
+Data follows the application. To let one application read another's data, the owner names its readers:
+
+```yaml
+sharedData:
+  - name: user-directory
+    owner: web
+    readers: [agents]
+```
+
+The owner keeps the database; each reader is granted a role on it.
+
+## What you need to know
+
+### Traffic between tenants is not possible
+
+Nothing in an application's configuration can name another tenant. Cross-tenant traffic has no mechanism at all.
+
+### A missing declaration hangs rather than failing
+
+Denied traffic is dropped silently. If a call hangs, check that both sides have declared the dependency.
+
+### Identity is bound to an immutable key
+
+Renaming a tenant never creates a second organisation in the identity provider. The binding between a tenant and its organisation is recorded once and never inferred from a name.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Can two applications share one database?">
+    No. One application owns each database. Others can be granted read access through `sharedData`, so a schema migration is never a negotiation between two release cycles.
+  </Accordion>
+  <Accordion title="Can I reach another tenant's application?">
+    No. There is no field in which another tenant could be named.
+  </Accordion>
+</AccordionGroup>

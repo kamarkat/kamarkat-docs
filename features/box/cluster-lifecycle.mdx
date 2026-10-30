@@ -1,0 +1,68 @@
+---
+title: "Cluster Lifecycle"
+sidebarTitle: "Cluster Lifecycle"
+description: "Day-0 creates your management cluster once, under your control. After that, every cluster is a declaration in your repository, reconciled by your own control plane."
+---
+
+> Day-0 runs once. After that, your repository is the only authority.
+
+## What it is
+
+A box comes into existence in two phases.
+
+**Day-0** creates the management cluster. The first cluster cannot reconcile itself into existence, so a command-line tool runs it from outside the box, in your own execution context (for example, a CI workflow in your organisation), against your own cloud account. It establishes trust, identity and configuration, then hands over.
+
+**Day-1 onwards** is declarative. The management cluster reconciles everything from your tenant repository, including any further clusters. Nothing is triggered and nothing is applied from outside.
+
+## Getting started
+
+### 1. Prepare a git organisation and a cloud account
+
+You supply both. Cloud credentials stay in your box and are never given to zero-ops.
+
+### 2. Scaffold your tenant repository
+
+`soloz tenant scaffold` creates `<tenant>-gitops` in your organisation. It writes only the facts unique to you: organisation, domain, region and cluster names.
+
+### 3. Run Day-0
+
+Day-0 bootstraps the management cluster in phases. Each phase records its state, so a run interrupted by a network fault resumes instead of starting over. A phase can be re-run only if it declares that re-running is safe.
+
+Day-0 commits the facts it discovers, such as the control-plane address, to your repository. That is the only write made outside a pull request.
+
+### 4. Declare workload clusters
+
+To add a workload cluster, hydrate its template into a new directory in your repository and commit it. Your control plane provisions it, and keeps it in its desired state from then on.
+
+## What you need to know
+
+### One management cluster, any number of workload clusters
+
+A tenant repository holds exactly one management cluster and any number of workload clusters, each in a directory named after it.
+
+### You name your workload clusters
+
+A workload cluster's name is chosen by you, written once, and never computed. It becomes the cluster's **cell id**, and every per-cluster identity (backup locations, labels, autoscaling targets) derives from it.
+
+### Policy attaches to cells
+
+A cell groups your clusters for policy. It holds no compute, pins no version and owns nothing. A residency policy on a cell is checked against the region of every cluster in it.
+
+### On-premises nodes are a capability
+
+You can add on-premises worker nodes to a cluster at any point in its life. They run workloads and burst capacity, never cluster-machinery state, so replacing one is a capacity operation rather than a recovery.
+
+### Spokes are not workflows
+
+A workflow provisions once and then stops caring; a controller does not. That is why workload clusters are declarations reconciled continuously, not jobs run by CI.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Do I need to run Day-0 again to add a cluster?">
+    No. Day-0 runs once, for the management cluster. Every later cluster is a declaration in your repository.
+  </Accordion>
+  <Accordion title="Can I rename a workload cluster?">
+    No. The name is the cluster's identity, and changing it would destroy what it names. Declare a new cluster instead.
+  </Accordion>
+</AccordionGroup>

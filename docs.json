@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Nutgraf",
+  "name": "zero-ops",
   "colors": {
     "primary": "#8B5CF6",
     "light": "#A78BFA",
@@ -17,7 +17,8 @@
             "group": "Overview",
             "pages": [
               "introduction/welcome",
-              "introduction/plans"
+              "introduction/architecture",
+              "introduction/support"
             ]
           }
         ]
@@ -26,20 +27,20 @@
         "tab": "Features",
         "groups": [
           {
-            "group": "Brands",
+            "group": "The Box",
             "pages": [
-              "features/brands/overview",
-              "features/brands/workspace",
-              "features/brands/stories",
-              "features/brands/schedules"
+              "features/box/overview",
+              "features/box/tenants-and-apps",
+              "features/box/bundle",
+              "features/box/cluster-lifecycle"
             ]
           },
           {
-            "group": "The Computers",
+            "group": "Capabilities",
             "pages": [
-              "features/computers/creative-studio",
-              "features/computers/product-development",
-              "features/computers/agent-collaboration"
+              "features/capabilities/overview",
+              "features/capabilities/workloads",
+              "features/capabilities/observability"
             ]
           }
         ]

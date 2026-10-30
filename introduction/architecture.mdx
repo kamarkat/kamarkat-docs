@@ -1,0 +1,205 @@
+---
+title: "BYOC architecture"
+description: "Your box runs in your own cloud account and reconciles from your own repository. zero-ops publishes versions and, once you enrol, receives control-plane facts. Nothing connects inward."
+---
+
+## Architecture overview
+
+A zero-ops deployment lives entirely in accounts you own: a git organisation that holds the desired state, and a cloud account that runs the box. The box is a management cluster running your control plane, plus the workload clusters it provisions. zero-ops delivers the platform into the box and maintains it, but holds no credential to it and never connects into it.
+
+zero-ops' side is small. A release pipeline publishes bundle versions to a registry, and a Support Plane receives control-plane facts from boxes that have enrolled for support.
+
+<div className="arch-sys not-prose">
+  <div className="arch-split">
+    <div className="arch-zone">
+      <span className="arch-zone-tab">Your git organisation and cloud account</span>
+      <div className="arch-zone-body">
+        <div className="arch-group">
+          <span className="arch-label">Your git organisation</span>
+          <div className="arch-row">
+            <div className="arch-box">
+              <span className="arch-icon arch-icon-neutral"><Icon icon="code-branch" /></span>
+              <span><strong>Tenant repository</strong><span className="arch-muted">versions and values per cluster</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon arch-icon-neutral"><Icon icon="folder-open" /></span>
+              <span><strong>Application repositories</strong><span className="arch-muted">source, chart, build</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon arch-icon-neutral"><Icon icon="robot" /></span>
+              <span><strong>Upgrade automation</strong><span className="arch-muted">proposes new versions</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon arch-icon-neutral"><Icon icon="terminal" /></span>
+              <span><strong>Day-0 runner</strong><span className="arch-muted">your CI, runs once</span></span>
+            </div>
+          </div>
+        </div>
+        <div className="arch-inline-wire">
+          <span className="arch-wire"></span>
+          <span className="arch-wire-label">Desired state</span>
+        </div>
+        <div className="arch-group arch-group-managed">
+          <span className="arch-label">Your box: delivered and maintained by zero-ops</span>
+          <span className="arch-label">Management cluster</span>
+          <div className="arch-pipe">
+            <span className="arch-chip">GitOps engine: reconciles your repository</span>
+            <span className="arch-pipe-arrow">↓</span>
+            <span className="arch-chip">Cluster lifecycle: provisions workload clusters</span>
+          </div>
+          <div className="arch-row">
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="key" /></span>
+              <span><strong>Secret store</strong></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="id-card" /></span>
+              <span><strong>Identity provider</strong></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="shield-halved" /></span>
+              <span><strong>Gateway and login</strong></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="chart-line" /></span>
+              <span><strong>Dashboards</strong><span className="arch-muted">every cluster in the box</span></span>
+            </div>
+          </div>
+          <span className="arch-label">Each workload cluster</span>
+          <div className="arch-row">
+            <div className="arch-box">
+              <span className="arch-icon arch-icon-neutral"><Icon icon="cubes" /></span>
+              <span><strong>Your applications</strong><span className="arch-muted">one namespace per app</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="shield-halved" /></span>
+              <span><strong>Gateway and login</strong></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="database" /></span>
+              <span><strong>Database</strong></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="wave-square" /></span>
+              <span><strong>Observability</strong><span className="arch-muted">metrics, logs, alerts</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="house" /></span>
+              <span><strong>On-premises nodes</strong><span className="arch-muted">optional</span></span>
+            </div>
+          </div>
+          <span className="arch-label">Every cluster</span>
+          <div className="arch-box">
+            <span className="arch-icon"><Icon icon="satellite-dish" /></span>
+            <span><strong>Support Agent</strong><span className="arch-muted">inert until you enrol</span></span>
+          </div>
+        </div>
+        <div className="arch-box">
+          <span className="arch-icon arch-icon-neutral"><Icon icon="vault" /></span>
+          <span><strong>Break-glass escrow</strong><span className="arch-muted">admin credential, outside the box</span></span>
+        </div>
+      </div>
+    </div>
+    <div className="arch-links">
+      <div className="arch-link">
+        <span className="arch-wire-label">Published bundle versions</span>
+        <span className="arch-wire arch-wire-h arch-wire-rev"></span>
+      </div>
+      <div className="arch-link">
+        <span className="arch-wire-label">Control-plane facts, when enrolled</span>
+        <span className="arch-wire arch-wire-h"></span>
+      </div>
+      <div className="arch-lock">
+        <Icon icon="lock" />
+        <span>Outbound only. zero-ops holds no credentials.</span>
+      </div>
+    </div>
+    <div className="arch-zone arch-zone-key">
+      <span className="arch-zone-tab">zero-ops</span>
+      <div className="arch-zone-body">
+        <span className="arch-label">Release</span>
+        <div className="arch-box">
+          <span className="arch-icon"><Icon icon="rocket" /></span>
+          <span><strong>Release pipeline</strong></span>
+        </div>
+        <div className="arch-box">
+          <span className="arch-icon"><Icon icon="box-archive" /></span>
+          <span><strong>Bundle registry</strong></span>
+        </div>
+        <span className="arch-label">Support</span>
+        <div className="arch-box">
+          <span className="arch-icon"><Icon icon="headset" /></span>
+          <span><strong>Support Plane</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+The diagram above shows one box. Your tenant repository is the only source of desired state. The GitOps engine on the management cluster reconciles it, and the cluster lifecycle provisions each workload cluster you declare. Your applications run on the workload clusters, each in its own namespace, alongside the gateway, database and observability stores that cluster needs. The Support Agent on each cluster is the only component that sends anything to zero-ops, and only once you enrol it.
+
+## Components
+
+### Your git organisation
+
+- **Tenant repository** (`<tenant>-gitops`): one directory per cluster, holding the bundle version that cluster runs and the values it runs with.
+- **Application repositories**: each application's source and chart. Its build publishes the chart to a registry in your organisation and commits the new version to the tenant repository.
+- **Upgrade automation**: a dependency-update bot that runs in your organisation, watches for published bundle versions and opens pull requests against your tenant repository.
+- **Day-0 runner**: your own CI, which creates the management cluster once under your credentials.
+
+### Management cluster
+
+- **GitOps engine**: reconciles everything in the box from your tenant repository.
+- **Cluster lifecycle**: provisions and maintains the workload clusters you declare.
+- **Secret store**: the box's single store for secret material. Each workload cluster pulls the secrets it needs from it.
+- **Identity provider**: one instance for the box. Each application is its own project in your organisation.
+- **Gateway and login**: authenticates browser traffic for the platform's own interfaces.
+- **Dashboards**: one view of every cluster's telemetry, querying each cluster's own stores.
+
+### Each workload cluster
+
+- **Your applications**: one namespace per application, isolated by default.
+- **Gateway and login**: public traffic for your applications terminates on the cluster that runs them.
+- **Database**: a platform-maintained database cluster. Each application receives its own empty database and role.
+- **Observability**: collection, storage and alert evaluation for that cluster.
+- **On-premises nodes** (optional): worker nodes you add for workloads and burst capacity. They never hold cluster-machinery state.
+
+### Support Agent
+
+One open-source agent runs on every cluster and does nothing until you enrol the box. Once enrolled, it sends an allowlisted set of control-plane facts, and nothing else, to the Support Plane. The allowlist is a config map in your own cluster, and `soloz support preview` shows the exact payload before anything is sent.
+
+### Break-glass escrow
+
+The box's admin credential is escrowed outside the box, in a secret store in your own cloud account. You use it only when ordinary sign-in has failed. You sign in to the box through its identity provider.
+
+### zero-ops
+
+- **Release pipeline**: builds and publishes each bundle version.
+- **Bundle registry**: holds every published version. Versions are immutable and never deleted.
+- **Support Plane**: receives enrolled boxes' control-plane facts. It is the basis of the maintenance obligation.
+
+## Connectivity model
+
+| Direction | Purpose |
+| :- | :- |
+| zero-ops → your organisation and box | Published bundle versions. Your upgrade automation proposes them, and the artefacts are mirrored into infrastructure you control. |
+| Each enrolled cluster → zero-ops | Allowlisted control-plane facts, over a mutually authenticated connection the cluster opens. |
+| zero-ops → your box | Nothing. No zero-ops component opens a connection into a box, holds a credential for one, or queries one. |
+
+Revoking enrolment stops the evidence stream. Stopping your subscription stops nothing running.
+
+## Delivery and upgrades
+
+**Day-0** runs once, from your CI, under your credentials. It creates the management cluster and commits the facts it discovers to your tenant repository. After that, **the repository is the only authority** for the box.
+
+**Platform upgrades** arrive as pull requests from your own upgrade automation, each changing one version field. A pre-flight check runs inside your box against the target cluster and reports its verdict. Nothing changes until you merge.
+
+**Application releases** follow the same shape. Your application's build publishes its chart and commits the new version to your tenant repository, and the GitOps engine deploys it.
+
+See [The Bundle and Upgrades](/features/box/bundle) and [Deploying Applications](/features/capabilities/workloads) for details.
+
+## Data residency
+
+Everything your box stores stays in your cloud account: application data, databases, secrets, identities and telemetry. Telemetry is never copied between clusters.
+
+The only data that leaves for zero-ops is the allowlisted control-plane facts of an enrolled box: the health and reconciliation state of the control plane, bundle and component versions, drift and policy violations, and upgrade outcomes. Workload data, application logs, database contents, secret material and end-user identifiers are never exported.

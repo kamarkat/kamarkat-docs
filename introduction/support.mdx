@@ -1,0 +1,70 @@
+---
+title: "Support and Maintenance"
+description: "zero-ops is free and open source. A subscription buys maintenance: tested upgrades proposed to your repository, and support grounded in the telemetry your box exports."
+---
+
+> The software is free. What you pay for is someone keeping it maintained, which is the platform engineer you would otherwise hire.
+
+## What maintenance covers
+
+Maintenance means every capability your box runs is **available, current, recoverable and correct as shipped**. Operators keep reconciling, versions stay supported, backups are taken and restorable, failover works, storage can grow and components are patched.
+
+Maintenance does not cover what you do with a capability. A slow query against a healthy database, or a misconfigured login client registered in a healthy identity provider, is yours. When a capability is working as shipped, zero-ops tells you so and helps you, but does not own the outcome.
+
+| | zero-ops maintains | You own |
+| :- | :- | :- |
+| **Database** | The engine, replicas, backups, failover | Schemas, queries, migrations, data |
+| **Identity** | The identity provider and its availability | Your users and the clients you register |
+| **Gateway** | Routing, TLS, login | Which routes and hosts your apps declare |
+| **Applications** | The platform they run on | Their code, images and configuration |
+
+## The maintenance promise
+
+zero-ops **never forces an upgrade**. You can always decline a proposal and your box keeps running.
+
+Each published version is supported for a window stated when it is published. A version then moves through four stages:
+
+| Stage | What it means |
+| :- | :- |
+| **Supported** | Full maintenance promise |
+| **Deprecated** | Still maintained, with an end date announced |
+| **Unsupported** | Best-effort answers, no undertaking about outcome |
+| **End-of-life** | No undertaking at all |
+
+None of these stages stops a cluster running. What lapses is the obligation, not the software.
+
+**Security fixes are proposed straight away** rather than waiting for the next upgrade. Each proposal states what it fixes and what declining it leaves exposed.
+
+## Support is based on evidence
+
+zero-ops cannot see into your box, and nothing it runs connects into one. Support is based on what your box **exports**:
+
+- The health and reconciliation state of the control plane
+- The platform version and the component versions it resolved to
+- Drift, policy violations and the outcome of upgrades
+
+Workload data, application logs, database contents, secrets and end-user identifiers are **never exported** for support.
+
+Collection is done by the **Support Agent**, an open-source component shipped to every cluster. It does nothing until you enrol it, it sends only an allowlisted set of control-plane facts, and you can read what it would send before it sends anything.
+
+<Note>
+A maintenance claim extends exactly as far as the telemetry you export. A box that exports nothing still receives every version and every proposal, but carries no undertaking about the outcome on its clusters.
+</Note>
+
+## What a box costs
+
+You pay your cloud provider directly for the infrastructure your box runs on. The target for a production-capable minimum box is **€150–400 per month**. This target has not been measured yet, and zero-ops will not cut replicas to meet it: a capability that needs high availability to be supportable ships highly available.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="What happens if I stop paying for maintenance?">
+    Nothing stops running. You keep your control plane, your clusters and a mirrored copy of every artefact they run. Proposals stop arriving and the version you run eventually leaves support.
+  </Accordion>
+  <Accordion title="Can I run zero-ops without a subscription?">
+    Yes. The platform is open source, and the control plane you would run is the same one zero-ops tests and publishes, not a reduced edition.
+  </Accordion>
+  <Accordion title="Does zero-ops have access to my clusters?">
+    No. zero-ops holds no cloud, cluster or secret credential of yours. Its authority ends at publishing a version; your own automation proposes it and your own control plane applies it.
+  </Accordion>
+</AccordionGroup>

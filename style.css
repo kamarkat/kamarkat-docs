@@ -368,3 +368,182 @@
     border-bottom-color: var(--arch-accent);
   }
 }
+
+/* Boundary stack: a layer list beside an isometric stack of plates. */
+
+.bstack {
+  margin: 24px 0 8px;
+  padding: 20px;
+  border: 1px solid var(--arch-border);
+  border-radius: 12px;
+  background-color: var(--arch-panel);
+  background-image: radial-gradient(var(--arch-border) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.bstack-tabs {
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding: 3px;
+  border: 1px solid var(--arch-border);
+  border-radius: 9999px;
+  background: var(--arch-surface);
+}
+
+.bstack-tab {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  color: var(--arch-text-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bstack-tab.is-active {
+  background: var(--arch-accent);
+  color: var(--arch-accent-fg);
+}
+
+.bstack-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+  gap: 24px;
+  align-items: center;
+}
+
+.bstack-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bstack-layer {
+  overflow: hidden;
+  border-left: 6px solid var(--layer);
+  border-radius: 0 10px 10px 0;
+  background: transparent;
+  transition: background-color 0.3s ease;
+}
+
+.bstack-layer.is-active {
+  background: color-mix(in srgb, var(--layer) 12%, var(--arch-surface));
+}
+
+.bstack-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.bstack-tag {
+  color: var(--layer);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.bstack-name {
+  color: var(--arch-text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.bstack-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease-out;
+}
+
+.bstack-detail > div {
+  overflow: hidden;
+}
+
+.bstack-layer.is-active .bstack-detail {
+  grid-template-rows: 1fr;
+}
+
+.bstack-desc {
+  margin: 0;
+  padding: 0 14px 10px;
+  color: var(--arch-text-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.bstack-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 14px 14px;
+}
+
+.bstack-chip {
+  padding: 3px 8px;
+  border: 1px solid var(--arch-border);
+  border-radius: 6px;
+  background: var(--arch-surface);
+  color: var(--arch-text);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.bstack-chip.is-optional {
+  border-style: dashed;
+  border-color: var(--arch-accent);
+}
+
+.bstack-visual {
+  position: relative;
+  width: 100%;
+  transition: height 0.3s ease;
+}
+
+.bstack-plate {
+  position: absolute;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  margin-left: -100px;
+  border: 2px solid var(--layer);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--layer) 14%, var(--arch-surface));
+  opacity: 0.55;
+  cursor: pointer;
+  transform: rotateX(60deg) rotateZ(-45deg);
+  transition: bottom 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bstack-plate.is-active {
+  background: color-mix(in srgb, var(--layer) 55%, var(--arch-surface));
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--layer) 20%, transparent);
+  opacity: 1;
+}
+
+.bstack-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  color: var(--arch-text-3);
+  font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bstack-layer,
+  .bstack-detail,
+  .bstack-visual,
+  .bstack-plate { transition: none; }
+}
+
+@media (max-width: 768px) {
+  .bstack-body { grid-template-columns: 1fr; }
+  .bstack-visual { order: -1; transform: scale(0.75); transform-origin: top center; }
+}

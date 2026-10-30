@@ -3,6 +3,8 @@ title: "BYOC architecture"
 description: "Your box runs in your own cloud account and reconciles from your own repository. zero-ops publishes versions and, once you enrol, receives control-plane facts. Nothing connects inward."
 ---
 
+import { BoundaryStack } from "/snippets/boundary-stack.jsx";
+
 ## Architecture overview
 
 A zero-ops deployment lives entirely in accounts you own: a git organisation that holds the desired state, and a cloud account that runs the box. The box is a management cluster running your control plane, plus the workload clusters it provisions. zero-ops delivers the platform into the box and maintains it, but holds no credential to it and never connects into it.
@@ -43,26 +45,72 @@ zero-ops' side is small. A release pipeline publishes bundle versions to a regis
           <span className="arch-label">Your box: delivered and maintained by zero-ops</span>
           <span className="arch-label">Management cluster</span>
           <div className="arch-pipe">
-            <span className="arch-chip">GitOps engine: reconciles your repository</span>
+            <span className="arch-chip">GitOps engine: reconciles your repository on every cluster</span>
+            <span className="arch-pipe-arrow">↓</span>
+            <span className="arch-chip">Composition: turns declarations into resources</span>
             <span className="arch-pipe-arrow">↓</span>
             <span className="arch-chip">Cluster lifecycle: provisions workload clusters</span>
           </div>
           <div className="arch-row">
             <div className="arch-box">
+              <span className="arch-icon"><Icon icon="gears" /></span>
+              <span><strong>Platform operator</strong><span className="arch-muted">generates secrets, renders cluster config</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="users-gear" /></span>
+              <span><strong>Tenant provisioning</strong><span className="arch-muted">organisations, projects, clients</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="server" /></span>
+              <span><strong>Control-plane API</strong><span className="arch-muted">MCP server</span></span>
+            </div>
+            <div className="arch-box">
               <span className="arch-icon"><Icon icon="key" /></span>
-              <span><strong>Secret store</strong></span>
+              <span><strong>Secret store</strong><span className="arch-muted">the box's secret material</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="right-left" /></span>
+              <span><strong>Secret delivery</strong><span className="arch-muted">store to workloads</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="fingerprint" /></span>
+              <span><strong>Cluster identity</strong><span className="arch-muted">each workload cluster's store access</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="certificate" /></span>
+              <span><strong>Certificate issuance</strong><span className="arch-muted">TLS and internal PKI</span></span>
             </div>
             <div className="arch-box">
               <span className="arch-icon"><Icon icon="id-card" /></span>
-              <span><strong>Identity provider</strong></span>
+              <span><strong>Identity provider</strong><span className="arch-muted">one per box</span></span>
             </div>
             <div className="arch-box">
               <span className="arch-icon"><Icon icon="shield-halved" /></span>
-              <span><strong>Gateway and login</strong></span>
+              <span><strong>Gateway and login</strong><span className="arch-muted">platform interfaces</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="scale-balanced" /></span>
+              <span><strong>Admission policy</strong><span className="arch-muted">what may run</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="network-wired" /></span>
+              <span><strong>Network and DNS</strong><span className="arch-muted">policy, records</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="database" /></span>
+              <span><strong>Platform database and cache</strong><span className="arch-muted">state of platform services</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="coins" /></span>
+              <span><strong>Credit Authority</strong><span className="arch-muted">per-tenant credit ledger</span></span>
             </div>
             <div className="arch-box">
               <span className="arch-icon"><Icon icon="chart-line" /></span>
-              <span><strong>Dashboards</strong><span className="arch-muted">every cluster in the box</span></span>
+              <span><strong>Observability</strong><span className="arch-muted">stores, alerts, dashboards for every cluster</span></span>
+            </div>
+            <div className="arch-box">
+              <span className="arch-icon"><Icon icon="desktop" /></span>
+              <span><strong>Cluster console</strong><span className="arch-muted">sign in with your identity</span></span>
             </div>
           </div>
           <span className="arch-label">Each workload cluster</span>
@@ -138,6 +186,16 @@ zero-ops' side is small. A release pipeline publishes bundle versions to a regis
 
 The diagram above shows one box. Your tenant repository is the only source of desired state. The GitOps engine on the management cluster reconciles it, and the cluster lifecycle provisions each workload cluster you declare. Your applications run on the workload clusters, each in its own namespace, alongside the gateway, database and observability stores that cluster needs. The Support Agent on each cluster is the only component that sends anything to zero-ops, and only once you enrol it.
 
+## Deployment boundaries
+
+Nothing in a box is deployed all at once. Each cluster is built in layers called **boundaries**, and each boundary is applied only when the one beneath it is in place. Select a layer to see what it deploys.
+
+<BoundaryStack />
+
+On the management cluster, Day-0 lays the foundation once and hands over to the GitOps engine, which then reconciles every boundary above it from your tenant repository. A workload cluster receives its foundation as it is created; from then on the management cluster delivers its platform catalog, its shared gateway and your applications.
+
+A selectable capability is part of its boundary only when you select it in your cluster's values.
+
 ## Components
 
 ### Your git organisation
@@ -149,12 +207,24 @@ The diagram above shows one box. Your tenant repository is the only source of de
 
 ### Management cluster
 
-- **GitOps engine**: reconciles everything in the box from your tenant repository.
+- **GitOps engine**: reconciles everything in the box from your tenant repository. An agent on each workload cluster applies what it is given.
+- **Composition**: turns the platform's own declarations, such as a tenant application or a database, into the resources that realise them.
 - **Cluster lifecycle**: provisions and maintains the workload clusters you declare.
-- **Secret store**: the box's single store for secret material. Each workload cluster pulls the secrets it needs from it.
+- **Platform operator**: generates platform-owned secrets and renders the configuration each workload cluster needs.
+- **Tenant provisioning**: creates each application's organisation, project and clients in the identity provider.
+- **Control-plane API**: the platform's API for managing tenant state.
+- **Secret store**: the box's single store for secret material.
+- **Secret delivery**: delivers secrets from the store to the workloads that declare them. Each workload cluster pulls only its own.
+- **Cluster identity**: gives each workload cluster its own identity for reaching the secret store.
+- **Certificate issuance**: public TLS certificates and the box's internal certificate authority.
 - **Identity provider**: one instance for the box. Each application is its own project in your organisation.
 - **Gateway and login**: authenticates browser traffic for the platform's own interfaces.
-- **Dashboards**: one view of every cluster's telemetry, querying each cluster's own stores.
+- **Admission policy**: decides what may run, including required labels and digest-pinned images.
+- **Network and DNS**: default-deny network policy and the DNS records for the box's hostnames.
+- **Platform database and cache**: state for the platform's own services.
+- **Credit Authority**: a per-tenant credit ledger with transactional guarantees.
+- **Observability**: the management cluster's own stores and alerting, plus the dashboards for every cluster in the box.
+- **Cluster console**: a web console for the clusters, signed in through the box's identity provider.
 
 ### Each workload cluster
 

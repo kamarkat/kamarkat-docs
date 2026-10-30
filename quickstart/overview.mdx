@@ -1,0 +1,39 @@
+---
+title: "Overview"
+description: "Build a zero-ops box in your own accounts and run your first application on it."
+---
+
+This quickstart takes you from empty accounts to an application served on your own domain. You run every step yourself, under your own credentials. zero-ops never holds them.
+
+## What you will build
+
+- A **tenant repository**, `<tenant>-gitops`, in your git organisation. It is the only source of desired state for your box.
+- A **management cluster** that runs your control plane.
+- A **workload cluster** that runs your applications.
+- One **application**, deployed from its own repository and served on a hostname under your domain.
+
+## How it fits together
+
+<Steps>
+  <Step title="Prerequisites">
+    Prepare a cloud account, a git organisation, a domain and an escrow, and install the `soloz` CLI.
+  </Step>
+  <Step title="Build your first cluster">
+    Create the escrow project, scaffold your tenant repository, and run Day-0 from that repository's own CI. Day-0 creates the management cluster, which then provisions the workload cluster.
+  </Step>
+  <Step title="Run your first app">
+    Declare the application in your tenant repository, supply its secrets, and let its build publish and pin its chart.
+  </Step>
+</Steps>
+
+## How long it takes
+
+Most of the time goes into Day-0, which creates real infrastructure and runs for a few hours. The steps before and after it take minutes.
+
+<Note>
+Creating clusters costs money in your cloud account. Day-0 runs only when you start it, never because a file changed.
+</Note>
+
+<Card title="Start with the prerequisites" icon="list-check" href="/quickstart/prerequisites">
+  What you need before you scaffold anything.
+</Card>

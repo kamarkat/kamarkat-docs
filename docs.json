@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "zero-ops",
+  "name": "Kamarkat",
   "colors": {
     "primary": "#8B5CF6",
     "light": "#A78BFA",
@@ -19,6 +19,35 @@
               "introduction/welcome",
               "introduction/architecture",
               "introduction/support"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Quickstart",
+        "groups": [
+          {
+            "group": "Prerequisites",
+            "pages": [
+              "quickstart/overview",
+              "quickstart/prerequisites"
+            ]
+          },
+          {
+            "group": "Build your first cluster",
+            "pages": [
+              "quickstart/prepare-escrow",
+              "quickstart/scaffold-your-repository",
+              "quickstart/bootstrap-your-box",
+              "quickstart/access-your-box"
+            ]
+          },
+          {
+            "group": "Run your first app",
+            "pages": [
+              "quickstart/declare-your-app",
+              "quickstart/supply-secrets",
+              "quickstart/deploy-your-app"
             ]
           }
         ]
@@ -55,13 +84,13 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:support@nutgraf.in"
+        "href": "mailto:support@kamarkat.in"
       }
     ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/nutgraf"
+      "x": "https://x.com/kamarkat"
     }
   }
 }

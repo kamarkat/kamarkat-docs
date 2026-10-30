@@ -1,0 +1,45 @@
+---
+title: "Access your box"
+description: "Sign in to your box as yourself, through its identity provider. Keep the admin kubeconfig for emergencies only."
+---
+
+You reach your box as a person, through its identity provider. Each person signs in as themselves, and what they can do follows the roles they hold. The cluster admin credential exists, but only as a break-glass artefact in your escrow.
+
+## Sign in
+
+Your box publishes its platform interfaces under your domain, including the cluster console and the observability dashboards. Sign in with your identity in the box's identity provider. Viewing dashboards requires the **viewer** role in the box's observability project.
+
+## Break-glass access
+
+Use the admin kubeconfig only when ordinary sign-in is not available: the identity provider is down, the cluster is broken, or nobody can sign in.
+
+```bash
+export INFISICAL_ESCROW_URL=https://app.infisical.com
+export INFISICAL_ESCROW_PROJECT_ID=<project-id>
+export INFISICAL_ESCROW_CLIENT_ID=<machine-identity-client-id>
+export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
+
+soloz kubeconfig --cluster acme-hub --out acme-hub.kubeconfig
+kubectl --kubeconfig acme-hub.kubeconfig get nodes
+```
+
+The escrow holds one kubeconfig per cluster, so pass the cluster you need.
+
+<Warning>
+The credential is cluster-admin and is not tied to a person. Use it, then discard it. Never commit it: your tenant repository ignores the paths Day-0 writes credentials to, and they must stay out of git.
+</Warning>
+
+## See what your box would report
+
+If you enrol for support, the Support Agent sends an allowlisted set of control-plane facts. You can inspect them before anything is sent:
+
+```bash
+soloz support scope     # every field that may leave this box
+soloz support preview   # the exact payload, sent nowhere
+```
+
+## Next
+
+<Card title="Declare your app" icon="cube" href="/quickstart/declare-your-app">
+  Run your first application on the box.
+</Card>

@@ -1,0 +1,83 @@
+---
+title: "Deploy your app"
+description: "Your app's build publishes its chart and commits the version to your tenant repository. That commit is the deployment."
+---
+
+Your application's repository holds its source and its chart. Its build publishes the chart to your organisation's registry, then commits the new version to the workload's `Chart.yaml` in your tenant repository. The GitOps engine deploys it on its next pass.
+
+## Step 1: Give your builds write access to the tenant repository
+
+Publish the credential your builds use, once, at the organisation level:
+
+```bash
+soloz tenant set-gitops-token --org acme-inc
+```
+
+The command reads the token from stdin, so it stays out of your shell history. Every repository in the organisation inherits it, including ones you create later.
+
+<Warning>
+On GitHub's free plan, organisation secrets reach **public** repositories only. A private repository's workflow receives an empty value and fails with *"Invalid username or token"*. On the free plan, publish per repository instead: `soloz tenant set-gitops-token --repo acme-inc/shop`, or let `--discover --gitops-repo acme-inc/acme-gitops` find the repositories whose workflows write to it.
+</Warning>
+
+## Step 2: Build your chart on the platform library
+
+Your chart depends on the `platform-workload` library chart and declares only what differs:
+
+```yaml charts/frontend/values.yaml
+tenantId: acme
+appId: shop
+workload:
+  component: frontend
+  image: {repository: ghcr.io/acme-inc/shop-frontend}
+  ports: {http: 3000}
+```
+
+```yaml charts/frontend/templates/workload.yaml
+{{ include "platform-workload.all" . }}
+```
+
+The library renders the service account, service, rollout and network policy, with admission hardening built in. The gateway routes `/` to `frontend-workload:3000` and `/api/*` to `bff-workload:3001` in your app's namespace, so keep those names.
+
+## Step 3: Publish and pin from your build
+
+Add a job to your application's CI that:
+
+1. Builds and pushes the image.
+2. Packages the chart with the image **digest** as its `appVersion`.
+3. Pushes the chart to `oci://ghcr.io/acme-inc/charts`.
+4. Clones the tenant repository with `GITOPS_TOKEN` and sets the new version in `environments/dev/shop/frontend/Chart.yaml`.
+5. Commits and pushes.
+
+```bash
+helm package charts/frontend --version "$VERSION" --app-version "$IMAGE_DIGEST"
+helm push "frontend-${VERSION}.tgz" oci://ghcr.io/acme-inc/charts
+
+git clone "https://x-access-token:${GITOPS_TOKEN}@github.com/acme-inc/acme-gitops.git" gitops
+yq -i ".dependencies[0].version = \"${VERSION}\"" gitops/environments/dev/shop/frontend/Chart.yaml
+git -C gitops commit -am "shop/frontend ${VERSION}" && git -C gitops push
+```
+
+<Note>
+Admission refuses any image referenced by tag. The digest travels inside the chart, so there is no field in your tenant repository where an image could be written.
+</Note>
+
+## Step 4: Check the deployment
+
+Once the commit lands, the GitOps engine reconciles it. Your app runs in namespace `tenant-acme-shop` on its workload cluster, and its hostname serves behind the box's login.
+
+```bash
+kubectl get pods -n tenant-acme-shop
+```
+
+To promote to another environment, commit the same version to that environment's `Chart.yaml`. To roll back, commit the previous version: it still exists in the registry.
+
+## What's next
+
+<CardGroup cols={2}>
+  <Card title="Deploying applications" icon="cubes" href="/features/capabilities/workloads">
+    Public routes, configuration and the workload library in depth.
+  </Card>
+  <Card title="Tenants and applications" icon="sitemap" href="/features/box/tenants-and-apps">
+    Connect apps to each other and share data by declaration.
+  </Card>
+</CardGroup>

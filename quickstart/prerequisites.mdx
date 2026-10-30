@@ -1,0 +1,76 @@
+---
+title: "Prerequisites"
+description: "The accounts, tools and credentials you need before you scaffold a box."
+---
+
+Everything below belongs to you. zero-ops never receives any of it: the credentials are stored as secrets on your own tenant repository and used only by your own CI.
+
+## Step 1: Prepare your accounts
+
+| Account | What it is for |
+| :- | :- |
+| **Cloud account** | Where your clusters run, and what you are billed for. The `hetzner` provider is the default. |
+| **Git organisation** | Holds your tenant repository and your application repositories, runs Day-0 in its CI, and hosts your application charts and images in its package registry. |
+| **Domain** | Every hostname in your box sits under it. Its DNS zone must be hosted with your cloud provider's DNS service, because the box creates records and proves domain ownership there for its certificates. |
+| **Escrow secret manager** | Holds your box's master keys and admin credential outside the box. See [Prepare the escrow](/quickstart/prepare-escrow). |
+| **Object storage** (recommended) | Destination for database backups. A production box without it has no backups. |
+
+## Step 2: Install the tools
+
+You need `git`, `kubectl` and the GitHub CLI `gh`, plus the `soloz` CLI.
+
+The `soloz` binary is published with each platform release. Use the version you want your box to start on:
+
+```bash
+export SOLOZ_VERSION=<version>
+curl -fsSL -o soloz \
+  "https://github.com/soloz-io/zero-ops/releases/download/v${SOLOZ_VERSION}/soloz-linux-amd64"
+chmod +x soloz && sudo mv soloz /usr/local/bin/
+soloz bundle-version
+```
+
+`soloz bundle-version` prints the platform version the binary carries.
+
+<Note>
+The release publishes a Linux amd64 binary. On other platforms, build it from source with Go: `go install github.com/soloz-io/zero-ops/cmd/soloz@v<version>`.
+</Note>
+
+## Step 3: Gather your credentials
+
+Day-0 runs under secrets stored on your tenant repository. Gather these now. You pass them to `soloz tenant scaffold`, which stores them on the repository it creates.
+
+### Required
+
+| Secret | What it is |
+| :- | :- |
+| `HCLOUD_TOKEN` | Your cloud API token, read and write. Your clusters are created with it. |
+| `GITOPS_TOKEN` | Write access to your organisation's repositories, plus the organisation's **Secrets: write** permission. Day-0 commits what it generates with it, and your application builds inherit it. |
+| `INFISICAL_ESCROW_URL`, `INFISICAL_ESCROW_PROJECT_ID`, `INFISICAL_ESCROW_CLIENT_ID`, `INFISICAL_ESCROW_CLIENT_SECRET` | Your escrow. Scaffolding refuses without them, because an escrow cannot be added after the fact. |
+
+### Required for what your box runs
+
+Scaffolding refuses if a capability your box selects has no credential.
+
+| Secret | What it is for |
+| :- | :- |
+| `INFISICAL_ADMIN_EMAIL`, `INFISICAL_ADMIN_PASSWORD` | Administering your box's own secret store. There is no default. |
+| `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Backups of the platform database. |
+| `GHCR_USERNAME`, `GHCR_TOKEN` | Pulling your own private images. The platform's images are public. |
+
+### Optional
+
+| Secret | What it is for |
+| :- | :- |
+| `GRAFANA_IRM_ALERTMANAGER_URL`, `GRAFANA_IRM_HEARTBEAT_URL` | Where critical and warning alerts page you, and a heartbeat that pages when the management cluster stops reporting. Metrics, logs and dashboards run in the box without them. |
+| `ZITADEL_SMTP_URL` | Outbound mail for identity messages and alert email. |
+| `TS_AUTHKEY` | Only if the box accepts nodes on your own premises, which join over your tailnet. |
+
+<Tip>
+Export each value as an environment variable of the same name in the shell you will scaffold from. The scaffold reads them from there and stores them on your repository. It never prints or keeps them.
+</Tip>
+
+## Next
+
+<Card title="Prepare the escrow" icon="vault" href="/quickstart/prepare-escrow">
+  Create the project your box's master keys are escrowed to.
+</Card>

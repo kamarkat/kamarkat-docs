@@ -1,0 +1,90 @@
+---
+title: "Bootstrap your box"
+description: "Day-0 runs in your repository's own CI. It builds the management cluster, waits for it to converge, and brings up your workload cluster."
+---
+
+Day-0 runs as the **Bootstrap cluster** workflow in your tenant repository, on your organisation's runners, under the secrets you stored there. It is pinned to the platform version your repository was scaffolded on, so a later change to the platform cannot change how your repository bootstraps.
+
+## Step 1: Start Day-0
+
+The scaffold starts it for you. To start it yourself, for example after setting a missing secret:
+
+```bash
+gh workflow run bootstrap-cluster.yml --repo acme-inc/acme-gitops
+```
+
+You can also start it from **Actions** › **Bootstrap cluster** › **Run workflow** in your repository. Its inputs default to what you scaffolded:
+
+| Input | Meaning |
+| :- | :- |
+| `cluster` | The cluster to bootstrap, as named under `registry/clusters/` |
+| `provider`, `region`, `environment` | Where and what it is |
+| `workers` | Cloud worker nodes; defaults to the cluster's `values.yaml` |
+| `on-prem`, `tailnet` | Accept nodes on your own premises, joining over your tailnet |
+
+## Step 2: Follow the run
+
+```bash
+gh run watch --repo acme-inc/acme-gitops
+```
+
+The run takes a few hours. It works through these stages, and each must succeed before the next starts:
+
+<Steps>
+  <Step title="Fetch the platform CLI">
+    Downloads the `soloz` release for your version and checks that it reports that version.
+  </Step>
+  <Step title="Check the declaration">
+    Validates your repository before anything is created.
+  </Step>
+  <Step title="Bootstrap the management cluster">
+    Creates the cluster and builds its foundation in phases: secret store, PKI, bootstrap secrets, GitOps engine, platform. Each phase records its state, so a re-run resumes rather than starting over.
+  </Step>
+  <Step title="Verify the management cluster converges">
+    Waits for every platform boundary to become healthy, within a fixed budget.
+  </Step>
+  <Step title="Bring up the workload cluster">
+    The management cluster provisions the workload cluster your repository declares.
+  </Step>
+  <Step title="Validate the platform">
+    Runs the platform's validation and publishes the record as a run artefact.
+  </Step>
+</Steps>
+
+Day-0 commits the facts it discovers, such as the control-plane address, back to your repository. That is the only write made outside a pull request.
+
+## Step 3: Confirm convergence
+
+If the run ends before the management cluster converges, it prints the command to wait for it:
+
+```bash
+soloz verify --cluster acme-hub --timeout 15m
+```
+
+`soloz verify` reports what is still outstanding if the budget runs out.
+
+<Tip>
+If a run fails part-way, fix the cause and start the workflow again. Phases that completed are not repeated, and a phase that is not safe to repeat refuses to resume rather than running twice.
+</Tip>
+
+## Adding more workload clusters later
+
+A further workload cluster is a declaration, not another Day-0. From your tenant repository:
+
+```bash
+soloz tenant add-cluster \
+  --mgmt-cluster acme-hub \
+  --name acme-02 \
+  --tenant acme \
+  --bundle-version <version> \
+  --gitops-repo-url https://github.com/acme-inc/acme-gitops
+git add registry && git commit -m "Declare acme-02" && git push
+```
+
+The name you choose becomes the cluster's cell id for its whole life. The management cluster provisions it from the commit.
+
+## Next
+
+<Card title="Access your box" icon="right-to-bracket" href="/quickstart/access-your-box">
+  Sign in, and know where break-glass access is.
+</Card>

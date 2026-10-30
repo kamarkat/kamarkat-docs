@@ -1,6 +1,6 @@
-# Nutgraf Documentation
+# Kamarkat Documentation
 
-Official documentation for Nutgraf — an agentic multi-brand building platform.
+Official documentation for zero-ops — an open-source platform a startup runs its business on, delivered into a box in its own cloud account.
 
 Built with [Mintlify](https://mintlify.com).
 

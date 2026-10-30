@@ -1,0 +1,97 @@
+---
+title: "Declare your app"
+description: "An application becomes real when its values file exists in your tenant repository. It then gets a namespace, a database, a login client and its hostnames."
+---
+
+An application is declared in your tenant repository, one directory per application per environment:
+
+```text
+environments/<env>/<app>/
+├── values.yaml           what the app is: tenant, app, cell, hosts, capabilities
+├── frontend/Chart.yaml   one directory per workload, naming its chart version
+└── bff/Chart.yaml
+```
+
+The platform reconciles every `environments/*/*/values.yaml`, so the file existing is what makes the app real.
+
+## Step 1: Create the app's values file
+
+Copy the template and fill it in:
+
+```bash
+mkdir -p environments/dev/shop
+cp templates/fleet/values.yaml environments/dev/shop/values.yaml
+```
+
+```yaml environments/dev/shop/values.yaml
+tenantId: acme          # the organisation that owns the box, the same in every app
+appId: shop             # this product; it gets namespace tenant-acme-shop
+cellId: acme-01         # the workload cluster it runs on
+
+public:
+  hosts:
+    - shop.dev.acme.example
+
+database:
+  enabled: true         # an empty database and a role, owned by this app
+
+resourceQuota:
+  cpu: "1000m"
+  memory: "2Gi"
+  storage: "10Gi"
+  pods: "5"
+
+ownerEmail: platform@acme.example
+
+config: {}              # non-secret values your workloads read
+secrets: []             # secrets you supply; see "Supply your secrets"
+```
+
+| Field | Meaning |
+| :- | :- |
+| `tenantId` | Your organisation. The same value in every app's file. |
+| `appId` | The product, and its isolation unit. It never defaults to `tenantId`. |
+| `cellId` | Must match the workload cluster's name, or nothing is generated for the app. |
+| `public.hosts` | Public hostnames. An empty list publishes nothing. |
+| `database.enabled` | Provisions the app's own database and role. |
+
+## Step 2: Add a directory per workload
+
+Each workload directory holds one chart dependency. Copy the template once per workload:
+
+```bash
+mkdir -p environments/dev/shop/frontend
+cp templates/workload/Chart.yaml environments/dev/shop/frontend/Chart.yaml
+```
+
+```yaml environments/dev/shop/frontend/Chart.yaml
+apiVersion: v2
+name: frontend
+type: application
+version: 1.0.0
+dependencies:
+  - name: frontend
+    repository: oci://ghcr.io/acme-inc/charts
+    version: 0.0.1-rc.awaiting-ci
+```
+
+The placeholder version cannot resolve, on purpose. An empty dependency list would render nothing and report healthy, hiding a workload that never deployed. Your app's first build replaces it.
+
+## Step 3: Publish the hostnames and commit
+
+Your workload cluster has one shared gateway whose listeners come from every app's `public.hosts`. Regenerate it, then commit:
+
+```bash
+soloz fleet hosts aggregate
+git add environments registry
+git commit -m "Declare shop"
+git push
+```
+
+A preflight check fails review if the aggregate does not match the declarations, so a forgotten step cannot become a hostname that never resolves.
+
+## Next
+
+<Card title="Supply your secrets" icon="key" href="/quickstart/supply-secrets">
+  Give the app the secrets only you can choose.
+</Card>

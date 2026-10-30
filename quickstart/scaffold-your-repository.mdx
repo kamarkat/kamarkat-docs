@@ -1,0 +1,88 @@
+---
+title: "Scaffold your repository"
+description: "Create your tenant repository from the platform template, store your credentials on it, and start Day-0."
+---
+
+`soloz tenant scaffold` creates `<org>/<tenant>-gitops` in your organisation and renders it from the platform template. It writes only the facts unique to you: your organisation, domain, region and cluster names. Scaffolding happens once; every change after it is a commit or a pull request.
+
+## Step 1: Preview what you will receive
+
+A dry run renders the repository locally and creates nothing:
+
+```bash
+soloz tenant scaffold \
+  --tenant acme \
+  --org acme-inc \
+  --domain acme.example \
+  --region hel1 \
+  --environment dev \
+  --dry-run
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--tenant` | Your tenant identifier, lower-case. It names the repository and your box. |
+| `--org` | The git organisation the repository is created in. |
+| `--domain` | Your base domain. |
+| `--subdomain` | Optional. A DNS label every hostname sits under; empty publishes on the apex. |
+| `--provider` | `hetzner` (default), or `hybrid` for nodes on your own premises. |
+| `--region` | The cloud region your clusters run in. |
+| `--environment` | The environment slug, such as `dev` or `prod`. |
+| `--workers` | Cloud worker nodes the box starts with. Defaults to 2. |
+| `--cluster` | The management cluster's name. Defaults to `<tenant>-hub`. |
+| `--bundle-version` | The platform version the box starts on. Defaults to the version the CLI carries. |
+
+## Step 2: Scaffold and store your credentials
+
+Run the same command without `--dry-run`, from a shell where you exported your [credentials](/quickstart/prerequisites#step-3-gather-your-credentials):
+
+```bash
+soloz tenant scaffold \
+  --tenant acme \
+  --org acme-inc \
+  --domain acme.example \
+  --region hel1 \
+  --environment dev \
+  --escrow-url "$INFISICAL_ESCROW_URL" \
+  --escrow-project-id "$INFISICAL_ESCROW_PROJECT_ID" \
+  --escrow-client-id "$INFISICAL_ESCROW_CLIENT_ID" \
+  --escrow-client-secret "$INFISICAL_ESCROW_CLIENT_SECRET"
+```
+
+The scaffold then:
+
+1. Creates and pushes `acme-inc/acme-gitops`.
+2. Prompts for any of `HCLOUD_TOKEN`, `GITOPS_TOKEN` or `TS_AUTHKEY` you did not supply, with echo disabled.
+3. Verifies the escrow, and refuses if a capability your box selects has no credential.
+4. Stores every credential as a secret on the new repository.
+5. Starts the **Bootstrap cluster** workflow on it.
+
+```text
+[scaffold] created acme-inc/acme-gitops
+[scaffold] pushed to https://github.com/acme-inc/acme-gitops
+[scaffold] bootstrap dispatched on acme-inc/acme-gitops
+  https://github.com/acme-inc/acme-gitops/actions/workflows/bootstrap-cluster.yml
+```
+
+<Note>
+If a credential is missing, the scaffold creates the repository and prints the exact `gh secret set` commands to finish, followed by the command that starts Day-0. Nothing runs until they are set.
+</Note>
+
+## What is in your repository
+
+```text
+acme-gitops/
+├── registry/clusters/<cluster>/   one directory per cluster: bundle.yaml (version), values.yaml (yours)
+├── environments/<env>/<app>/      one directory per application, added in "Run your first app"
+├── templates/                     what you copy to add a cluster, an app or a workload
+├── scripts/seed-secrets.sh        first-time secret supply for an app
+└── renovate.json                  proposes new platform versions as pull requests
+```
+
+`bundle.yaml` changes only through upgrade proposals. `values.yaml` holds only what you change from the defaults.
+
+## Next
+
+<Card title="Bootstrap your box" icon="play" href="/quickstart/bootstrap-your-box">
+  Follow Day-0 as it builds your clusters.
+</Card>

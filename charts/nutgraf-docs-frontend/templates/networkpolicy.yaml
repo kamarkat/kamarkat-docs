@@ -1,0 +1,21 @@
+{{/*
+Default-deny egress with nothing allowed (ADR-021).
+
+This workload serves files and calls nothing: the browser reaches the API
+through the gateway, never through this pod. An empty allowlist states that --
+and makes any future outbound call a visible change rather than an accident.
+*/}}
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: {{ include "nutgraf-docs-frontend.workload" . }}-egress
+  labels:
+    {{- include "nutgraf-docs-frontend.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  endpointSelector:
+    matchLabels:
+      {{- include "nutgraf-docs-frontend.selectorLabels" . | nindent 6 }}
+  egress:
+    - {}

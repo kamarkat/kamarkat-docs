@@ -1,0 +1,66 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Nutgraf",
+  "colors": {
+    "primary": "#8B5CF6",
+    "light": "#A78BFA",
+    "dark": "#7C3AED"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Introduction",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "introduction/welcome",
+              "introduction/plans"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Features",
+        "groups": [
+          {
+            "group": "Brands",
+            "pages": [
+              "features/brands/overview",
+              "features/brands/workspace",
+              "features/brands/stories",
+              "features/brands/schedules"
+            ]
+          },
+          {
+            "group": "The Computers",
+            "pages": [
+              "features/computers/creative-studio",
+              "features/computers/product-development",
+              "features/computers/agent-collaboration"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@nutgraf.in"
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/nutgraf"
+    }
+  }
+}

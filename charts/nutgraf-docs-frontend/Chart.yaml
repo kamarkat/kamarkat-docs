@@ -1,0 +1,13 @@
+# nutgraf docs SPA chart (ADR-073): the tenant's GitOps repository pins this chart's
+# version and nothing else.
+#
+# Named nutgraf-docs-frontend, not frontend: charts share one OCI repository and
+# `frontend` is waypoint's. The WORKLOAD is still `frontend-workload`, because
+# the gateway derives that name -- see _helpers.tpl.
+apiVersion: v2
+name: nutgraf-docs-frontend
+description: nutgraf docs SPA -- nginx serving the Mintlify static export
+type: application
+version: 0.1.0
+# The image DIGEST, stamped by CI.
+appVersion: "placeholder"

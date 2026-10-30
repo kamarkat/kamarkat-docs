@@ -1,0 +1,72 @@
+---
+title: "Product Development"
+description: "Product Development is the code Computer. Describe the app you want to build, and multi-agents using a computer scaffold, write, and test it — with the result visible on a live interactive preview canvas as work progresses."
+---
+
+> Product Development is the code Computer. Describe the app you want to build, and multi-agents using a computer scaffold, write, and test it — with the result visible on a live interactive preview canvas as work progresses.
+
+## What it is
+
+Product Development is the app-building capability inside Nutgraf. An orchestrator agent breaks down your description and delegates implementation to a coder agent. Both operate using a computer with a persistent workspace. The result appears on a live preview canvas you can interact with in real time — not a screenshot, but the running application.
+
+This Computer builds web and mobile apps from a natural-language starting point. You describe what you want, review the plan the orchestrator produces, and watch the agents build it. When you want changes, you describe them conversationally and the agents update the build.
+
+## Getting Started: Your First App in Minutes
+
+### 1. Select the Code Computer
+
+Open the input bar inside your Brand and click **+**. Select **Code** from the options. A tooltip confirms what Code does: "Build and edit a mobile or web app, with its screens live on the preview canvas." The input bar updates to show the Code Computer is active.
+
+### 2. Describe the app
+
+Type a description of what you want to build. Include the key screens, core functionality, and any specific requirements. For example: "A two-screen app. First screen shows a list of today's top AI stories with a brief summary each. Second screen opens the full story with a share button." The more detail you provide upfront, the closer the first build is to your intent.
+
+### 3. Review the architecture plan
+
+Before writing code, the orchestrator agent presents a development plan: the screens it will build, the data structure it will use, and the approach it plans to take. Review this plan and confirm it matches your intent. This is your opportunity to catch misalignments before implementation begins.
+
+### 4. Watch the agents build
+
+Once you approve the plan, the coder agent begins implementation. The preview canvas updates in real time as screens are scaffolded and wired together. You can interact with the app on the canvas while the agents are still working — clicking through screens, testing interactions, and identifying anything that needs adjustment.
+
+### 5. Iterate with natural language
+
+When you want a change, describe it conversationally. "Move the share button to the top right of the second screen" or "Add a loading state when the stories are fetching." The coder agent makes the targeted change and the preview canvas updates. You do not need to write or edit any code.
+
+## What You Need to Know
+
+### Live preview canvas
+
+The preview canvas renders the application as the agents build it. It is interactive — you can navigate screens, tap controls, and test the app's behaviour in real time. The canvas updates automatically after each change the agents make.
+
+### Persistent workspace
+
+The Computer maintains a persistent workspace for each Code session. If you close the browser, the agents' work is preserved. Return to the story tab and the current state of the application is exactly as you left it.
+
+### What the agents can build
+
+The Code Computer builds web and mobile apps using standard component libraries. It handles frontend screens, navigation, state management, and mock data. Backend integrations and live data connections are outside the current scope.
+
+## Tips
+
+- **Describe screens, not code.** "A settings screen with toggle switches for notifications and dark mode" is the right level of detail. Technical implementation is the agents' job.
+- **Approve the architecture plan before the agents build.** A misunderstood requirement is cheaper to fix in the plan than in working code.
+- **Use the canvas to test before requesting changes.** Interacting with the app yourself often reveals issues faster than reviewing code.
+- **Request one change at a time for complex modifications.** Batching many changes in one message works for small tweaks, but large structural changes are easier to review individually.
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Can the app connect to real data sources or APIs?">
+    The current version of the Code Computer builds apps with mock or static data. Live API integrations are not supported in this release.
+  </Accordion>
+  <Accordion title="How do I export or download the built app?">
+    Completed apps are available for download from the story session. The agents produce a deployable build as part of the run.
+  </Accordion>
+  <Accordion title="Can I continue building on an app from a previous session?">
+    Yes. Each Code session has a persistent workspace. Open the story from the Stories bar and continue the conversation — the agents resume from the current state of the application.
+  </Accordion>
+  <Accordion title="What happens if the agents misunderstand my description?">
+    Review the architecture plan before approving it. If the plan does not match your intent, describe the correction in the conversation and the orchestrator will revise the plan before implementation begins.
+  </Accordion>
+</AccordionGroup>

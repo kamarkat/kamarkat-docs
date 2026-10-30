@@ -1,0 +1,108 @@
+name: docs-frontend
+
+# Build the image, publish the chart, pin the version.
+#
+# The documentation site is Mintlify, served as docs's own app behind its
+# own gateway. It must render as frontend-workload:3000 -- a name the platform
+# derives, not one this repo chooses.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, 'feat/**']
+    paths-ignore:
+      - 'README.md'
+      - '.agents/**'
+      - 'AGENTS.md'
+      - 'skills-lock.json'
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/soloz-io/docs/nutgraf-docs-frontend
+  CHART_REGISTRY: oci://ghcr.io/soloz-io/charts
+  CHART_DIR: charts/nutgraf-docs-frontend
+  GITOPS_REPO: soloz-io/nutgraf-gitops
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    outputs:
+      chart-version: ${{ steps.version.outputs.chart-version }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=gha,scope=docs-frontend
+          cache-to: type=gha,mode=max,scope=docs-frontend
+
+      - id: version
+        run: |
+          BASE=$(yq '.version' "${CHART_DIR}/Chart.yaml")
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          echo "chart-version=${BASE}-rc.${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Package and push the chart
+        run: |
+          echo "${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}" \
+            | helm registry login ghcr.io --username "${{ github.actor }}" --password-stdin
+          helm package "${CHART_DIR}" \
+            --version "${{ steps.version.outputs.chart-version }}" \
+            --app-version "${{ steps.build.outputs.digest }}"
+          helm push "nutgraf-docs-frontend-${{ steps.version.outputs.chart-version }}.tgz" "${CHART_REGISTRY}"
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev]
+    steps:
+      - name: Pin the version in the tenant's GitOps repository
+        env:
+          GITOPS_TOKEN: ${{ secrets.GITOPS_TOKEN }}
+          VERSION: ${{ needs.publish.outputs.chart-version }}
+          ENVIRONMENT: ${{ matrix.environment }}
+        run: |
+          test -n "${GITOPS_TOKEN}" || {
+            echo "GITOPS_TOKEN is not set on this repository." >&2
+            echo "The image and chart are published; only the pin is missing." >&2
+            exit 1
+          }
+          git clone --depth 1 \
+            "https://x-access-token:${GITOPS_TOKEN}@github.com/${GITOPS_REPO}.git" /tmp/gitops
+          cd /tmp/gitops
+
+          CHART="environments/${ENVIRONMENT}/docs/frontend/Chart.yaml"
+          test -f "$CHART" || { echo "no such chart: $CHART" >&2; exit 1; }
+          yq -i "(.dependencies[] | select(.name == \"nutgraf-docs-frontend\")).version = \"${VERSION}\"" "$CHART"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$CHART"
+          git diff --cached --quiet && exit 0
+
+          git commit -m "chore(nutgraf-docs-frontend): ${ENVIRONMENT} to chart ${VERSION}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push && exit 0
+            sleep $((RANDOM % 5 + 1))
+          done
+          exit 1

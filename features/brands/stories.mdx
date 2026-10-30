@@ -1,0 +1,104 @@
+---
+title: "Stories"
+description: "Stories organize every Brand conversation and Computer run into a daily session bar. Status colors and badge indicators show at a glance what is working, what is ready, and where your input is needed."
+---
+
+> Stories organize every Brand conversation and Computer run into a daily session bar. Status colors and badge indicators show at a glance what is working, what is ready, and where your input is needed.
+
+## What it is
+
+The Stories bar sits at the top of your Brand workspace, grouped by date. Each circular item represents an active or past session — either your ongoing conversation with the Brand, or a Computer run (such as Creative Studio or Product Development) producing a specific outcome.
+
+Every story communicates two independent signals without requiring you to open it:
+
+1. **The icon color reflects execution state** — whether a Computer is currently running, completed, stopped, or encountered an error.
+2. **The badge dot indicates unread activity** — alerting you when an agent asked a question, requested an approval, completed a deliverable, or reported a failure.
+
+| Indicator | Visual | Meaning | Action Expected |
+| :- | :- | :- | :- |
+| **Ready** | Green icon | Output delivered (video rendered, app built) | Open to review or use the result |
+| **Working** | Amber icon | Computer is actively executing in the background | None; production is underway |
+| **Failed** | Red icon | The latest background job encountered an error | Open to inspect the issue |
+| **Stopped** | Grey icon | Inactive session with no running computer | Open to resume work |
+| **Badge** | Dot on avatar | New unread activity or pending user input | Open to answer or catch up |
+
+## How to use it
+
+### Reading the Stories bar
+
+The Stories bar displays your sessions in chronological order from left to right. The pinned first entry is your direct Brand conversation. Every subsequent bubble represents a Computer run, labeled with its topic or project name.
+
+### Identifying sessions that need attention
+
+Scan the bar for the **badge dot**. A badge appears on the bottom-right corner of a story bubble whenever that session requires your attention or holds fresh updates. Hover over any story bubble to see its full title in a tooltip.
+
+### Opening and resuming a session
+
+Click any story bubble to open that session. The conversation history, generated media, and live preview canvas load immediately. Opening a story marks all its notifications as seen and dismisses the badge dot.
+
+### Navigating between days
+
+Use the date controls at the top right of the bar to navigate to previous days. Each day retains its complete history of runs and conversations, allowing you to review past deliverables or continue earlier threads.
+
+## What You Need to Know
+
+### When the badge appears
+
+The badge dot appears exclusively when a session holds activity you have not seen yet:
+
+- **Agent questions (`ask_user`)**: The agent paused execution and is waiting for your direct response or design decision.
+- **Approval checkpoints**: The multi-agent workflow reached a milestone requiring your explicit sign-off before proceeding.
+- **New agent replies**: An agent finished its turn and delivered a new response in that conversation.
+- **Job completions**: A background job completed and delivered its outcome into the session (for example, a finished video draft or a scaffolded app).
+- **Job failures**: A background job encountered an error and reported the failure into the session for your review.
+- **Activity while away**: Any update that arrived while you were in a different Brand or offline appears with a badge when you return.
+
+### What does not trigger a badge
+
+To prevent unnecessary alerts, internal platform events do not raise a badge:
+- Background computer start-ups and shutdowns do not trigger a badge (they only update the icon color).
+- Internal file writes and scaffolding steps do not trigger a badge.
+- Internal communication between subagents does not trigger a badge.
+
+### How the badge clears
+
+- **Opening the story**: Clicking and opening a story records that session as seen up to that moment, clearing the badge dot.
+- **Active on screen**: If a story is already open and visible on your screen, incoming messages and updates are marked seen immediately and do not raise a badge.
+- **Client persistence**: Your seen record is stored in your browser session. A question you already viewed will not badge again unless a new reply or notification arrives.
+
+### Story types
+
+| Tab Indicator | What It Represents |
+| :- | :- |
+| **★ Brand** | Direct conversation with the Brand agent for brief updates and direction |
+| **Video** | A Creative Studio run producing a video from a brief or topic |
+| **Code** | A Product Development run building an application |
+
+Scheduled tasks automatically appear as new story bubbles when their fire time arrives. Each scheduled run starts an independent Video or Code story scoped to that build. See [Scheduled Tasks](/features/brands/schedules) for details on setting up recurring runs.
+
+## Tips
+
+- **Look for red or badged bubbles first.** A red icon indicates a stopped job needing review; a badge indicates an agent waiting on your decision.
+- **Keep story titles descriptive.** Specific topics like *"Q3 SaaS metrics explainer"* make identifying individual runs on the bar effortless.
+- **Use the Brand conversation for strategy, Computers for deliverables.** Use the pinned Brand tab to refine briefs and plan campaigns, and launch Computers for actual production runs.
+- **Check previous days for context.** Past stories remain permanently accessible so you can branch new ideas from completed builds.
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Why is my story green with a badge dot?">
+    Green indicates that your Computer run completed its deliverable (such as a finished video render). The badge dot means the completion notification arrived and you have not opened the story to review it yet. Opening the story clears the badge.
+  </Accordion>
+  <Accordion title="Does a badge stay if I leave a question unanswered?">
+    Opening the story marks the question as seen and dismisses the badge dot. The badge will not reappear for that same question, but will trigger again if the agent sends a follow-up notification or message.
+  </Accordion>
+  <Accordion title="Can multiple Computer runs happen simultaneously in Stories?">
+    Yes. You can have multiple Computer runs active at the same time across different story tabs. Amber icons show which runs are currently working in the background, and badges will notify you as each finishes.
+  </Accordion>
+  <Accordion title="Do stories expire or get archived automatically?">
+    No. Stories persist permanently within the Brand. You can navigate back to any date to review past runs, inspect outputs, or continue refining deliverables.
+  </Accordion>
+  <Accordion title="Why did my story icon turn grey?">
+    A grey icon indicates a stopped session where no computer is actively running and no deliverable is ready. Opening the story allows you to resume the conversation and restart execution.
+  </Accordion>
+</AccordionGroup>

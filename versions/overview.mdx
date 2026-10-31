@@ -7,36 +7,23 @@ description: "One version names the whole platform: the bundle chart, the CLI th
 
 ## What it is
 
-A release publishes one semantic version, such as `0.1.15`. The same string names every part of the release, so the parts cannot disagree.
+A release publishes one semantic version, such as `0.1.15`. The same string names every part of the release.
 
-| Part of a release | Where it is published | What it is for |
-| :- | :- | :- |
-| **Bundle chart** | `oci://ghcr.io/soloz-io/charts/environment-manager` | The whole platform. Every cluster pins a version of it. |
-| **`soloz` CLI** | Release assets for `darwin` and `linux`, `amd64` and `arm64` | Scaffolds and bootstraps a box on the version it carries. |
-| **Release notes** | The release page for tag `v0.1.15` | What the version spans, whether it is reversible, and its lifecycle dates. |
-| **Third-party inputs** | Release asset `third-party-charts-<version>.tar.gz` | The exact upstream charts the bundle was built from. |
+| Part of a release | Where it is published |
+| :- | :- |
+| **Bundle chart** | `oci://ghcr.io/soloz-io/charts/environment-manager` |
+| **`soloz` CLI** | Release assets `soloz-darwin-amd64`, `soloz-darwin-arm64`, `soloz-linux-amd64` and `soloz-linux-arm64` |
+| **Release notes** | The release page for tag `v<version>` on `soloz-io/zero-ops` |
+| **Third-party inputs** | Release asset `third-party-charts-<version>.tar.gz`: the upstream charts the bundle was built from |
+| **Component inventory** | `components.json` inside the bundle chart, also attached to the release |
 
-A published version is immutable. It is never re-published, re-pointed or deleted. A defective version is replaced by a newer one.
+A published version is immutable. It is never re-published, re-pointed or deleted. A defective version is superseded by a newer one.
 
 ## How it works
 
 ### What a version carries
 
-The bundle chart renders three layers from one version:
-
-<CardGroup cols={3}>
-  <Card title="Cluster machinery" icon="gears">
-    What every box runs: the GitOps engine, composition, secret delivery, certificates, identity, gateway and admission policy.
-  </Card>
-  <Card title="Capabilities" icon="puzzle-piece">
-    The platform tools you select in a cluster's values, such as the database and observability.
-  </Card>
-  <Card title="Workload infrastructure" icon="layer-group">
-    What your applications rest on: namespaces, access rules, secret bindings, gateways and TLS.
-  </Card>
-</CardGroup>
-
-Selecting a capability is a value, not a version. Adopting a capability and upgrading a version are separate changes.
+The bundle chart renders the platform's cluster machinery, the capabilities you select in a cluster's values, and the infrastructure your applications rest on: namespaces, access rules, secret bindings, gateways and TLS. Selecting a capability is a value, not a version, so adopting a capability and upgrading a version are separate changes.
 
 ### Where a cluster records its version
 
@@ -53,31 +40,31 @@ sources:
           value: "0.1.15"
 ```
 
-`targetRevision` and `bundleVersion` always carry the same version. Upgrade proposals change both together. Your settings live beside this file, in `values.yaml`, and no upgrade ever writes to it.
+`targetRevision` and `bundleVersion` carry the same version and change together. Your settings live beside this file, in `values.yaml`.
 
 ### Where the first version comes from
 
-The `soloz` CLI carries its version, and `soloz tenant scaffold` pins your management cluster to it unless you pass `--bundle-version`. Check what a binary carries with:
+The `soloz` CLI carries its version. `soloz tenant scaffold` pins your management cluster to it unless you pass `--bundle-version`. Check what a binary carries with:
 
 ```bash
 soloz bundle-version
 ```
 
-A binary that prints `development` was built without a release version, and you cannot use it to build a box from a published release.
+A binary that prints `development` was built without a release version.
 
 ## What you need to know
 
 ### Releases and prereleases
 
-A release such as `0.1.15` is what your clusters run. A prerelease such as `0.1.16-rc.1` uses the same path as a release, so Kamarkat can test that path before it publishes the release. A prerelease does not use up the release number.
+A prerelease such as `0.1.16-rc.1` is built and published through the same path as a release. It is a distinct version, so publishing it does not use up the release number.
 
 ### Gaps in version numbers
 
-A release that publishes anything uses up its version, even if it fails part-way. The next attempt takes the next number. A gap only means a release was attempted.
+A release that publishes anything uses up its version, even if it fails part-way. The next attempt takes the next number.
 
 ### Supported environments and providers
 
-Each version states which combinations of environment and provider it supports. Any other combination fails at render time, with the reason.
+The bundle chart declares which combinations of environment and provider it supports. Any other combination is refused when the chart renders.
 
 | Environment | `hetzner` | `hybrid` |
 | :- | :- | :- |
@@ -85,29 +72,20 @@ Each version states which combinations of environment and provider it supports. 
 | `stg` | Supported | Not supported |
 | `prod` | Supported | Not supported |
 
-Use `hybrid` for development only: its capacity comes from your own machines and its platform database uses node-local storage. Staging runs on the same provider as production, so it tests the failures production can have.
-
 ### Components move only with the bundle
 
-A version pins a tested combination of components. A newer upstream release is not a reason to move, and no component is upgraded on its own. Every combination a cluster runs was tested as a whole.
-
-## Tips
-
-- **Pin the CLI to the version you scaffold with.** The binary's version becomes your management cluster's first version.
-- **Read the release notes, not the component list.** They state what the version spans and whether it can be reverted.
-- **Keep staging on `hetzner`.** It is the only provider supported for both staging and production.
-- **Leave defaults to the bundle.** A default that improves in a new version reaches you only if your values file doesn't override it.
+No component is upgraded on its own. A new version is published with the new set, and that version is what a cluster moves to.
 
 ## Frequently asked questions
 
 <AccordionGroup>
   <Accordion title="Can I upgrade a single component?">
-    No. Components move only as part of a new version, so every combination a cluster runs was tested as a whole first.
+    No. Components move only as part of a new version.
   </Accordion>
   <Accordion title="Do all my clusters have to run the same version?">
-    No. Each cluster pins its own version, so you can move a development cluster first and production later.
+    No. Each cluster pins its own version in its own `bundle.yaml`.
   </Accordion>
-  <Accordion title="Should I run a prerelease?">
-    No. Prereleases are for testing the released path before a release is published. Pin your clusters to releases.
+  <Accordion title="Where do I see what a version installs?">
+    Under **Releases** in this tab. Each version lists every component it installs, by cluster and node role, and what changed from the version before it.
   </Accordion>
 </AccordionGroup>

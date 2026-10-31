@@ -72,11 +72,7 @@ def jsx(name: str, value) -> str:
 
 def release_page(r: dict, line: str) -> str:
     v = r["version"]
-    lead = (
-        f"Every component bundle version `{v}` installs, on which nodes, at what version."
-        if "-" not in v else
-        f"Every component prerelease `{v}` installs. Prereleases test the release path; pin your clusters to releases."
-    )
+    lead = f"Every component {'prerelease' if '-' in v else 'bundle version'} `{v}` installs, on which nodes, at what version."
     since = f" since `{r['previous']}`" if r.get("previous") else ""
     return f"""---
 title: "{v}"

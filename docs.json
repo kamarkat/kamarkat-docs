@@ -90,9 +90,7 @@
             "group": "Versions",
             "pages": [
               "versions/overview",
-              "versions/lifecycle",
-              "versions/upgrades",
-              "versions/release-history"
+              "versions/upgrades"
             ]
           },
           {

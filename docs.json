@@ -94,6 +94,12 @@
               "versions/upgrades",
               "versions/release-history"
             ]
+          },
+          {
+            "group": "Releases",
+            "pages": [
+              "versions/lines/0-1"
+            ]
           }
         ]
       }

@@ -1,0 +1,29 @@
+---
+title: "0.1.16-rc.183"
+description: "Components in bundle version 0.1.16-rc.183."
+---
+
+import { ReleaseComponents, ReleaseChanges, BootstrapTools } from "/snippets/release-components.jsx";
+import { release } from "/snippets/releases/0-1-16-rc-183.jsx";
+
+> Every component prerelease `0.1.16-rc.183` installs. Prereleases test the release path; pin your clusters to releases.
+
+[All 0.1 versions](/versions/lines/0-1)
+
+## What changed since `0.1.16-rc.182`
+
+<ReleaseChanges release={release} />
+
+## What's included
+
+Your box has one management cluster and the managed clusters it provisions. Each has control plane nodes and worker nodes. Choose a cluster, then a node role, to see what runs there. A version marked **unpinned** is installed at whatever version its source serves when a node is created.
+
+<ReleaseComponents release={release} />
+
+## Bootstrap tools
+
+Run by the `soloz` CLI on your machine or in your CI during Day-0. Not installed in any cluster.
+
+<BootstrapTools release={release} />
+
+These components are for the `hetzner` provider. Your applications, deployed from your GitOps repository, are yours and are not listed.

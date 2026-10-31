@@ -1,7 +1,10 @@
-# Mintlify automatically ignores these files and directories:
-# .git, .github, .claude, .agents, .idea, node_modules,
-# README.md, LICENSE.md, CHANGELOG.md, CONTRIBUTING.md
-
-# Draft content
-drafts/
-*.draft.mdx
+# Repository content that is not part of the docs site.
+#
+# Mintlify reads every YAML and JSON file it finds as a possible OpenAPI spec, so
+# the Helm chart that deploys the site fails validation on its template syntax.
+charts/
+# Generators and the inventories they read; pages carry their data in snippets/.
+scripts/
+data/
+# Working material and deferred pages, not yet published.
+scratch/

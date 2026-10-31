@@ -621,3 +621,225 @@
 @media (max-width: 640px) {
   .vlc-track { grid-template-columns: 1fr; }
 }
+
+/* Releases: component table, changes and the line list. */
+
+.rel-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid var(--arch-border);
+  margin-bottom: 12px;
+}
+
+.rel-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--arch-text-2);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.rel-tab.is-active {
+  color: var(--arch-accent);
+  border-bottom-color: var(--arch-accent);
+}
+
+.rel-count {
+  font-size: 11px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--arch-subtle);
+  color: var(--arch-accent);
+}
+
+.rel-tools {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.rel-search,
+.rel-select {
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--arch-text);
+  background: var(--arch-surface);
+  border: 1px solid var(--arch-border);
+  border-radius: 8px;
+}
+
+.rel-search { flex: 1; min-width: 0; }
+
+.rel-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--arch-border);
+  border-radius: 10px;
+}
+
+.rel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rel-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--arch-text-3);
+  background: var(--arch-panel);
+  border-bottom: 1px solid var(--arch-border);
+  white-space: nowrap;
+}
+
+.rel-table td {
+  padding: 10px 12px;
+  vertical-align: top;
+  color: var(--arch-text);
+  border-bottom: 1px solid var(--arch-border);
+}
+
+.rel-table tr:last-child td { border-bottom: 0; }
+
+.rel-name {
+  display: block;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-weight: 600;
+  color: var(--arch-text);
+}
+
+.rel-desc {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--arch-text-3);
+  max-width: 420px;
+}
+
+.rel-version {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  word-break: break-all;
+}
+
+.rel-from {
+  display: block;
+  font-size: 12px;
+  color: var(--arch-text-3);
+}
+
+.rel-type {
+  font-size: 12px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--arch-border);
+  color: var(--arch-text-2);
+  white-space: nowrap;
+}
+
+.rel-muted { color: var(--arch-text-3); font-size: 13px; }
+
+.rel-kind {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+
+.rel-kind.is-changed { color: var(--arch-accent); background: var(--arch-subtle); }
+.rel-kind.is-added { color: #15803d; background: rgba(21, 128, 61, 0.1); }
+.rel-kind.is-removed { color: #b91c1c; background: rgba(185, 28, 28, 0.1); }
+
+.rel-pager {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.rel-pages { display: flex; gap: 4px; }
+
+.rel-page {
+  min-width: 28px;
+  padding: 2px 8px;
+  font-size: 12px;
+  border: 1px solid var(--arch-border);
+  border-radius: 6px;
+  color: var(--arch-text-2);
+}
+
+.rel-page.is-active {
+  color: var(--arch-accent-fg);
+  background: var(--arch-accent);
+  border-color: var(--arch-accent);
+}
+
+.rel-item {
+  border: 1px solid var(--arch-border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: var(--arch-surface);
+}
+
+.rel-item-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.rel-item-head .rel-name { display: inline; }
+.rel-item-meta { margin-left: auto; }
+
+.rel-item-body {
+  padding: 0 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rel-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--arch-accent);
+}
+
+@media (max-width: 640px) {
+  .rel-tools { flex-direction: column; }
+  .rel-item-meta { display: none; }
+}
+
+.rel-groups {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 12px;
+  border: 1px solid var(--arch-border);
+  border-radius: 10px;
+  background: var(--arch-panel);
+}
+
+.rel-group {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 7px;
+  color: var(--arch-text-2);
+}
+
+.rel-group.is-active {
+  color: var(--arch-accent-fg);
+  background: var(--arch-accent);
+}
+
+.rel-version.is-unpinned {
+  color: #b45309;
+  font-weight: 600;
+}

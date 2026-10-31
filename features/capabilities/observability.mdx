@@ -9,7 +9,7 @@ description: "Every cluster collects its own metrics and logs, stores them and e
 
 Observability is split into two parts.
 
-**Collection is machinery.** Every cluster runs agents that gather node, container, cluster-state and platform metrics, plus logs. Collection always runs, whatever else you select, because the Support Agent depends on it.
+**Collection is machinery.** Every cluster runs agents that gather node, container, cluster-state and platform metrics, plus logs. Collection always runs, whatever else you select, so turning off the in-box backend never stops you forwarding telemetry elsewhere.
 
 **The backend is selectable.** With `capabilities.observability.enabled`, each cluster also runs its own highly available stores for metrics and logs, its own alert evaluation and its own alert routing. The management cluster adds the dashboards.
 
@@ -27,7 +27,7 @@ Opt your application's namespace in, then either expose a metrics endpoint for s
 
 ### 3. Add your own dashboards and alerts
 
-Write dashboards and alert rules in your tenant repository. They are reconciled into your box like everything else, and tenant rules run inside enforced limits. Platform alerts are enabled one at a time.
+Write dashboards and alert rules in your GitOps repository. They are reconciled into your box like everything else, and tenant rules run inside enforced limits. Platform alerts are enabled one at a time.
 
 ### 4. Route alerts
 
@@ -58,9 +58,6 @@ Usage records for billing never pass through the observability stack, and switch
 ## Frequently asked questions
 
 <AccordionGroup>
-  <Accordion title="If I turn off the observability backend, does the Support Agent stop working?">
-    No. Collection is machinery and keeps running. The Support Agent never depends on the observability backend.
-  </Accordion>
   <Accordion title="Can I switch off observability on a running box?">
     Not by changing the value. The setting decides what a new cluster is provisioned with. Decommissioning a running backend is a separate, deliberate operation.
   </Accordion>

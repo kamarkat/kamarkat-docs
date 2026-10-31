@@ -1,28 +1,39 @@
 ---
 title: "Overview"
-description: "Build a zero-ops box in your own accounts and run your first application on it."
+description: "Build a Kamarkat box in your own accounts and run your first application on it."
 ---
 
-This quickstart takes you from empty accounts to an application served on your own domain. You run every step yourself, under your own credentials. zero-ops never holds them.
+This quickstart takes you from empty accounts to an application served on your own domain. You run every step yourself, under your own credentials. Kamarkat never holds them.
 
 ## What you will build
 
-- A **tenant repository**, `<tenant>-gitops`, in your git organisation. It is the only source of desired state for your box.
+- A **GitOps repository**, `<tenant>-gitops`, in your git organization. It is the only source of desired state for your box.
 - A **management cluster** that runs your control plane.
 - A **workload cluster** that runs your applications.
 - One **application**, deployed from its own repository and served on a hostname under your domain.
+
+## Choose your path
+
+You choose where your nodes run when you scaffold, with `--provider`.
+
+| Path | Nodes | Choose it when |
+| :- | :- | :- |
+| **Cloud** (`hetzner`, default) | Cloud servers in your account | You want the shortest path to a running box |
+| **Hybrid** (`hybrid`) | A cloud control plane, with worker nodes on your own machines joining over your tailnet | You are building a development box on hardware you already have. Supported for `dev` only. |
+
+This quickstart follows the cloud path. The hybrid path adds a `TS_AUTHKEY` secret and the nodes you list for each workload cluster.
 
 ## How it fits together
 
 <Steps>
   <Step title="Prerequisites">
-    Prepare a cloud account, a git organisation, a domain and an escrow, and install the `soloz` CLI.
+    Prepare a cloud account, a git organization, a domain and an escrow, and install the `soloz` CLI.
   </Step>
   <Step title="Build your first cluster">
-    Create the escrow project, scaffold your tenant repository, and run Day-0 from that repository's own CI. Day-0 creates the management cluster, which then provisions the workload cluster.
+    Create the escrow project, scaffold your GitOps repository, and run Day-0 from that repository's own CI. Day-0 creates the management cluster, which then provisions the workload cluster.
   </Step>
   <Step title="Run your first app">
-    Declare the application in your tenant repository, supply its secrets, and let its build publish and pin its chart.
+    Declare the application in your GitOps repository, supply its secrets, and let its build publish and pin its chart.
   </Step>
 </Steps>
 

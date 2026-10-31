@@ -1,41 +1,41 @@
 ---
 title: "Welcome"
-description: "zero-ops is an open-source platform a startup runs its business on. It ships a complete, maintained stack into a box you own, on infrastructure you pay for directly."
+description: "Kamarkat is an open-source platform a startup runs its business on. It ships a complete platform into a box you own, on infrastructure you pay for directly."
 ---
 
-> zero-ops gives you the platform a platform team would build, without the platform team. You own the box; zero-ops keeps what runs in it maintained.
+> Kamarkat gives you the platform a platform team would build, without the platform team. You own the box and everything in it.
 
-## What zero-ops is
+## What Kamarkat is
 
-zero-ops is a complete platform stack for startups that want a golden path and cannot yet staff a platform engineering team. It runs on affordable infrastructure in your own cloud account rather than on a hyperscaler's managed services, and it covers everything your applications need to run: cluster lifecycle, GitOps delivery, secrets, certificates, DNS, a gateway with login, a database, an identity provider and observability.
+Kamarkat is a complete platform stack for startups that want a golden path and cannot yet staff a platform engineering team. It runs on affordable infrastructure in your own cloud account rather than on a hyperscaler's managed services, and it covers everything your applications need to run: cluster lifecycle, GitOps delivery, secrets, certificates, DNS, a gateway with login, a database, an identity provider and observability.
 
-The foundational unit is the **box**. A box is your control plane and the workload clusters it manages, all running in your cloud account under credentials only you hold. The control plane is not hosted for you. It is delivered to you, and it keeps running whether or not zero-ops is reachable.
+The foundational unit is the **box**: your management cluster and the workload clusters it manages, all running in your cloud account under credentials only you hold. The **control plane** (the GitOps engine, cluster lifecycle and the operators that reconcile everything else) runs inside your management cluster. There is no separate control-plane tier above it and nothing hosted for you, so your box keeps running whether or not Kamarkat is reachable.
 
-zero-ops is free and open source. What you can buy is **maintenance**: the stack is tested as one set, published as one version, and proposed to your repository as an upgrade you accept.
+Kamarkat is free and open source. The stack is tested as one set, published as one version, and proposed to your repository as an upgrade you accept.
 
-## What you can do with zero-ops
+## What you can do with Kamarkat
 
 - **Run a production platform in your own cloud account.** Your bill, your credentials, your clusters.
 - **Ship applications without operating infrastructure.** Publish a chart from your application's build; the platform renders its namespace, gateway, login, database, secrets and network policy.
-- **Use maintained capabilities.** A database, an identity provider and an observability stack are kept available, current and recoverable. You own what you do with them.
+- **Use the platform tools your apps need.** A database, an identity provider and an observability stack come with the platform, at versions tested together. You own what you do with them.
 - **Upgrade by accepting a pull request.** A new platform version arrives as a one-line change to your repository. Nothing changes until you merge it.
-- **Leave without migrating.** Every artefact your box runs is mirrored into infrastructure you control, so stopping maintenance stops nothing that is running.
+- **Leave without migrating.** Every artefact your box runs is mirrored into infrastructure you control, so nothing you run depends on Kamarkat staying reachable.
 
-## How zero-ops is organised
+## How Kamarkat is organized
 
-Everything starts with a **box**. Each box belongs to one **tenant**, the organisation that owns it, and holds one management cluster plus any number of workload clusters.
+Everything starts with a **box**. Each box belongs to one **organization** (the `tenant` in configuration), and holds one management cluster plus any number of workload clusters.
 
-A **tenant repository**, `<tenant>-gitops`, is the single source of desired state for the box. For each cluster it records two things: the platform version that cluster runs, and the values it runs with.
+A **GitOps repository**, `<tenant>-gitops`, is the single source of desired state for the box. For each cluster it records two things: the platform version that cluster runs, and the values it runs with.
 
 The **bundle** is the platform itself: every component, at versions tested together, published as one versioned artefact.
 
-**Capabilities** are what the bundle provides. Some are machinery every box runs; others, such as the database and observability, you select. Your **applications** run on top of them, each in its own isolated namespace.
+**Capabilities** are the platform tools the bundle provides. Some are machinery every box runs; others, such as the database and observability, you select. Your **applications** run on top of them, each in its own isolated namespace.
 
 <CardGroup cols={2}>
   <Card title="The box" icon="box" href="/features/box/overview">
-    What runs in your account, and what zero-ops never holds.
+    What runs in your account, and what Kamarkat never holds.
   </Card>
   <Card title="Capabilities" icon="layer-group" href="/features/capabilities/overview">
-    What the platform provides and maintains.
+    What the platform provides, and what you own.
   </Card>
 </CardGroup>

@@ -26,17 +26,8 @@ kubectl --kubeconfig acme-hub.kubeconfig get nodes
 The escrow holds one kubeconfig per cluster, so pass the cluster you need.
 
 <Warning>
-The credential is cluster-admin and is not tied to a person. Use it, then discard it. Never commit it: your tenant repository ignores the paths Day-0 writes credentials to, and they must stay out of git.
+The credential is cluster-admin and is not tied to a person. Use it, then discard it. Never commit it: your GitOps repository ignores the paths Day-0 writes credentials to, and they must stay out of git.
 </Warning>
-
-## See what your box would report
-
-If you enrol for support, the Support Agent sends an allowlisted set of control-plane facts. You can inspect them before anything is sent:
-
-```bash
-soloz support scope     # every field that may leave this box
-soloz support preview   # the exact payload, sent nowhere
-```
 
 ## Next
 

@@ -3,7 +3,7 @@ title: "Bootstrap your box"
 description: "Day-0 runs in your repository's own CI. It builds the management cluster, waits for it to converge, and brings up your workload cluster."
 ---
 
-Day-0 runs as the **Bootstrap cluster** workflow in your tenant repository, on your organisation's runners, under the secrets you stored there. It is pinned to the platform version your repository was scaffolded on, so a later change to the platform cannot change how your repository bootstraps.
+Day-0 runs as the **Bootstrap cluster** workflow in your GitOps repository, on your organization's runners, under the secrets you stored there. It is pinned to the platform version your repository was scaffolded on, so a later change to the platform cannot change how your repository bootstraps.
 
 ## Step 1: Start Day-0
 
@@ -69,7 +69,7 @@ If a run fails part-way, fix the cause and start the workflow again. Phases that
 
 ## Adding more workload clusters later
 
-A further workload cluster is a declaration, not another Day-0. From your tenant repository:
+A further workload cluster is a declaration, not another Day-0. `soloz tenant add-cluster` renders the cluster template your GitOps repository carries. From the repository root:
 
 ```bash
 soloz tenant add-cluster \

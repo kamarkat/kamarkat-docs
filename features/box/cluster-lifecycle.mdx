@@ -10,19 +10,19 @@ description: "Day-0 creates your management cluster once, under your control. Af
 
 A box comes into existence in two phases.
 
-**Day-0** creates the management cluster. The first cluster cannot reconcile itself into existence, so a command-line tool runs it from outside the box, in your own execution context (for example, a CI workflow in your organisation), against your own cloud account. It establishes trust, identity and configuration, then hands over.
+**Day-0** creates the management cluster. The first cluster cannot reconcile itself into existence, so a command-line tool runs it from outside the box, in your own execution context (for example, a CI workflow in your organization), against your own cloud account. It establishes trust, identity and configuration, then hands over.
 
-**Day-1 onwards** is declarative. The management cluster reconciles everything from your tenant repository, including any further clusters. Nothing is triggered and nothing is applied from outside.
+**Day-1 onwards** is declarative. The management cluster reconciles everything from your GitOps repository, including any further clusters. Nothing is triggered and nothing is applied from outside.
 
 ## Getting started
 
-### 1. Prepare a git organisation and a cloud account
+### 1. Prepare a git organization and a cloud account
 
-You supply both. Cloud credentials stay in your box and are never given to zero-ops.
+You supply both. Cloud credentials stay in your box and are never given to Kamarkat.
 
-### 2. Scaffold your tenant repository
+### 2. Scaffold your GitOps repository
 
-`soloz tenant scaffold` creates `<tenant>-gitops` in your organisation. It writes only the facts unique to you: organisation, domain, region and cluster names.
+`soloz tenant scaffold` creates `<tenant>-gitops` in your organization. It writes only the facts unique to you: organization, domain, region and cluster names.
 
 ### 3. Run Day-0
 
@@ -32,13 +32,13 @@ Day-0 commits the facts it discovers, such as the control-plane address, to your
 
 ### 4. Declare workload clusters
 
-To add a workload cluster, hydrate its template into a new directory in your repository and commit it. Your control plane provisions it, and keeps it in its desired state from then on.
+To add a workload cluster, render the **cluster template** into a new directory in your repository and commit it. Your control plane provisions it, and keeps it in its desired state from then on.
 
 ## What you need to know
 
 ### One management cluster, any number of workload clusters
 
-A tenant repository holds exactly one management cluster and any number of workload clusters, each in a directory named after it.
+A GitOps repository holds exactly one management cluster and any number of workload clusters, each in a directory named after it.
 
 ### You name your workload clusters
 

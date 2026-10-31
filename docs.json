@@ -18,7 +18,7 @@
             "pages": [
               "introduction/welcome",
               "introduction/architecture",
-              "introduction/support"
+              "introduction/responsibility-boundaries"
             ]
           }
         ]
@@ -56,10 +56,11 @@
         "tab": "Features",
         "groups": [
           {
-            "group": "The Box",
+            "group": "Platform",
             "pages": [
               "features/box/overview",
               "features/box/tenants-and-apps",
+              "features/box/environments",
               "features/box/bundle",
               "features/box/cluster-lifecycle"
             ]
@@ -70,6 +71,28 @@
               "features/capabilities/overview",
               "features/capabilities/workloads",
               "features/capabilities/observability"
+            ]
+          },
+          {
+            "group": "Administration",
+            "pages": [
+              "features/admin/cloud-account",
+              "features/admin/git-connection",
+              "features/admin/escrow"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Versions",
+        "groups": [
+          {
+            "group": "Versions",
+            "pages": [
+              "versions/overview",
+              "versions/lifecycle",
+              "versions/upgrades",
+              "versions/release-history"
             ]
           }
         ]

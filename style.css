@@ -547,3 +547,77 @@
   .bstack-body { grid-template-columns: 1fr; }
   .bstack-visual { order: -1; transform: scale(0.75); transform-origin: top center; }
 }
+
+/* Versions: lifecycle track and release list. */
+
+.vlc {
+  margin: 24px 0 8px;
+  padding: 20px;
+  border: 1px solid var(--arch-border);
+  border-radius: 12px;
+  background: var(--arch-panel);
+}
+
+.vlc-track {
+  display: grid;
+  grid-template-columns: 4fr 2fr 1.4fr 1.2fr;
+  gap: 4px;
+}
+
+.vlc-seg {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.vlc-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--arch-border);
+}
+
+.vlc-seg.is-supported .vlc-bar { background: var(--arch-accent); }
+.vlc-seg.is-deprecated .vlc-bar { background: color-mix(in srgb, var(--arch-accent) 45%, transparent); }
+.vlc-seg.is-unsupported .vlc-bar {
+  background: repeating-linear-gradient(90deg, var(--arch-border) 0 6px, transparent 6px 10px);
+}
+
+.vlc-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--arch-text);
+}
+
+.vlc-when {
+  font-size: 12px;
+  color: var(--arch-text-3);
+}
+
+.vlc-note {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--arch-text-2);
+}
+
+.vlc-pill {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--arch-accent);
+  background: var(--arch-subtle);
+  border: 1px solid var(--arch-subtle-border);
+}
+
+.vlc-pill.is-latest {
+  color: var(--arch-accent-fg);
+  background: var(--arch-accent);
+  border-color: var(--arch-accent);
+}
+
+@media (max-width: 640px) {
+  .vlc-track { grid-template-columns: 1fr; }
+}

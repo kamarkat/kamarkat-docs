@@ -1,11 +1,11 @@
 ---
 name: writing-style
-description: Writing style guide for the Kamarkat documentation of zero-ops. Use whenever creating, editing, or reviewing any MDX page in this docs project. Covers product identity, terminology, tone, page anatomy, section headings, sentence construction, and length calibration. Always activate this skill before writing any documentation page.
+description: Writing style guide for the Kamarkat documentation of Kamarkat. Use whenever creating, editing, or reviewing any MDX page in this docs project. Covers product identity, terminology, tone, page anatomy, section headings, sentence construction, and length calibration. Always activate this skill before writing any documentation page.
 ---
 
 # Kamarkat Documentation Writing Style
 
-Kamarkat documents zero-ops. The goal is prose that is direct and informative — not too sparse, not over-explained. Every sentence earns its place.
+These pages document Kamarkat. The goal is prose that is direct and informative — not too sparse, not over-explained. Every sentence earns its place.
 
 ## Tone and voice
 
@@ -24,10 +24,14 @@ These are hard constraints — never deviate.
 | hub | management cluster |
 | spoke | workload cluster |
 | fleet | application (or app) |
+| tenant (in prose) | organization; keep `tenant` only in literal values such as `tenantId` and `--tenant` |
+| tenant repository | GitOps repository |
+| platform tools (alone) | capabilities, introduced as "the platform tools your apps need" |
+| catalog, register an app | none: every capability ships in the bundle, and an app exists because its declaration is committed |
 | catalogue, catalog (of components) | capability, bundle |
-| zero-ops deploys / applies / pushes to your cluster | zero-ops publishes a version; your control plane applies it |
-| zero-ops manages / operates your box | zero-ops maintains the platform in your box |
-| upgrade (as something zero-ops does) | upgrade proposal you accept |
+| Kamarkat deploys / applies / pushes to your cluster | Kamarkat publishes a version; your control plane applies it |
+| Kamarkat manages / operates your box | Kamarkat delivers the platform into your box |
+| upgrade (as something Kamarkat does) | upgrade proposal you accept |
 | SaaS, hosted platform | delivered into your box |
 | internal component names (`hub-operator`, `kube-sbt`, `mcp-server`) | the capability they provide (platform operator, tenant provisioning, control-plane API) |
 
@@ -134,49 +138,49 @@ Do not pad to fill space. Do not truncate to save space.
 
 This is the most important section. Get this wrong and all the writing will be wrong.
 
-**What zero-ops is:**
-zero-ops is an open-source platform a startup runs its business on. It delivers a complete, maintained platform into a box in the customer's own cloud account, for organisations that want a golden path and cannot yet staff a platform team. The software is free; what a customer buys is maintenance.
+**What Kamarkat is:**
+Kamarkat is an open-source platform a startup runs its business on. It delivers a complete platform into a box in the customer's own cloud account, for organizations that want a golden path and cannot yet staff a platform team.
 
-**What zero-ops is NOT:**
-- Not a hosted or managed service — zero-ops operates no customer infrastructure and holds no customer credential
-- Not a platform for platform engineers to customise — it is a maintained golden path
+**What Kamarkat is NOT:**
+- Not a hosted or managed service — Kamarkat operates no customer infrastructure and holds no customer credential
+- Not a platform for platform engineers to customise — it is a tested golden path
 - Not responsible for the customer's applications — the customer owns their code, images, data and how they use each capability
 
 **The correct mental model:**
 - The **box** is the constant — a management cluster and its workload clusters, in the customer's account
-- The **tenant repository** is the only source of desired state for the box
-- zero-ops **publishes versions**; the customer's own automation proposes them and the customer's control plane applies them
-- zero-ops **maintains capability health**; the customer **owns capability usage**
+- The **GitOps repository** is the only source of desired state for the box
+- Kamarkat **publishes versions**; the customer's own automation proposes them and the customer's control plane applies them
+- Kamarkat **provides the capability**; the customer **owns its use**
 
 **Core vocabulary:**
-- Use **"box"** for what a customer owns, **"tenant"** for the organisation, **"application"** for a product running on it
+- Use **"box"** for what a customer owns, **"tenant"** for the organization, **"application"** for a product running on it
 - Use **"capability"** — not "feature", not "service", not "module" — for what the platform provides
-- Use **"maintain"** as zero-ops' verb, **"propose"** for upgrades, **"reconcile"** for what the control plane does
+- Use **"propose"** for upgrades, **"reconcile"** for what the control plane does
 
 ---
 
 ## Concepts to use accurately
 
 **Box**
-A management cluster running the customer's control plane, plus the workload clusters it provisions. It runs in the customer's cloud account under credentials only the customer holds, belongs to one tenant, and keeps running whether or not zero-ops is reachable.
+A management cluster running the customer's control plane, plus the workload clusters it provisions. It runs in the customer's cloud account under credentials only the customer holds, belongs to one tenant, and keeps running whether or not Kamarkat is reachable.
 
 **Tenant and application**
-The tenant is the organisation that owns the box (`tenantId`). An application is a product running on it (`appId`), and the unit of isolation: its own namespace `tenant-<tenantId>-<appId>`, database, identity project, secret path and network policy. Being in the same tenant never grants access; only a declaration does.
+The tenant is the organization that owns the box (`tenantId`). An application is a product running on it (`appId`), and the unit of isolation: its own namespace `tenant-<tenantId>-<appId>`, database, identity project, secret path and network policy. Being in the same tenant never grants access; only a declaration does.
 
 **Cell**
 A workload cluster's name, chosen by the customer and fixed for life. Applications name the cell they run on. Policy attaches to cells.
 
-**Tenant repository**
-`<tenant>-gitops` in the customer's git organisation. For each cluster it holds the bundle version and the customer's values; for each application, its declaration and the chart version of each workload.
+**GitOps repository**
+`<tenant>-gitops` in the customer's git organization. For each cluster it holds the bundle version and the customer's values; for each application, its declaration and the chart version of each workload.
 
 **Bundle**
 The whole platform at one immutable version, published as one artefact and mirrored into infrastructure the customer controls. Upgrades change one version field per cluster.
 
 **Capability**
-What the platform provides and maintains. Machinery runs on every box; selectable capabilities (database, observability, on-premises capacity) are chosen in the cluster's values. Selecting a capability never makes it the customer's to maintain.
+What the platform provides. Machinery runs on every box; selectable capabilities (database, observability, on-premises capacity) are chosen in the cluster's values. Selecting a capability never makes it the customer's to maintain.
 
 **Day-0**
-The one-time creation of the management cluster, run from the customer's own CI. After Day-0 the tenant repository is the only authority.
+The one-time creation of the management cluster, run from the customer's own CI. After Day-0 the GitOps repository is the only authority.
 
 **Support Agent**
 An open-source agent on every cluster that does nothing until the customer enrols. It sends an allowlisted set of control-plane facts outward, and the customer can preview the exact payload first.

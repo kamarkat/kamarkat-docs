@@ -1,9 +1,9 @@
 ---
 title: "Capabilities"
-description: "The platform is the set of capabilities it provides and maintains. Some run on every box; others you select. zero-ops maintains both, and you own how you use them."
+description: "The platform is the set of capabilities it provides. Some run on every box; others you select. Kamarkat ships and tests both; you own how you use them."
 ---
 
-> zero-ops maintains the capability. You own the use you make of it.
+> Kamarkat provides the capability. You own the use you make of it.
 
 ## What it is
 
@@ -15,7 +15,7 @@ Capabilities come in two kinds.
 
 **Selectable capabilities** are ones you choose in your cluster's values. A box runs what you need and does not carry the rest.
 
-Selecting a capability does not make it yours to maintain. zero-ops maintains everything your box runs.
+Selecting a capability does not change what it is: every capability, selected or not, ships with the bundle, moves with each version, and was tested on the same machinery.
 
 ## What is available
 
@@ -34,7 +34,6 @@ Selecting a capability does not make it yours to maintain. zero-ops maintains ev
 | Database | Selectable | `capabilities.database.enabled` |
 | Observability | Selectable | `capabilities.observability.enabled` |
 | On-premises capacity | Selectable | `onPrem.enabled` |
-| Support Agent | Selectable | Enrolment |
 
 Every selectable capability defaults to **on**, so an upgrade can never remove one from a running box.
 
@@ -42,11 +41,11 @@ Every selectable capability defaults to **on**, so an upgrade can never remove o
 
 ### Database
 
-You declare that an application needs a database and receive an **empty database and a role** that it owns. Everything inside it belongs to the application: tables, functions, migrations and data. zero-ops maintains the engine underneath, including replicas, backups and failover.
+You declare that an application needs a database and receive an **empty database and a role** that it owns. Everything inside it belongs to the application: tables, functions, migrations and data. The platform runs the engine underneath, including replicas, backups and failover.
 
 ### Identity
 
-Each application is its own **project** in your organisation's identity provider. Your users sign in through the gateway, so login is part of the platform and not something each application builds.
+Each application is its own **project** in your organization's identity provider. Your users sign in through the gateway, so login is part of the platform and not something each application builds.
 
 - An application's API accepts **access tokens**, never ID tokens.
 - An application calling another on its own behalf uses **client credentials**.
@@ -60,7 +59,7 @@ Every application's traffic passes through a gateway that handles TLS and login.
 
 ### Capabilities have a lifecycle
 
-A capability moves through **declared**, **supported**, **deprecated** (maintained, with an end date), **end-of-life** and **removed**. A capability is never removed from a running box. Before end-of-life you receive notice and, where one exists, a migration path.
+A capability moves through **declared**, **supported**, **deprecated** (still shipped, with an end date), **end-of-life** and **removed**. A capability is never removed from a running box. Before end-of-life you receive notice and, where one exists, a migration path.
 
 ### Selecting is set up at provisioning
 
@@ -73,8 +72,8 @@ A bundle version certifies the machinery as a unit and each capability against i
 ## Frequently asked questions
 
 <AccordionGroup>
-  <Accordion title="Who handles an incident caused by a slow query?">
-    You do. If the database is healthy and working as shipped, the incident is in how it is used. zero-ops confirms that the capability is healthy and helps you.
+  <Accordion title="Is there a catalog of tools to choose from?">
+    No. Every capability ships in the bundle, at versions tested together, and you turn the selectable ones on or off in your cluster's values. A capability you leave off still moves with each version, so turning it on later needs nothing but a change to your values.
   </Accordion>
   <Accordion title="Can I bring my own database or identity provider?">
     The platform's own components authenticate against the box's identity provider, so it is machinery. Your applications can call any external service you declare.

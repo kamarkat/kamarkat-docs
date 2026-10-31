@@ -1,0 +1,65 @@
+---
+title: "Responsibility Boundaries"
+description: "What Kamarkat provides and what you own, across your repositories, your infrastructure and your applications."
+---
+
+> Kamarkat provides the platform. You own the box it runs in, and everything you build on it.
+
+## Color key
+
+| Color | Owner | Scope |
+| :- | :- | :- |
+| <span style={{color: "#7c3aed"}}>●</span> Purple | **Kamarkat** | The bundle: every platform component, its tested versions and defaults, the templates you start from, and the `soloz` CLI. You reference it by version; you never edit it. |
+| <span style={{color: "#10b981"}}>●</span> Green | **You** | Your accounts, your GitOps repository, your clusters, your applications, and the use you make of every capability. |
+
+There is no third party. Kamarkat is built for organizations without a platform team, so there is no split between a platform team and engineering teams: everything outside the bundle is yours.
+
+## Git layer
+
+| | Kamarkat | You |
+| :- | :- | :- |
+| **Platform content** | Publishes each bundle version with its defaults | Choose the version each cluster runs |
+| **GitOps repository** | Provides the template it is scaffolded from | Own it: your values, cluster declarations and app declarations |
+| **Upgrades** | Publishes new versions | Your automation proposes them; you merge |
+| **Application repositories** | Publishes the `platform-workload` library chart | Own your source, charts, images and CI |
+
+## Infrastructure layer
+
+| | Kamarkat | You |
+| :- | :- | :- |
+| **Cloud account** | — | Own it, pay for it, hold its credentials |
+| **Management cluster** | Ships the control plane it runs | Create it with Day-0, from your own CI |
+| **Workload clusters** | Ships the cluster template and the platform catalog | Declare them; your control plane provisions them |
+| **Secrets** | Ships the secret store and delivery | Supply the secrets only you can choose |
+| **Escrow** | — | Own it, outside the box |
+
+## Application layer
+
+| | Kamarkat | You |
+| :- | :- | :- |
+| **Capabilities** | Ships each capability, tested on the platform machinery | Choose which to run, and own how you use them |
+| **Database** | Ships the engine, replicas, backups and failover | Own the schema, migrations, queries and data |
+| **Identity** | Ships the identity provider and sign-in | Own your users and the clients your apps register |
+| **Gateway** | Ships routing, TLS and login | Declare the hosts and public routes your apps serve |
+| **Applications** | Renders their namespace, policy and credentials from your declaration | Own their code, images, configuration and secrets |
+
+## What you need to know
+
+### The line is authorship, not location
+
+A component belongs to Kamarkat when none of your logic is inside it. A database engine is Kamarkat's; the tables in it are yours. Where it runs does not change that.
+
+### Nothing crosses the line by default
+
+Kamarkat never writes to your repository and never connects into your box. Every change to what runs reaches your clusters through your repository and your control plane.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Can I change a platform component's configuration?">
+    Yes, through your cluster's `values.yaml`. It holds only the fields you change, so every override you make survives across versions.
+  </Accordion>
+  <Accordion title="Can I pin one component to a different version?">
+    No. Components move only as part of a bundle version, so every combination your clusters run was tested as a whole first.
+  </Accordion>
+</AccordionGroup>

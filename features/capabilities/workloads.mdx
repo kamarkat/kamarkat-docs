@@ -1,7 +1,7 @@
 ---
 title: "Deploying Applications"
 sidebarTitle: "Deploying Applications"
-description: "An application is delivered the way the platform is: its build publishes a versioned chart, and your tenant repository names that version."
+description: "An application is delivered the way the platform is: its build publishes a versioned chart, and your GitOps repository names that version."
 ---
 
 > The version is the only field your build writes. What was tested is what ships.
@@ -13,9 +13,9 @@ An application's deployment lives in two repositories, split by the kind of fact
 | Repository | Holds |
 | :- | :- |
 | **Application repository** | Source code, the chart, and the build that publishes both |
-| **Tenant repository** | One directory per application per environment, naming a chart version |
+| **GitOps repository** | One directory per application per environment, naming a chart version |
 
-The chart is published to a registry in your own organisation, so your applications keep deploying even if zero-ops' registry is unavailable.
+The chart is published to a registry in your own organization, so your applications keep deploying even if Kamarkat' registry is unavailable.
 
 ## Getting started
 
@@ -36,11 +36,11 @@ The library renders the service account, service, rollout and network policy, wi
 
 ### 2. Publish from your build
 
-Your build publishes the chart with the image **pinned by digest** inside it, then commits the new version to the application's directory in your tenant repository. Promoting to the next environment is the same commit with a different target.
+Your build publishes the chart with the image **pinned by digest** inside it, then commits the new version to the application's directory in your GitOps repository. Promoting to the next environment is the same commit with a different target.
 
 ### 3. Declare configuration and secrets
 
-Every value your workloads read is declared in your tenant repository, split by who owns it:
+Every value your workloads read is declared in your GitOps repository, split by who owns it:
 
 | Kind | Where the value lives |
 | :- | :- |
@@ -54,7 +54,7 @@ A secret's value is never in your repository in any form. Before your workloads 
 
 ### Images must be pinned by digest
 
-Admission refuses any image referenced by tag. Because the digest travels inside the chart, there is no field in your tenant repository where an image could be written.
+Admission refuses any image referenced by tag. Because the digest travels inside the chart, there is no field in your GitOps repository where an image could be written.
 
 ### Service names are derived by the platform
 

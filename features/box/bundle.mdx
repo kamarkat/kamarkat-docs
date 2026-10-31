@@ -1,70 +1,50 @@
 ---
-title: "The Bundle and Upgrades"
-sidebarTitle: "Bundle and Upgrades"
-description: "The platform is one bundle and its version is a tag. Each cluster pins a version, and an upgrade is a pull request that changes it."
+title: "The Bundle"
+description: "The platform is one bundle chart at one version. Each cluster pins a version and supplies its own values."
 ---
 
 > A cluster runs a set of components that was tested together before it was deployed, never the newest of each.
 
 ## What it is
 
-The **bundle** is the whole platform at one version: every component, every chart version and every default value. It is published as one immutable artefact and named by one semantic version.
+The **bundle** is the whole platform at one version: every component, every chart version and every default value. It is published as one immutable chart, `environment-manager`, and named by one semantic version.
 
-Your tenant repository records, for each cluster, the version it runs and the values it runs with:
+Your GitOps repository records, for each cluster, the version it runs and the values it runs with:
 
 ```text
 <tenant>-gitops/
-└── <cluster>/
-    ├── bundle version   # set by upgrade proposals
-    └── values           # yours: only what differs from the defaults
+└── registry/clusters/<cluster>/
+    ├── bundle.yaml   # the version, changed by upgrade proposals
+    └── values.yaml   # yours: only what differs from the defaults
 ```
 
-None of the bundle's content is copied into your repository. Upgrades write the version; you write the values. Because the two never touch the same field, an upgrade never needs a merge.
+None of the bundle's content is copied into your repository. Upgrades write the version and you write the values. The two never touch the same field, so an upgrade never conflicts with your changes.
 
-## How an upgrade works
+## How it works
 
-1. A new version is published. Versions are **immutable**: never re-published, re-pointed or deleted.
-2. Your repository's dependency-update automation opens a pull request changing the version on the clusters that are due it.
-3. The proposal lists the component versions that move, whether the step is reversible, and the oldest version it can be taken from.
-4. A pre-flight check inside your box adds its verdict.
-5. You merge it, and your control plane reconciles it.
+Your control plane pulls the bundle chart at the version in `bundle.yaml` and renders it with your `values.yaml`. Every platform-owned Application on the cluster comes from that one render, so a cluster cannot run two versions at once.
 
-Each cluster is upgraded on its own. A version can move through your environments in order, and production can carry protection rules and required reviewers.
+How versions are published, proposed and taken is covered in [Versions](/versions/overview).
 
 ## What you need to know
 
-### You can skip versions
-
-Each version installs from any version before it. If you are eight versions behind, accepting the latest takes you to the same state as someone who merged every proposal on the day it opened.
-
-### Rollback restores a declaration, not a state
-
-Reverting the version restores what the cluster asks for. Some upgrades are one-way, for example a controller that migrates stored resources to a new API version. Each version states at publication whether its predecessor can be restored, and the proposal tells you before you accept it.
-
-### Every artefact is mirrored into your infrastructure
-
-Everything your box needs to run is mirrored into infrastructure you control before it becomes part of a supported runtime. Your clusters never depend on zero-ops' registry or source code being reachable.
-
-### Component versions deliberately lag their upstreams
-
-The bundle pins versions that work together. A newer release of a component is not a reason to move. A security fix still moves the whole bundle, but it is proposed as soon as it is published.
-
 ### Defaults belong to the bundle
 
-Your values file holds only what you change. When a default improves in a new version, you receive it without any change to your values, and any field you overrode stays overridden.
+Your values file holds only what you change. When a default improves in a new version, you get it without editing your values. Any field you overrode stays overridden.
+
+### The bundle includes what your applications rest on
+
+The bundle also renders the infrastructure under your applications: namespaces, access rules, secret bindings, gateways and TLS. A new version updates it on the next reconcile, without any change to your application repositories.
 
 ## Tips
 
-- **Turn on auto-merge for non-production clusters** to get a hands-off upgrade path, and keep a human review on production.
-- **Read the reversibility statement before merging.** If you need a way back from a one-way upgrade, the only time to prepare it is before you accept.
+- **Keep `values.yaml` small.** Every field you set is a default you stop receiving.
+- **Never edit `bundle.yaml` by hand except to pick a version.** Change `targetRevision` and `bundleVersion` together.
 
 ## Frequently asked questions
 
 <AccordionGroup>
-  <Accordion title="Why are there gaps in the version numbers?">
-    A release that publishes any artefact uses up its version, even if it fails part-way. The next attempt takes the next number. A gap means only that a release was attempted.
-  </Accordion>
   <Accordion title="Can I upgrade a single component?">
-    No. Components move only as part of a new bundle version, so every combination a cluster runs was exercised as a whole first.
+    No. Components move only as part of a new bundle version, so every combination a cluster runs was tested as a whole first.
   </Accordion>
 </AccordionGroup>

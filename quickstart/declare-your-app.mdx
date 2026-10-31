@@ -1,9 +1,9 @@
 ---
 title: "Declare your app"
-description: "An application becomes real when its values file exists in your tenant repository. It then gets a namespace, a database, a login client and its hostnames."
+description: "An application becomes real when its values file exists in your GitOps repository. It then gets a namespace, a database, a login client and its hostnames."
 ---
 
-An application is declared in your tenant repository, one directory per application per environment:
+An application is declared in your GitOps repository, one directory per application per environment:
 
 ```text
 environments/<env>/<app>/
@@ -24,7 +24,7 @@ cp templates/fleet/values.yaml environments/dev/shop/values.yaml
 ```
 
 ```yaml environments/dev/shop/values.yaml
-tenantId: acme          # the organisation that owns the box, the same in every app
+tenantId: acme          # the organization that owns the box, the same in every app
 appId: shop             # this product; it gets namespace tenant-acme-shop
 cellId: acme-01         # the workload cluster it runs on
 
@@ -49,7 +49,7 @@ secrets: []             # secrets you supply; see "Supply your secrets"
 
 | Field | Meaning |
 | :- | :- |
-| `tenantId` | Your organisation. The same value in every app's file. |
+| `tenantId` | Your organization. The same value in every app's file. |
 | `appId` | The product, and its isolation unit. It never defaults to `tenantId`. |
 | `cellId` | Must match the workload cluster's name, or nothing is generated for the app. |
 | `public.hosts` | Public hostnames. An empty list publishes nothing. |

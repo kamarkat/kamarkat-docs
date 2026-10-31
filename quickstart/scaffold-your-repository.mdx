@@ -1,9 +1,9 @@
 ---
 title: "Scaffold your repository"
-description: "Create your tenant repository from the platform template, store your credentials on it, and start Day-0."
+description: "Create your GitOps repository from the platform template, store your credentials on it, and start Day-0."
 ---
 
-`soloz tenant scaffold` creates `<org>/<tenant>-gitops` in your organisation and renders it from the platform template. It writes only the facts unique to you: your organisation, domain, region and cluster names. Scaffolding happens once; every change after it is a commit or a pull request.
+`soloz tenant scaffold` creates `<org>/<tenant>-gitops` in your organization and renders it from the platform template. It writes only the facts unique to you: your organization, domain, region and cluster names. Scaffolding happens once; every change after it is a commit or a pull request.
 
 ## Step 1: Preview what you will receive
 
@@ -22,12 +22,12 @@ soloz tenant scaffold \
 | Flag | Meaning |
 | :- | :- |
 | `--tenant` | Your tenant identifier, lower-case. It names the repository and your box. |
-| `--org` | The git organisation the repository is created in. |
+| `--org` | The git organization the repository is created in. |
 | `--domain` | Your base domain. |
 | `--subdomain` | Optional. A DNS label every hostname sits under; empty publishes on the apex. |
-| `--provider` | `hetzner` (default), or `hybrid` for nodes on your own premises. |
+| `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines. `hybrid` is supported for `dev` only. |
 | `--region` | The cloud region your clusters run in. |
-| `--environment` | The environment slug, such as `dev` or `prod`. |
+| `--environment` | The environment slug: `dev` (default), `stg` or `prod`. |
 | `--workers` | Cloud worker nodes the box starts with. Defaults to 2. |
 | `--cluster` | The management cluster's name. Defaults to `<tenant>-hub`. |
 | `--bundle-version` | The platform version the box starts on. Defaults to the version the CLI carries. |

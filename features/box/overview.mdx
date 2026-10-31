@@ -1,17 +1,17 @@
 ---
 title: "The Box"
-description: "A box is your control plane and the clusters it manages, running in your own cloud account. zero-ops delivers it to you and never operates it."
+description: "A box is your control plane and the clusters it manages, running in your own cloud account. Kamarkat delivers it to you and never operates it."
 ---
 
-> zero-ops may propose changes to your platform. It is never the authority that makes them take effect.
+> Kamarkat may propose changes to your platform. It is never the authority that makes them take effect.
 
 ## What it is
 
-A box is everything zero-ops gives you: a **management cluster** that runs your control plane, and the **workload clusters** it creates and reconciles. It runs in your cloud account, under credentials you hold, and it belongs to exactly one tenant.
+A box is everything Kamarkat gives you: a **management cluster** that runs your control plane, and the **workload clusters** it creates and reconciles. It runs in your cloud account, under credentials you hold, and it belongs to exactly one organization.
 
-The control plane is **delivered, not hosted**. It is the same control plane zero-ops tests and publishes, not a reduced edition. Once it is running it reconciles your clusters from your own repository and depends on nothing zero-ops operates.
+The control plane is **delivered, not hosted**. It is the same control plane Kamarkat tests and publishes, not a reduced edition. Once it is running it reconciles your clusters from your own repository and depends on nothing Kamarkat operates.
 
-## What zero-ops never holds
+## What Kamarkat never holds
 
 | Credential | Where it lives |
 | :- | :- |
@@ -20,17 +20,17 @@ The control plane is **delivered, not hosted**. It is the same control plane zer
 | Secret material | Your box's secret store |
 | Write access to your repository | Your own automation |
 
-Because no zero-ops component serves more than one tenant, a compromise of zero-ops cannot reach your running infrastructure. Isolation between customers comes from the topology itself: there is no shared control plane to break into.
+Because no Kamarkat component serves more than one organization, a compromise of Kamarkat cannot reach your running infrastructure. Isolation between customers comes from the topology itself: there is no shared control plane to break into.
 
 ## How a change reaches your box
 
-1. zero-ops **publishes** a new platform version.
+1. Kamarkat **publishes** a new platform version.
 2. Your repository's own dependency-update automation **proposes** it as a pull request that changes one version field.
 3. A **pre-flight check** runs inside your box against the target cluster and attaches its verdict to the proposal.
 4. You **merge** it, or configure your repository to merge qualifying proposals automatically.
 5. Your control plane **reconciles** the new version.
 
-zero-ops does step 1 and nothing else. Every change reaches running infrastructure through your repository and your control plane.
+Kamarkat does step 1 and nothing else. Every change reaches running infrastructure through your repository and your control plane.
 
 ## Reaching your box
 
@@ -38,25 +38,25 @@ You sign in to your box as a person, through your box's identity provider. The c
 
 ## What you need to know
 
-### Your box keeps running without zero-ops
+### Your box keeps running without Kamarkat
 
-If zero-ops is unreachable, your box keeps reconciling. If you stop your subscription, nothing is withdrawn, because nothing was ever held on your behalf.
+If Kamarkat is unreachable, your box keeps reconciling. Nothing is ever withdrawn from it, because nothing was ever held on your behalf.
 
-### zero-ops cannot see inside your box
+### Kamarkat cannot see inside your box
 
-Support depends on what your box exports. See [Support and Maintenance](/introduction/support) for what is exported and what never is.
+No Kamarkat component opens a connection into your box, holds a credential for it, or queries it.
 
 ### Every box carries a full control plane
 
-There is no shared control plane between tenants. That is what makes the custody claim true, and it sets the floor on what a box costs.
+There is no shared control plane between organizations. That is what makes the custody claim true, and it sets the floor on what a box costs.
 
 ## Frequently asked questions
 
 <AccordionGroup>
-  <Accordion title="Can zero-ops push a change to my clusters?">
-    No. zero-ops holds no access to your repository or your clusters. A change takes effect only when your repository says so and your control plane applies it.
+  <Accordion title="Can Kamarkat push a change to my clusters?">
+    No. Kamarkat holds no access to your repository or your clusters. A change takes effect only when your repository says so and your control plane applies it.
   </Accordion>
   <Accordion title="What if a published version is defective?">
-    A published version is never changed in place. zero-ops publishes a new version that supersedes it, and that version reaches you as a proposal like any other.
+    A published version is never changed in place. Kamarkat publishes a new version that supersedes it, and that version reaches you as a proposal like any other.
   </Accordion>
 </AccordionGroup>

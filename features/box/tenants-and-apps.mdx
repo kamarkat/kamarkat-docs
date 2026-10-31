@@ -1,30 +1,30 @@
 ---
-title: "Tenants and Applications"
-sidebarTitle: "Tenants and Apps"
-description: "A tenant is the organisation that owns a box. An application is a product running on it. They are separate axes, and the application is the unit of isolation."
+title: "Organizations and Applications"
+sidebarTitle: "Organizations and Apps"
+description: "An organization owns a box; in configuration it is the `tenantId`. An application is a product running on it. They are separate axes, and the application is the unit of isolation."
 ---
 
-> Being in the same tenant never grants access. Only a declaration does.
+> Being in the same organization never grants access. Only a declaration does.
 
 ## What it is
 
-zero-ops names two things separately:
+Kamarkat names two things separately:
 
 | | `tenantId` | `appId` |
 | :- | :- | :- |
-| **Names** | The organisation that owns the box | A product running on it |
-| **Identity** | An organisation in the identity provider | A project within that organisation |
+| **Names** | The organization that owns the box | A product running on it |
+| **Identity** | An organization in the identity provider | A project within that organization |
 | **Namespace** | — | `tenant-<tenantId>-<appId>` |
-| **Repository** | One `<tenant>-gitops` per tenant | One directory per application |
+| **Repository** | One `<tenant>-gitops` per organization | One directory per application |
 | **Cost attribution** | `tenant-id` label | `app-id` label |
 
-For example, a tenant `acme` running two products, `web` and `agents`, gets the namespaces `tenant-acme-web` and `tenant-acme-agents`. Both are billed to `acme`, and costs split by product.
+For example, an organization `acme` running two products, `web` and `agents`, gets the namespaces `tenant-acme-web` and `tenant-acme-agents`. Both are billed to `acme`, and costs split by product.
 
-A tenant may hold several clusters. Each cluster has a **cell id**, its own name, which never stands in for the tenant.
+An organization may hold several clusters. Each cluster has a **cell id**, its own name, which never stands in for the organization.
 
 ## Applications are isolated by default
 
-Each application gets its own namespace, service account, network policy, logical database and secret path. Network traffic is **default-deny**. Two applications of the same tenant are as separated from each other as two applications of different tenants.
+Each application gets its own namespace, service account, network policy, logical database and secret path. Network traffic is **default-deny**. Two applications of the same organization are as separated from each other as two applications of different organizations.
 
 ## Connecting applications
 
@@ -40,7 +40,7 @@ dependsOn:
     urlEnv: [AGENTS_URL]
 ```
 
-You never write a namespace. It is derived from the tenant and application, so a rename moves both ends of the call together.
+You never write a namespace. It is derived from the organization and application, so a rename moves both ends of the call together.
 
 ### Calling another application's API
 
@@ -72,9 +72,9 @@ The owner keeps the database; each reader is granted a role on it.
 
 ## What you need to know
 
-### Traffic between tenants is not possible
+### Traffic between organizations is not possible
 
-Nothing in an application's configuration can name another tenant. Cross-tenant traffic has no mechanism at all.
+Nothing in an application's configuration can name another organization. Cross-organization traffic has no mechanism at all.
 
 ### A missing declaration hangs rather than failing
 
@@ -82,7 +82,7 @@ Denied traffic is dropped silently. If a call hangs, check that both sides have 
 
 ### Identity is bound to an immutable key
 
-Renaming a tenant never creates a second organisation in the identity provider. The binding between a tenant and its organisation is recorded once and never inferred from a name.
+Renaming your organization never creates a second organization in the identity provider. The binding between your organization and its identity-provider organization is recorded once and never inferred from a name.
 
 ## Frequently asked questions
 
@@ -90,7 +90,7 @@ Renaming a tenant never creates a second organisation in the identity provider. 
   <Accordion title="Can two applications share one database?">
     No. One application owns each database. Others can be granted read access through `sharedData`, so a schema migration is never a negotiation between two release cycles.
   </Accordion>
-  <Accordion title="Can I reach another tenant's application?">
-    No. There is no field in which another tenant could be named.
+  <Accordion title="Can I reach another organization's application?">
+    No. There is no field in which another organization could be named.
   </Accordion>
 </AccordionGroup>

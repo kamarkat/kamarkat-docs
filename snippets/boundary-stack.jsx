@@ -7,7 +7,7 @@ export const BoundaryStack = () => {
           tag: "Boundaries 05–07",
           name: "Fleet",
           color: "#a855f7",
-          desc: "Rendered from your tenant repository for each workload cluster and each application. The management cluster deploys these; they run on the workload clusters.",
+          desc: "Rendered from your GitOps repository for each workload cluster and each application. The management cluster deploys these; they run on the workload clusters.",
           items: [
             { name: "Workload-cluster platform catalog" },
             { name: "Shared gateway per workload cluster" },
@@ -50,7 +50,6 @@ export const BoundaryStack = () => {
             { name: "Telemetry collection" },
             { name: "Observability backend", optional: true },
             { name: "Credit Authority", optional: true },
-            { name: "Support Agent", optional: true },
           ],
         },
         {
@@ -103,7 +102,7 @@ export const BoundaryStack = () => {
           tag: "Per application",
           name: "Applications",
           color: "#a855f7",
-          desc: "One set per application declared in your tenant repository, in its own namespace.",
+          desc: "One set per application declared in your GitOps repository, in its own namespace.",
           items: [
             { name: "Namespace and identity" },
             { name: "Database and role" },
@@ -139,7 +138,6 @@ export const BoundaryStack = () => {
             { name: "Sandboxed runtime" },
             { name: "Telemetry collection" },
             { name: "Observability stores and alerts" },
-            { name: "Support Agent" },
             { name: "Configuration reloader" },
           ],
         },

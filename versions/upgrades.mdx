@@ -1,0 +1,82 @@
+---
+title: "Upgrades"
+description: "An upgrade is a pull request against your GitOps repository that changes one cluster's version. Nothing changes until you merge it."
+---
+
+> Kamarkat publishes a version. Your automation proposes it, and your control plane applies it once you merge.
+
+## What it is
+
+An upgrade changes the version a single cluster pins. Your GitOps repository has a `renovate.json`, and your organization's dependency-update automation reads it. The automation watches the bundle registry and opens a pull request each time a newer version is published.
+
+The pull request changes two fields in `registry/clusters/<cluster>/bundle.yaml`, `targetRevision` and `bundleVersion`, and nothing else. It does not copy bundle content or touch your values, so it never conflicts with your own changes.
+
+## How it works
+
+<Steps>
+  <Step title="A version is published">
+    The release notes state the versions it spans, its security fixes, whether it is reversible, the oldest version it can be taken from, and its lifecycle dates.
+  </Step>
+  <Step title="Your automation proposes it">
+    It opens one pull request per cluster that is due the version. It links the release notes and explains what merging and closing each mean.
+  </Step>
+  <Step title="You review and merge">
+    Production clusters are never merged automatically. For other clusters, you can turn on automatic merging.
+  </Step>
+  <Step title="Your control plane reconciles">
+    The cluster pulls the bundle chart at the new version and reconciles every layer from it on its next sync.
+  </Step>
+</Steps>
+
+### What the release notes tell you
+
+Each release has a **Taking this version** table:
+
+| Field | What it tells you |
+| :- | :- |
+| **Spans from** | The previous release. Taking this version crosses everything between the two. |
+| **Minimum version this may be taken from** | The oldest version you can upgrade from directly. |
+| **Predecessor restorable from this version** | `yes`, `no` or `unknown`: whether reverting the version also restores the cluster's previous state. |
+
+Security fixes are listed separately. If a release has none, the notes say so.
+
+## What you need to know
+
+### Check the minimum before you skip versions
+
+A version installs directly from any version at or above its stated minimum. Within that range, merging the latest proposal gets you to the same place as merging each proposal on the day it opened. If your cluster is below the minimum, upgrade to the minimum first.
+
+### Rollback restores a declaration, not a state
+
+Reverting the version restores what the cluster asks for. It does not undo what the upgrade already did. For example, a controller that migrates stored resources to a new API version leaves them migrated.
+
+The **Predecessor restorable** field tells you which kind of upgrade you are looking at before you merge it. If it isn't `yes`, prepare your way back before you merge, because that is the only time you can.
+
+### Production stays a human decision
+
+Your `renovate.json` matches files under `clusters/*prod*/`, so proposals for production clusters always wait for a person to merge them.
+
+### Upgrades start when you merge
+
+A cluster changes only after you merge and your control plane reconciles. Kamarkat holds no credential for your repository or your clusters.
+
+## Tips
+
+- **Upgrade one environment at a time.** Each cluster pins its own version, so merge for development first, watch it reconcile, then merge for staging and production.
+- **Automerge non-production clusters** if you want upgrades with no manual step outside production.
+- **Treat `unknown` as `no`.** A reversibility value that isn't stated is not a promise that you can go back.
+- **Merge security proposals promptly.** They are published outside any schedule, specifically so you can take them straight away.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="How do I decline an upgrade?">
+    Close the pull request. The cluster stays on its version, and that version moves through its [lifecycle](/versions/lifecycle) on the usual schedule.
+  </Accordion>
+  <Accordion title="Can I take an older version than the one proposed?">
+    Yes. Set the version you want on both fields in the cluster's `bundle.yaml` and merge. It must be a published release at or above the stated minimum for your current version.
+  </Accordion>
+  <Accordion title="Why did my values not change after an upgrade?">
+    Upgrades never write to your values. A changed default reaches you through the bundle, unless your values file overrides that field.
+  </Accordion>
+</AccordionGroup>

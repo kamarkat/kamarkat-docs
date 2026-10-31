@@ -1,0 +1,50 @@
+---
+title: "Escrow"
+description: "A secret manager you control, outside the box, holding your box's master keys and each cluster's break-glass kubeconfig."
+---
+
+> The escrow is the one copy of your box's keys that survives losing the box.
+
+## What it is
+
+Your box's secret store is encrypted by master keys. The box cannot keep its only copy of them, because they would be unreachable exactly when you need them. The escrow holds a copy outside the box, in a secret manager you control.
+
+| The escrow holds | Used for |
+| :- | :- |
+| **Secret-store master keys** | Restoring every secret when a cluster is rebuilt |
+| **Admin kubeconfig, one per cluster** | Break-glass access when ordinary sign-in has failed |
+
+It is reached with four values, stored as secrets on your GitOps repository: `INFISICAL_ESCROW_URL`, `INFISICAL_ESCROW_PROJECT_ID`, `INFISICAL_ESCROW_CLIENT_ID` and `INFISICAL_ESCROW_CLIENT_SECRET`.
+
+## Getting started
+
+Create the escrow before you scaffold. Scaffolding refuses without it, because an escrow cannot be added afterwards. See [Prepare the escrow](/quickstart/prepare-escrow) for the steps.
+
+## What you need to know
+
+### Rebuilds restore secrets, not re-enter them
+
+The secret store's data is backed up outside the box, and the escrow holds the keys that decrypt it. A rebuilt cluster restores both, so every secret is present before any workload starts. If you find yourself re-entering secrets after a rebuild, the escrow or the backup is broken.
+
+### Break-glass access
+
+```bash
+soloz kubeconfig --cluster acme-hub --out acme-hub.kubeconfig
+```
+
+The credential is cluster-admin and not tied to a person. Use it, then discard it.
+
+### Keep the four values outside the box
+
+They are the only way to reach the escrow when the box is down. Store them where you keep other recovery credentials.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Can I add an escrow to a box that has none?">
+    No. A box without an escrow has nowhere to restore its keys from, which is why scaffolding refuses to create one.
+  </Accordion>
+  <Accordion title="Does Kamarkat have access to my escrow?">
+    No. It is your account in your secret manager, and the four values live only in your repository's secrets and your own records.
+  </Accordion>
+</AccordionGroup>

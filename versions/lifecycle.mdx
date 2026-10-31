@@ -1,0 +1,106 @@
+---
+title: "Version Lifecycle"
+sidebarTitle: "Lifecycle"
+description: "Every version is published with its lifecycle dates. The dates belong to the version, so what you run tells you where you stand."
+---
+
+> A version moves from supported to deprecated to unsupported on dates stated when it is published. Your clusters keep running through every stage.
+
+## What it is
+
+Every release states its lifecycle in its release notes. The lifecycle is a property of the version, not of your organization, so two boxes on the same version are always at the same stage.
+
+<div className="vlc not-prose">
+  <div className="vlc-track">
+    <div className="vlc-seg is-supported">
+      <div className="vlc-bar" />
+      <span className="vlc-name">Supported</span>
+      <span className="vlc-when">180 days, or while within 2 minor versions of the newest</span>
+    </div>
+    <div className="vlc-seg is-deprecated">
+      <div className="vlc-bar" />
+      <span className="vlc-name">Deprecated</span>
+      <span className="vlc-when">90 days, end date stated</span>
+    </div>
+    <div className="vlc-seg is-unsupported">
+      <div className="vlc-bar" />
+      <span className="vlc-name">Unsupported</span>
+      <span className="vlc-when">Best effort</span>
+    </div>
+    <div className="vlc-seg">
+      <div className="vlc-bar" />
+      <span className="vlc-name">End of life</span>
+      <span className="vlc-when">No undertaking</span>
+    </div>
+  </div>
+  <div className="vlc-note">Whichever half of the supported window is longer applies. Nothing stops running at any stage.</div>
+</div>
+
+| Stage | What it means |
+| :- | :- |
+| **Supported** | Kamarkat stands behind the version as shipped. |
+| **Deprecated** | Still maintained, and its end date is announced. You can still adopt it or stay on it. |
+| **Unsupported** | Best effort only, with no undertaking about the outcome. |
+| **End of life** | No undertaking at all. |
+
+## How it works
+
+### The supported window has two halves
+
+A version stays supported for **180 days** from publication, or for as long as it is within **2 minor versions** of the newest release, whichever is longer.
+
+- Time alone would leave you supported on a version six releases behind.
+- Versions alone would let a burst of releases expire a version you adopted last week.
+
+Taking the longer of the two means neither one can shorten the window.
+
+### The release notes state the dates
+
+Each release's notes include a **Support window** table:
+
+| Field | Example |
+| :- | :- |
+| Published | 2026-10-31 |
+| Supported until | 2027-04-29 |
+| Then deprecated until | 2027-07-28 |
+| Or while within | 2 minor versions of the newest published version |
+
+The dates are a floor. The minor-version half can only extend them. A release that states no window is refused before it is published.
+
+### Upgrade proposals carry the same dates
+
+Your upgrade proposal links the release notes, so you see the window when you decide, not only when you go looking.
+
+## What you need to know
+
+### Declining an upgrade is allowed
+
+Closing an upgrade proposal is your decision, and the only effect is that your version keeps moving through its stages on its normal schedule.
+
+### Security fixes are never held back
+
+There is no release train. A version that carries a security fix is published as soon as it is ready, and your repository proposes it the moment it exists. Its release notes list the fixes under **Security fixes in this version**.
+
+### The minor-version half is not yet in effect
+
+Every release so far is `0.1.x`, so every version is within 2 minor versions of the newest. Until a third minor version is published, the 180-day half alone sets the dates.
+
+## Tips
+
+- **Note the "Supported until" date when you merge.** Plan your next upgrade before it passes.
+- **Merge security proposals first.** Declining one leaves the listed fixes unapplied.
+- **Check the minimum before a long jump.** Each release states the oldest version it can be taken from. See [Upgrades](/versions/upgrades).
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="What happens to my cluster when its version becomes unsupported?">
+    Nothing changes in the cluster. It keeps reconciling the version it pins. What lapses is the undertaking about that version, not the cluster's ability to run it.
+  </Accordion>
+  <Accordion title="Can my organization negotiate a longer window?">
+    No. The window belongs to the version, and every organization on the same version is at the same stage.
+  </Accordion>
+  <Accordion title="Where do I find the stage of every version?">
+    See [Release history](/versions/release-history), or open the version's release notes.
+  </Accordion>
+</AccordionGroup>

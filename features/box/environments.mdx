@@ -1,0 +1,76 @@
+---
+title: "Environments"
+description: "An environment is a stage your applications move through, such as dev, stg and prod. Each one is a directory in your GitOps repository, and promotion is a commit."
+---
+
+> Every environment lives on the main branch of your GitOps repository. Promotion moves a version from one directory to the next.
+
+## What it is
+
+An environment is a deployment stage for your applications. Kamarkat recognizes the slugs `dev`, `stg`, `prod` and `ephemeral`, and you choose one when you scaffold a box or declare a cluster.
+
+Each environment is a directory in your GitOps repository. Every application you run in it has its own directory there, holding its declaration and the chart version of each of its workloads.
+
+```text
+environments/
+├── dev/
+│   └── shop/
+│       ├── values.yaml          the app in dev: cell, hosts, capabilities, secrets
+│       └── frontend/Chart.yaml  the version running in dev
+└── prod/
+    └── shop/
+        ├── values.yaml
+        └── frontend/Chart.yaml  the version running in prod
+```
+
+| | What differs per environment |
+| :- | :- |
+| **Cell** | Each app declares the workload cluster it runs on in that environment. |
+| **Hostnames** | Each app declares its public hosts per environment. |
+| **Versions** | Each workload pins its own chart version per environment. |
+| **Secrets** | Secrets are supplied per environment: `soloz fleet secrets set <env> <app> <KEY>`. |
+
+## How it works
+
+### 1. Deploy to the first environment
+
+Your application's build publishes its chart and commits the new version to the workload's `Chart.yaml` in the first environment, usually `dev`. The GitOps engine deploys it on its next pass.
+
+### 2. Promote
+
+To promote, commit the **same version** to the same workload in the next environment. What was tested is exactly what ships, because the version names a chart that cannot change.
+
+### 3. Roll back
+
+To roll back, commit the previous version. Every published version stays in your registry, so going back is an edit to one line.
+
+## What you need to know
+
+### Promotion is never a branch
+
+All environments live on the main branch. There is no environment branch to merge or keep in step, so the repository always shows what runs everywhere.
+
+### Platform versions move the same way
+
+A platform upgrade is a version change in each cluster's `bundle.yaml`, proposed as a pull request. Accept it on a lower environment's cluster first, then on the next.
+
+### Protect production in your repository
+
+Who may change `environments/prod` and `registry/clusters/<prod-cluster>` is set by your repository's own review rules. Require reviewers there, and allow automatic merges only on lower environments.
+
+## Tips
+
+- **Promote by copying the version, never the chart.** The version is the only field that should differ between two environments' `Chart.yaml`.
+- **Keep secrets separate per environment.** A production key supplied to `dev` is a production key exposed to everything `dev` runs.
+- **Name hostnames by environment.** A `dev` host under a `dev` label keeps test traffic visibly apart from production.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Can an environment span several workload clusters?">
+    Each app in an environment declares one cell. Different apps in the same environment can run on different workload clusters.
+  </Accordion>
+  <Accordion title="Can I add a staging environment later?">
+    Yes. Create `environments/stg/<app>/` from the templates in your GitOps repository, declare its cell and hosts, supply its secrets, and commit.
+  </Accordion>
+</AccordionGroup>

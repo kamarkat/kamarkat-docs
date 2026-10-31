@@ -1,0 +1,75 @@
+---
+title: "Git Connection"
+description: "Your git organization holds your GitOps repository and your application repositories, runs Day-0, and hosts your charts and images."
+---
+
+> Your git organization is where your box's desired state lives, and where everything that changes it starts.
+
+## What it is
+
+Kamarkat uses your git organization for four things:
+
+| Use | What it needs |
+| :- | :- |
+| **GitOps repository** | `<tenant>-gitops`, created once by `soloz tenant scaffold` |
+| **Day-0** | The **Bootstrap cluster** workflow, running in your organization's CI |
+| **Application builds** | Write access to your GitOps repository, to pin each new version |
+| **Charts and images** | Your organization's package registry, at `oci://ghcr.io/<org>/charts` |
+
+## Getting started
+
+### 1. Create the GitOps token
+
+Create a token with write access to your organization's repositories and the organization's **Secrets: write** permission. Day-0 commits what it generates with it, and your application builds pin their versions with it.
+
+### 2. Store it on your GitOps repository
+
+`soloz tenant scaffold` stores it as `GITOPS_TOKEN`. To set it yourself:
+
+```bash
+gh secret set GITOPS_TOKEN --repo acme-inc/acme-gitops
+```
+
+### 3. Publish it to your application builds
+
+```bash
+soloz tenant set-gitops-token --org acme-inc
+```
+
+The token is read from stdin, so it stays out of your shell history. Every repository in the organization inherits it, including ones you create later.
+
+### 4. Let your clusters pull your private images
+
+Store `GHCR_USERNAME` and `GHCR_TOKEN` on your GitOps repository. The platform's own images are public; these are for yours.
+
+## What you need to know
+
+### Free plans deliver organization secrets to public repositories only
+
+On GitHub's free plan, a private repository's workflow receives an empty organization secret and fails with *"Invalid username or token"*. Publish per repository instead:
+
+```bash
+soloz tenant set-gitops-token --repo acme-inc/shop
+soloz tenant set-gitops-token --discover --gitops-repo acme-inc/acme-gitops
+```
+
+`--discover` finds the repositories whose workflows write to your GitOps repository.
+
+### Upgrade proposals come from your own automation
+
+Your GitOps repository carries a `renovate.json`. Your organization's dependency-update automation reads it, watches for new platform versions and opens pull requests. Kamarkat holds no access to your repository.
+
+### Protect what matters
+
+Your GitOps repository is administered by your organization. Use its review rules to require reviewers on production clusters and environments, and enable automatic merges where you want them.
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Can I use a different git provider?">
+    The Day-0 workflow, the scaffold and `set-gitops-token` are built for GitHub today.
+  </Accordion>
+  <Accordion title="What happens if the GitOps token expires?">
+    Your box keeps running. Application builds stop pinning new versions, and Day-0 cannot commit, until you set a new token with the same commands.
+  </Accordion>
+</AccordionGroup>

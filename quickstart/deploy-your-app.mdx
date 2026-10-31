@@ -1,22 +1,22 @@
 ---
 title: "Deploy your app"
-description: "Your app's build publishes its chart and commits the version to your tenant repository. That commit is the deployment."
+description: "Your app's build publishes its chart and commits the version to your GitOps repository. That commit is the deployment."
 ---
 
-Your application's repository holds its source and its chart. Its build publishes the chart to your organisation's registry, then commits the new version to the workload's `Chart.yaml` in your tenant repository. The GitOps engine deploys it on its next pass.
+Your application's repository holds its source and its chart. Its build publishes the chart to your organization's registry, then commits the new version to the workload's `Chart.yaml` in your GitOps repository. The GitOps engine deploys it on its next pass.
 
-## Step 1: Give your builds write access to the tenant repository
+## Step 1: Give your builds write access to the GitOps repository
 
-Publish the credential your builds use, once, at the organisation level:
+Publish the credential your builds use, once, at the organization level:
 
 ```bash
 soloz tenant set-gitops-token --org acme-inc
 ```
 
-The command reads the token from stdin, so it stays out of your shell history. Every repository in the organisation inherits it, including ones you create later.
+The command reads the token from stdin, so it stays out of your shell history. Every repository in the organization inherits it, including ones you create later.
 
 <Warning>
-On GitHub's free plan, organisation secrets reach **public** repositories only. A private repository's workflow receives an empty value and fails with *"Invalid username or token"*. On the free plan, publish per repository instead: `soloz tenant set-gitops-token --repo acme-inc/shop`, or let `--discover --gitops-repo acme-inc/acme-gitops` find the repositories whose workflows write to it.
+On GitHub's free plan, organization secrets reach **public** repositories only. A private repository's workflow receives an empty value and fails with *"Invalid username or token"*. On the free plan, publish per repository instead: `soloz tenant set-gitops-token --repo acme-inc/shop`, or let `--discover --gitops-repo acme-inc/acme-gitops` find the repositories whose workflows write to it.
 </Warning>
 
 ## Step 2: Build your chart on the platform library
@@ -45,7 +45,7 @@ Add a job to your application's CI that:
 1. Builds and pushes the image.
 2. Packages the chart with the image **digest** as its `appVersion`.
 3. Pushes the chart to `oci://ghcr.io/acme-inc/charts`.
-4. Clones the tenant repository with `GITOPS_TOKEN` and sets the new version in `environments/dev/shop/frontend/Chart.yaml`.
+4. Clones the GitOps repository with `GITOPS_TOKEN` and sets the new version in `environments/dev/shop/frontend/Chart.yaml`.
 5. Commits and pushes.
 
 ```bash
@@ -58,7 +58,7 @@ git -C gitops commit -am "shop/frontend ${VERSION}" && git -C gitops push
 ```
 
 <Note>
-Admission refuses any image referenced by tag. The digest travels inside the chart, so there is no field in your tenant repository where an image could be written.
+Admission refuses any image referenced by tag. The digest travels inside the chart, so there is no field in your GitOps repository where an image could be written.
 </Note>
 
 ## Step 4: Check the deployment
@@ -77,7 +77,7 @@ To promote to another environment, commit the same version to that environment's
   <Card title="Deploying applications" icon="cubes" href="/features/capabilities/workloads">
     Public routes, configuration and the workload library in depth.
   </Card>
-  <Card title="Tenants and applications" icon="sitemap" href="/features/box/tenants-and-apps">
+  <Card title="Organizations and applications" icon="sitemap" href="/features/box/tenants-and-apps">
     Connect apps to each other and share data by declaration.
   </Card>
 </CardGroup>

@@ -1,6 +1,7 @@
 ---
 title: "Environments"
 description: "An environment is a stage your applications move through, such as dev, stg and prod. Each one is a directory in your GitOps repository, and promotion is a commit."
+keywords: ["environments", "dev", "stg", "prod", "promotion", "rollback"]
 ---
 
 > Every environment lives on the main branch of your GitOps repository. Promotion moves a version from one directory to the next.
@@ -25,7 +26,7 @@ environments/
 
 | | What differs per environment |
 | :- | :- |
-| **Cell** | Each app declares the workload cluster it runs on in that environment. |
+| **Cell** | Each app declares the managed cluster it runs on in that environment. |
 | **Hostnames** | Each app declares its public hosts per environment. |
 | **Versions** | Each workload pins its own chart version per environment. |
 | **Secrets** | Secrets are supplied per environment: `soloz fleet secrets set <env> <app> <KEY>`. |
@@ -67,8 +68,8 @@ Who may change `environments/prod` and `registry/clusters/<prod-cluster>` is set
 ## Frequently asked questions
 
 <AccordionGroup>
-  <Accordion title="Can an environment span several workload clusters?">
-    Each app in an environment declares one cell. Different apps in the same environment can run on different workload clusters.
+  <Accordion title="Can an environment span several managed clusters?">
+    Each app in an environment declares one cell. Different apps in the same environment can run on different managed clusters.
   </Accordion>
   <Accordion title="Can I add a staging environment later?">
     Yes. Create `environments/stg/<app>/` from the templates in your GitOps repository, declare its cell and hosts, supply its secrets, and commit.

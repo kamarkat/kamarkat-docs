@@ -5,12 +5,12 @@ export const BoundaryStack = () => {
       layers: [
         {
           tag: "Boundaries 05–07",
-          name: "Fleet",
+          name: "Cluster and workload provisioning",
           color: "#a855f7",
-          desc: "Rendered from your GitOps repository for each workload cluster and each application. The management cluster deploys these; they run on the workload clusters.",
+          desc: "Rendered from your GitOps repository for each managed cluster and each application. The management cluster deploys these; they run on the managed clusters.",
           items: [
-            { name: "Workload-cluster platform catalog" },
-            { name: "Shared gateway per workload cluster" },
+            { name: "Platform services for managed clusters" },
+            { name: "Shared gateway per managed cluster" },
             { name: "Application provisioning" },
             { name: "Application workloads" },
             { name: "Public TLS routes" },
@@ -18,9 +18,9 @@ export const BoundaryStack = () => {
         },
         {
           tag: "Boundary 04",
-          name: "Tenant services",
+          name: "Organization services",
           color: "#f59e0b",
-          desc: "The services your applications and people sign in through, and the API that manages tenant state.",
+          desc: "The services your applications and people sign in through, and the API that manages organizations and applications.",
           items: [
             { name: "Identity provider" },
             { name: "Identity credentials" },
@@ -33,16 +33,16 @@ export const BoundaryStack = () => {
           tag: "Boundary 03",
           name: "Platform services",
           color: "#10b981",
-          desc: "The services that make the box work: certificates, DNS, the gateway, the secret store, the operators that provision tenants and clusters, and observability.",
+          desc: "The services that make the box work: certificates, DNS, the gateway, the secret store, the operators that provision organizations and clusters, and observability.",
           items: [
             { name: "Certificate issuance" },
             { name: "DNS" },
             { name: "Network policy" },
             { name: "Secret store" },
             { name: "Platform operator" },
-            { name: "Tenant provisioning" },
+            { name: "Organization provisioning" },
             { name: "Cluster registration" },
-            { name: "Workload-cluster bootstrap templates" },
+            { name: "Managed-cluster bootstrap templates" },
             { name: "Infrastructure provider" },
             { name: "Cluster autoscaler" },
             { name: "Gateway" },
@@ -96,7 +96,7 @@ export const BoundaryStack = () => {
       ],
     },
     workload: {
-      title: "Workload cluster",
+      title: "Managed cluster",
       layers: [
         {
           tag: "Per application",
@@ -123,9 +123,9 @@ export const BoundaryStack = () => {
         },
         {
           tag: "Per cluster",
-          name: "Platform catalog",
+          name: "Platform services",
           color: "#10b981",
-          desc: "Everything the platform runs on a workload cluster, delivered as one unit from the management cluster.",
+          desc: "Everything the platform runs on a managed cluster, delivered as one unit from the management cluster.",
           items: [
             { name: "Composition and database roles" },
             { name: "Secret delivery" },

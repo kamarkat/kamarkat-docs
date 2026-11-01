@@ -1,6 +1,7 @@
 ---
 title: "Declare your app"
 description: "An application becomes real when its values file exists in your GitOps repository. It then gets a namespace, a database, a login client and its hostnames."
+keywords: ["application", "declare", "values file", "hostnames", "appId"]
 ---
 
 An application is declared in your GitOps repository, one directory per application per environment:
@@ -26,7 +27,7 @@ cp templates/fleet/values.yaml environments/dev/shop/values.yaml
 ```yaml environments/dev/shop/values.yaml
 tenantId: acme          # the organization that owns the box, the same in every app
 appId: shop             # this product; it gets namespace tenant-acme-shop
-cellId: acme-01         # the workload cluster it runs on
+cellId: acme-01         # the managed cluster it runs on
 
 public:
   hosts:
@@ -51,7 +52,7 @@ secrets: []             # secrets you supply; see "Supply your secrets"
 | :- | :- |
 | `tenantId` | Your organization. The same value in every app's file. |
 | `appId` | The product, and its isolation unit. It never defaults to `tenantId`. |
-| `cellId` | Must match the workload cluster's name, or nothing is generated for the app. |
+| `cellId` | Must match the managed cluster's name, or nothing is generated for the app. |
 | `public.hosts` | Public hostnames. An empty list publishes nothing. |
 | `database.enabled` | Provisions the app's own database and role. |
 
@@ -79,7 +80,7 @@ The placeholder version cannot resolve, on purpose. An empty dependency list wou
 
 ## Step 3: Publish the hostnames and commit
 
-Your workload cluster has one shared gateway whose listeners come from every app's `public.hosts`. Regenerate it, then commit:
+Your managed cluster has one shared gateway whose listeners come from every app's `public.hosts`. Regenerate it, then commit:
 
 ```bash
 soloz fleet hosts aggregate

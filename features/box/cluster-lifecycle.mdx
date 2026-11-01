@@ -1,7 +1,7 @@
 ---
-title: "Cluster Lifecycle"
-sidebarTitle: "Cluster Lifecycle"
+title: "Cluster lifecycle"
 description: "Day-0 creates your management cluster once, under your control. After that, every cluster is a declaration in your repository, reconciled by your own control plane."
+keywords: ["cluster lifecycle", "day-0", "cluster template", "soloz tenant add-cluster"]
 ---
 
 > Day-0 runs once. After that, your repository is the only authority.
@@ -30,19 +30,19 @@ Day-0 bootstraps the management cluster in phases. Each phase records its state,
 
 Day-0 commits the facts it discovers, such as the control-plane address, to your repository. That is the only write made outside a pull request.
 
-### 4. Declare workload clusters
+### 4. Declare managed clusters
 
-To add a workload cluster, render the **cluster template** into a new directory in your repository and commit it. Your control plane provisions it, and keeps it in its desired state from then on.
+To add a managed cluster, render the **cluster template** into a new directory in your repository and commit it. Your control plane provisions it, and keeps it in its desired state from then on.
 
 ## What you need to know
 
-### One management cluster, any number of workload clusters
+### One management cluster, any number of managed clusters
 
-A GitOps repository holds exactly one management cluster and any number of workload clusters, each in a directory named after it.
+A GitOps repository holds exactly one management cluster and any number of managed clusters, each in a directory named after it.
 
-### You name your workload clusters
+### You name your managed clusters
 
-A workload cluster's name is chosen by you, written once, and never computed. It becomes the cluster's **cell id**, and every per-cluster identity (backup locations, labels, autoscaling targets) derives from it.
+A managed cluster's name is chosen by you, written once, and never computed. It becomes the cluster's **cell id**, and every per-cluster identity (backup locations, labels, autoscaling targets) derives from it.
 
 ### Policy attaches to cells
 
@@ -54,7 +54,7 @@ You can add on-premises worker nodes to a cluster at any point in its life. They
 
 ### Spokes are not workflows
 
-A workflow provisions once and then stops caring; a controller does not. That is why workload clusters are declarations reconciled continuously, not jobs run by CI.
+A workflow provisions once and then stops caring; a controller does not. That is why managed clusters are declarations reconciled continuously, not jobs run by CI.
 
 ## Frequently asked questions
 
@@ -62,7 +62,7 @@ A workflow provisions once and then stops caring; a controller does not. That is
   <Accordion title="Do I need to run Day-0 again to add a cluster?">
     No. Day-0 runs once, for the management cluster. Every later cluster is a declaration in your repository.
   </Accordion>
-  <Accordion title="Can I rename a workload cluster?">
+  <Accordion title="Can I rename a managed cluster?">
     No. The name is the cluster's identity, and changing it would destroy what it names. Declare a new cluster instead.
   </Accordion>
 </AccordionGroup>

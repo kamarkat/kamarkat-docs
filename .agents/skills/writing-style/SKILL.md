@@ -22,7 +22,7 @@ These are hard constraints — never deviate.
 | Avoid | Use instead |
 | :- | :- |
 | hub | management cluster |
-| spoke | workload cluster |
+| spoke | managed cluster |
 | fleet | application (or app) |
 | tenant (in prose) | organization; keep `tenant` only in literal values such as `tenantId` and `--tenant` |
 | tenant repository | GitOps repository |
@@ -33,7 +33,7 @@ These are hard constraints — never deviate.
 | Kamarkat manages / operates your box | Kamarkat delivers the platform into your box |
 | upgrade (as something Kamarkat does) | upgrade proposal you accept |
 | SaaS, hosted platform | delivered into your box |
-| internal component names (`hub-operator`, `kube-sbt`, `mcp-server`) | the capability they provide (platform operator, tenant provisioning, control-plane API) |
+| internal component names (`hub-operator`, `kube-sbt`, `mcp-server`) | the capability they provide (platform operator, organization provisioning, control-plane API) |
 
 ### No vendor names
 
@@ -147,7 +147,7 @@ Kamarkat is an open-source platform a startup runs its business on. It delivers 
 - Not responsible for the customer's applications — the customer owns their code, images, data and how they use each capability
 
 **The correct mental model:**
-- The **box** is the constant — a management cluster and its workload clusters, in the customer's account
+- The **box** is the constant — a management cluster and its managed clusters, in the customer's account
 - The **GitOps repository** is the only source of desired state for the box
 - Kamarkat **publishes versions**; the customer's own automation proposes them and the customer's control plane applies them
 - Kamarkat **provides the capability**; the customer **owns its use**
@@ -162,13 +162,13 @@ Kamarkat is an open-source platform a startup runs its business on. It delivers 
 ## Concepts to use accurately
 
 **Box**
-A management cluster running the customer's control plane, plus the workload clusters it provisions. It runs in the customer's cloud account under credentials only the customer holds, belongs to one tenant, and keeps running whether or not Kamarkat is reachable.
+A management cluster running the customer's control plane, plus the managed clusters it provisions. It runs in the customer's cloud account under credentials only the customer holds, belongs to one tenant, and keeps running whether or not Kamarkat is reachable.
 
 **Tenant and application**
 The tenant is the organization that owns the box (`tenantId`). An application is a product running on it (`appId`), and the unit of isolation: its own namespace `tenant-<tenantId>-<appId>`, database, identity project, secret path and network policy. Being in the same tenant never grants access; only a declaration does.
 
 **Cell**
-A workload cluster's name, chosen by the customer and fixed for life. Applications name the cell they run on. Policy attaches to cells.
+A managed cluster's name, chosen by the customer and fixed for life. Applications name the cell they run on. Policy attaches to cells.
 
 **GitOps repository**
 `<tenant>-gitops` in the customer's git organization. For each cluster it holds the bundle version and the customer's values; for each application, its declaration and the chart version of each workload.

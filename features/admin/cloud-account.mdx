@@ -1,13 +1,14 @@
 ---
-title: "Cloud Account"
+title: "Cloud account"
 description: "The cloud account your box runs in. You own it, pay for it, and hold the only credential that creates clusters in it."
+keywords: ["cloud account", "HCLOUD_TOKEN", "hetzner", "hybrid", "dns zone"]
 ---
 
 > Your clusters are created in your cloud account, with your token. Kamarkat never receives it.
 
 ## What it is
 
-The cloud account is where your management cluster and workload clusters run, and what your cloud provider bills you for. Its API token is stored as the `HCLOUD_TOKEN` secret on your GitOps repository, where Day-0 reads it, and then held by your control plane, which creates every later cluster with it.
+The cloud account is where your management cluster and managed clusters run, and what your cloud provider bills you for. Its API token is stored as the `HCLOUD_TOKEN` secret on your GitOps repository, where Day-0 reads it, and then held by your control plane, which creates every later cluster with it.
 
 | Provider | What it runs |
 | :- | :- |
@@ -36,11 +37,11 @@ gh secret set HCLOUD_TOKEN --repo acme-inc/acme-gitops
 
 ### Region and size
 
-You choose the region when you scaffold (`--region`) and when you add a workload cluster. A workload cluster starts with 2 cloud worker nodes unless you pass `--workers`.
+You choose the region when you scaffold (`--region`) and when you add a managed cluster. A managed cluster starts with 2 cloud worker nodes unless you pass `--workers`.
 
 ### Nodes on your own machines
 
-`hybrid` is a development provider. Its platform database uses node-local storage, so `stg` and `prod` run on `hetzner` only. With `hybrid`, a workload cluster has no cloud workers: its capacity is the hardware you list for it. Until you add nodes, workloads stay pending. The control plane and those nodes join your tailnet with the `TS_AUTHKEY` secret.
+`hybrid` is a development provider. Its platform database uses node-local storage, so `stg` and `prod` run on `hetzner` only. With `hybrid`, a managed cluster has no cloud workers: its capacity is the hardware you list for it. Until you add nodes, workloads stay pending. The control plane and those nodes join your tailnet with the `TS_AUTHKEY` secret.
 
 ### One account per box
 

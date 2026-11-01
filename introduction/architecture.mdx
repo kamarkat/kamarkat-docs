@@ -1,13 +1,14 @@
 ---
 title: "BYOC architecture"
 description: "Your box runs in your own cloud account and reconciles from your own repository. Kamarkat publishes versions; nothing connects inward."
+keywords: ["architecture", "byoc", "management cluster", "managed cluster", "bundle", "deployment boundaries"]
 ---
 
 import { BoundaryStack } from "/snippets/boundary-stack.jsx";
 
 ## Architecture overview
 
-A Kamarkat deployment lives entirely in accounts you own: a git organization that holds the desired state, and a cloud account that runs the box. The box is a management cluster running your control plane, plus the workload clusters it provisions. Kamarkat delivers the platform into the box, but holds no credential to it and never connects into it.
+A Kamarkat deployment lives entirely in accounts you own: a git organization that holds the desired state, and a cloud account that runs the box. The box is a management cluster running your control plane, plus the managed clusters it provisions. Kamarkat delivers the platform into the box, but holds no credential to it and never connects into it.
 
 Kamarkat's side is small: a release pipeline publishes bundle versions to a registry.
 
@@ -49,7 +50,7 @@ Kamarkat's side is small: a release pipeline publishes bundle versions to a regi
             <span className="arch-pipe-arrow">↓</span>
             <span className="arch-chip">Composition: turns declarations into resources</span>
             <span className="arch-pipe-arrow">↓</span>
-            <span className="arch-chip">Cluster lifecycle: provisions workload clusters</span>
+            <span className="arch-chip">Cluster lifecycle: provisions managed clusters</span>
           </div>
           <div className="arch-row">
             <div className="arch-box">
@@ -58,7 +59,7 @@ Kamarkat's side is small: a release pipeline publishes bundle versions to a regi
             </div>
             <div className="arch-box">
               <span className="arch-icon"><Icon icon="users-gear" /></span>
-              <span><strong>Tenant provisioning</strong><span className="arch-muted">organizations, projects, clients</span></span>
+              <span><strong>Organization provisioning</strong><span className="arch-muted">organizations, projects, clients</span></span>
             </div>
             <div className="arch-box">
               <span className="arch-icon"><Icon icon="server" /></span>
@@ -74,7 +75,7 @@ Kamarkat's side is small: a release pipeline publishes bundle versions to a regi
             </div>
             <div className="arch-box">
               <span className="arch-icon"><Icon icon="fingerprint" /></span>
-              <span><strong>Cluster identity</strong><span className="arch-muted">each workload cluster's store access</span></span>
+              <span><strong>Cluster identity</strong><span className="arch-muted">each managed cluster's store access</span></span>
             </div>
             <div className="arch-box">
               <span className="arch-icon"><Icon icon="certificate" /></span>
@@ -102,7 +103,7 @@ Kamarkat's side is small: a release pipeline publishes bundle versions to a regi
             </div>
             <div className="arch-box">
               <span className="arch-icon"><Icon icon="coins" /></span>
-              <span><strong>Credit Authority</strong><span className="arch-muted">per-tenant credit ledger</span></span>
+              <span><strong>Credit Authority</strong><span className="arch-muted">per-organization credit ledger</span></span>
             </div>
             <div className="arch-box">
               <span className="arch-icon"><Icon icon="chart-line" /></span>
@@ -113,7 +114,7 @@ Kamarkat's side is small: a release pipeline publishes bundle versions to a regi
               <span><strong>Cluster console</strong><span className="arch-muted">sign in with your identity</span></span>
             </div>
           </div>
-          <span className="arch-label">Each workload cluster</span>
+          <span className="arch-label">Each managed cluster</span>
           <div className="arch-row">
             <div className="arch-box">
               <span className="arch-icon arch-icon-neutral"><Icon icon="cubes" /></span>
@@ -170,7 +171,7 @@ Kamarkat's side is small: a release pipeline publishes bundle versions to a regi
   </div>
 </div>
 
-The diagram above shows one box. Your GitOps repository is the only source of desired state. The GitOps engine on the management cluster reconciles it, and the cluster lifecycle provisions each workload cluster you declare. Your applications run on the workload clusters, each in its own namespace, alongside the gateway, database and observability stores that cluster needs.
+The diagram above shows one box. Your GitOps repository is the only source of desired state. The GitOps engine on the management cluster reconciles it, and the cluster lifecycle provisions each managed cluster you declare. Your applications run on the managed clusters, each in its own namespace, alongside the gateway, database and observability stores that cluster needs.
 
 ## Deployment boundaries
 
@@ -178,7 +179,7 @@ Nothing in a box is deployed all at once. Each cluster is built in layers called
 
 <BoundaryStack />
 
-On the management cluster, Day-0 lays the foundation once and hands over to the GitOps engine, which then reconciles every boundary above it from your GitOps repository. A workload cluster receives its foundation as it is created; from then on the management cluster delivers its platform catalog, its shared gateway and your applications.
+On the management cluster, Day-0 lays the foundation once and hands over to the GitOps engine, which then reconciles every boundary above it from your GitOps repository. A managed cluster receives its foundation as it is created; from then on the management cluster delivers its platform services, its shared gateway and your applications.
 
 A selectable capability is part of its boundary only when you select it in your cluster's values.
 
@@ -193,26 +194,26 @@ A selectable capability is part of its boundary only when you select it in your 
 
 ### Management cluster
 
-- **GitOps engine**: reconciles everything in the box from your GitOps repository. An agent on each workload cluster applies what it is given.
-- **Composition**: turns the platform's own declarations, such as a tenant application or a database, into the resources that realise them.
-- **Cluster lifecycle**: provisions and maintains the workload clusters you declare.
-- **Platform operator**: generates platform-owned secrets and renders the configuration each workload cluster needs.
-- **Tenant provisioning**: creates each application's organization, project and clients in the identity provider.
-- **Control-plane API**: the platform's API for managing tenant state.
+- **GitOps engine**: reconciles everything in the box from your GitOps repository. An agent on each managed cluster applies what it is given.
+- **Composition**: turns the platform's own declarations, such as an application or a database, into the resources that realise them.
+- **Cluster lifecycle**: provisions and maintains the managed clusters you declare.
+- **Platform operator**: generates platform-owned secrets and renders the configuration each managed cluster needs.
+- **Organization provisioning**: creates each application's organization, project and clients in the identity provider.
+- **Control-plane API**: the platform's API for managing organizations and applications.
 - **Secret store**: the box's single store for secret material.
-- **Secret delivery**: delivers secrets from the store to the workloads that declare them. Each workload cluster pulls only its own.
-- **Cluster identity**: gives each workload cluster its own identity for reaching the secret store.
+- **Secret delivery**: delivers secrets from the store to the workloads that declare them. Each managed cluster pulls only its own.
+- **Cluster identity**: gives each managed cluster its own identity for reaching the secret store.
 - **Certificate issuance**: public TLS certificates and the box's internal certificate authority.
 - **Identity provider**: one instance for the box. Each application is its own project in your organization.
 - **Gateway and login**: authenticates browser traffic for the platform's own interfaces.
 - **Admission policy**: decides what may run, including required labels and digest-pinned images.
 - **Network and DNS**: default-deny network policy and the DNS records for the box's hostnames.
 - **Platform database and cache**: state for the platform's own services.
-- **Credit Authority**: a per-tenant credit ledger with transactional guarantees.
+- **Credit Authority**: a per-organization credit ledger with transactional guarantees.
 - **Observability**: the management cluster's own stores and alerting, plus the dashboards for every cluster in the box.
 - **Cluster console**: a web console for the clusters, signed in through the box's identity provider.
 
-### Each workload cluster
+### Each managed cluster
 
 - **Your applications**: one namespace per application, isolated by default.
 - **Gateway and login**: public traffic for your applications terminates on the cluster that runs them.

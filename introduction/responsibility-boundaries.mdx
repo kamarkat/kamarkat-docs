@@ -1,6 +1,7 @@
 ---
-title: "Responsibility Boundaries"
+title: "Responsibility boundaries"
 description: "What Kamarkat provides and what you own, across your repositories, your infrastructure and your applications."
+keywords: ["responsibility", "ownership", "shared responsibility", "gitops repository", "infrastructure"]
 ---
 
 > Kamarkat provides the platform. You own the box it runs in, and everything you build on it.
@@ -29,7 +30,7 @@ There is no third party. Kamarkat is built for organizations without a platform 
 | :- | :- | :- |
 | **Cloud account** | — | Own it, pay for it, hold its credentials |
 | **Management cluster** | Ships the control plane it runs | Create it with Day-0, from your own CI |
-| **Workload clusters** | Ships the cluster template and the platform catalog | Declare them; your control plane provisions them |
+| **Managed clusters** | Ships the cluster template and the platform services | Declare them; your control plane provisions them |
 | **Secrets** | Ships the secret store and delivery | Supply the secrets only you can choose |
 | **Escrow** | — | Own it, outside the box |
 

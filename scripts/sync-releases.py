@@ -77,6 +77,7 @@ def release_page(r: dict, line: str) -> str:
     return f"""---
 title: "{v}"
 description: "Components in bundle version {v}."
+keywords: ["{v}", "components", "inventory", "management cluster", "managed clusters"]
 ---
 
 import {{ ReleaseComponents, ReleaseChanges, BootstrapTools }} from "/snippets/release-components.jsx";
@@ -110,6 +111,7 @@ def line_page(line: str, rows: list[dict]) -> str:
     return f"""---
 title: "{line}"
 description: "Every bundle version on the {line} line, and what each one changed."
+keywords: ["{line}", "releases", "versions", "component changes"]
 ---
 
 import {{ ReleaseLine }} from "/snippets/release-line.jsx";

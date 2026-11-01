@@ -1,6 +1,7 @@
 ---
 title: "Bootstrap your box"
-description: "Day-0 runs in your repository's own CI. It builds the management cluster, waits for it to converge, and brings up your workload cluster."
+description: "Day-0 runs in your repository's own CI. It builds the management cluster, waits for it to converge, and brings up your managed cluster."
+keywords: ["day-0", "bootstrap", "management cluster", "soloz verify"]
 ---
 
 Day-0 runs as the **Bootstrap cluster** workflow in your GitOps repository, on your organization's runners, under the secrets you stored there. It is pinned to the platform version your repository was scaffolded on, so a later change to the platform cannot change how your repository bootstraps.
@@ -43,8 +44,8 @@ The run takes a few hours. It works through these stages, and each must succeed 
   <Step title="Verify the management cluster converges">
     Waits for every platform boundary to become healthy, within a fixed budget.
   </Step>
-  <Step title="Bring up the workload cluster">
-    The management cluster provisions the workload cluster your repository declares.
+  <Step title="Bring up the managed cluster">
+    The management cluster provisions the managed cluster your repository declares.
   </Step>
   <Step title="Validate the platform">
     Runs the platform's validation and publishes the record as a run artefact.
@@ -67,9 +68,9 @@ soloz verify --cluster acme-hub --timeout 15m
 If a run fails part-way, fix the cause and start the workflow again. Phases that completed are not repeated, and a phase that is not safe to repeat refuses to resume rather than running twice.
 </Tip>
 
-## Adding more workload clusters later
+## Adding more managed clusters later
 
-A further workload cluster is a declaration, not another Day-0. `soloz tenant add-cluster` renders the cluster template your GitOps repository carries. From the repository root:
+A further managed cluster is a declaration, not another Day-0. `soloz tenant add-cluster` renders the cluster template your GitOps repository carries. From the repository root:
 
 ```bash
 soloz tenant add-cluster \

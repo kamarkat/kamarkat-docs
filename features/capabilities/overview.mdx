@@ -1,6 +1,7 @@
 ---
 title: "Capabilities"
 description: "The platform is the set of capabilities it provides. Some run on every box; others you select. Kamarkat ships and tests both; you own how you use them."
+keywords: ["capabilities", "machinery", "database", "observability", "values"]
 ---
 
 > Kamarkat provides the capability. You own the use you make of it.
@@ -72,8 +73,16 @@ A bundle version certifies the machinery as a unit and each capability against i
 ## Frequently asked questions
 
 <AccordionGroup>
-  <Accordion title="Is there a catalog of tools to choose from?">
-    No. Every capability ships in the bundle, at versions tested together, and you turn the selectable ones on or off in your cluster's values. A capability you leave off still moves with each version, so turning it on later needs nothing but a change to your values.
+  <Accordion title="How do I add a tool my apps need, such as a database?">
+    It is already in your box. Every capability ships with each version, and the selectable ones are on by default. To turn one on or off, change its value in your cluster's `values.yaml` and commit:
+
+    ```yaml
+    capabilities:
+      database:
+        enabled: true
+    ```
+
+    There is nothing to browse, install or register. A capability you leave off still moves with each version, so turning it on later is the same one-line change.
   </Accordion>
   <Accordion title="Can I bring my own database or identity provider?">
     The platform's own components authenticate against the box's identity provider, so it is machinery. Your applications can call any external service you declare.

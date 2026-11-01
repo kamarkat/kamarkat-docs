@@ -1,6 +1,7 @@
 ---
 title: "Deploy your app"
 description: "Your app's build publishes its chart and commits the version to your GitOps repository. That commit is the deployment."
+keywords: ["deploy", "chart", "platform-workload", "digest", "pin"]
 ---
 
 Your application's repository holds its source and its chart. Its build publishes the chart to your organization's registry, then commits the new version to the workload's `Chart.yaml` in your GitOps repository. The GitOps engine deploys it on its next pass.
@@ -63,7 +64,7 @@ Admission refuses any image referenced by tag. The digest travels inside the cha
 
 ## Step 4: Check the deployment
 
-Once the commit lands, the GitOps engine reconciles it. Your app runs in namespace `tenant-acme-shop` on its workload cluster, and its hostname serves behind the box's login.
+Once the commit lands, the GitOps engine reconciles it. Your app runs in namespace `tenant-acme-shop` on its managed cluster, and its hostname serves behind the box's login.
 
 ```bash
 kubectl get pods -n tenant-acme-shop

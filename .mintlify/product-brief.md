@@ -35,10 +35,10 @@ terminal and a cloud console, not a Kubernetes specialist.
 ## Motivation
 
 The closest comparable system, kubefirst, provisions and hands over; Kamarkat ships the control
-plane into the customer's box and keeps it maintained through published versions the customer
-accepts (ADR-071). The customer keeps custody: credentials, data and the decision to change anything
+plane into the customer's box and publishes versions the customer accepts (ADR-071). The customer keeps custody: credentials, data and the decision to change anything
 running stay with them (ADR-065). No catalog: every capability ships in the bundle and is enabled in
 the customer's own values (ADR-071).
 
-**Assumption:** Kamarkat is open source; the docs describe the open-source product only (user
-instruction, 2026-10-31). Subscription and support content is deferred.
+The docs describe the open-source, turnkey platform only (user instruction, 2026-11-01). Commercial
+content (support, maintenance commitments, credits and billing) is deferred to `scratch/deferred/` and
+will be added later, deliberately.

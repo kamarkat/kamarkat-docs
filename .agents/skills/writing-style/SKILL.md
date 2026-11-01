@@ -171,6 +171,8 @@ This is the most important section. Get this wrong and all the writing will be w
 **What Kamarkat is:**
 Kamarkat is an open-source platform a startup runs its business on. It delivers a complete platform into a box in the customer's own cloud account, for organizations that want a golden path and cannot yet staff a platform team.
 
+**Scope: open source only.** The docs describe the open-source, turnkey platform. Commercial content (support, maintenance commitments, credits, billing, metering, pricing) is out of scope until it is added deliberately; drafts live in `scratch/deferred/`. A customer's own cloud bill is infrastructure cost, not commercial content.
+
 **What Kamarkat is NOT:**
 - Not a hosted or managed service — Kamarkat operates no customer infrastructure and holds no customer credential
 - Not a platform for platform engineers to customise — it is a tested golden path

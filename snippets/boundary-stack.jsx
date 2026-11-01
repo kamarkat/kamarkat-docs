@@ -49,7 +49,6 @@ export const BoundaryStack = () => {
             { name: "Cluster console" },
             { name: "Telemetry collection" },
             { name: "Observability backend", optional: true },
-            { name: "Credit Authority", optional: true },
           ],
         },
         {

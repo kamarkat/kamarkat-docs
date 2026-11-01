@@ -19,23 +19,11 @@ Kamarkat's side is small: a release pipeline publishes bundle versions to a regi
       <div className="arch-zone-body">
         <div className="arch-group">
           <span className="arch-label">Your git organization</span>
-          <div className="arch-row">
-            <div className="arch-box">
-              <span className="arch-icon arch-icon-neutral"><Icon icon="code-branch" /></span>
-              <span><strong>GitOps repository</strong><span className="arch-muted">versions and values per cluster</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon arch-icon-neutral"><Icon icon="folder-open" /></span>
-              <span><strong>Application repositories</strong><span className="arch-muted">source, chart, build</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon arch-icon-neutral"><Icon icon="robot" /></span>
-              <span><strong>Upgrade automation</strong><span className="arch-muted">proposes new versions</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon arch-icon-neutral"><Icon icon="terminal" /></span>
-              <span><strong>Day-0 runner</strong><span className="arch-muted">your CI, runs once</span></span>
-            </div>
+          <div className="arch-caps">
+            <a className="arch-cap" href="/features/box/bundle"><span className="arch-icon arch-icon-neutral"><Icon icon="code-branch" /></span>GitOps repository</a>
+            <a className="arch-cap" href="/features/workloads/deploying-applications"><span className="arch-icon arch-icon-neutral"><Icon icon="folder-open" /></span>Application repositories</a>
+            <a className="arch-cap" href="/versions/upgrades"><span className="arch-icon arch-icon-neutral"><Icon icon="robot" /></span>Upgrade proposals (Renovate)</a>
+            <a className="arch-cap" href="/features/capabilities/cluster-lifecycle"><span className="arch-icon arch-icon-neutral"><Icon icon="terminal" /></span>Day-0 runner (your CI)</a>
           </div>
         </div>
         <div className="arch-inline-wire">
@@ -43,104 +31,41 @@ Kamarkat's side is small: a release pipeline publishes bundle versions to a regi
           <span className="arch-wire-label">Desired state</span>
         </div>
         <div className="arch-group arch-group-managed">
-          <span className="arch-label">Your box: the platform, delivered by Kamarkat</span>
-          <span className="arch-label">Management cluster</span>
-          <div className="arch-pipe">
-            <span className="arch-chip">GitOps engine: reconciles your repository on every cluster</span>
-            <span className="arch-pipe-arrow">↓</span>
-            <span className="arch-chip">Composition: turns declarations into resources</span>
-            <span className="arch-pipe-arrow">↓</span>
-            <span className="arch-chip">Cluster lifecycle: provisions managed clusters</span>
+          <span className="arch-label">Your box · Management cluster: your control plane</span>
+          <div className="arch-caps">
+            <a className="arch-cap" href="/features/capabilities/gitops-and-composition"><span className="arch-icon"><Icon icon="code-merge" /></span>GitOps and composition</a>
+            <a className="arch-cap" href="/features/capabilities/cluster-lifecycle"><span className="arch-icon"><Icon icon="server" /></span>Cluster lifecycle</a>
+            <a className="arch-cap" href="/features/capabilities/secret-management"><span className="arch-icon"><Icon icon="key" /></span>Secret management</a>
+            <a className="arch-cap" href="/features/capabilities/certificate-management"><span className="arch-icon"><Icon icon="certificate" /></span>Certificate management</a>
+            <a className="arch-cap" href="/features/capabilities/identity-management"><span className="arch-icon"><Icon icon="id-card" /></span>Identity management</a>
+            <a className="arch-cap" href="/features/capabilities/gateway-and-login"><span className="arch-icon"><Icon icon="shield-halved" /></span>Gateway and login</a>
+            <a className="arch-cap" href="/features/capabilities/networking-and-dns"><span className="arch-icon"><Icon icon="network-wired" /></span>Networking and DNS</a>
+            <a className="arch-cap" href="/features/capabilities/admission-policy"><span className="arch-icon"><Icon icon="scale-balanced" /></span>Admission policy</a>
+            <a className="arch-cap" href="/features/capabilities/observability"><span className="arch-icon"><Icon icon="chart-line" /></span>Observability</a>
+            <a className="arch-cap" href="/features/capabilities/databases"><span className="arch-icon"><Icon icon="database" /></span>Databases</a>
+            <a className="arch-cap" href="/features/capabilities/console-and-platform-services"><span className="arch-icon"><Icon icon="desktop" /></span>Console and platform services</a>
           </div>
-          <div className="arch-row">
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="gears" /></span>
-              <span><strong>Platform operator</strong><span className="arch-muted">generates secrets, renders cluster config</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="users-gear" /></span>
-              <span><strong>Organization provisioning</strong><span className="arch-muted">organizations, projects, clients</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="server" /></span>
-              <span><strong>Control-plane API</strong><span className="arch-muted">MCP server</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="key" /></span>
-              <span><strong>Secret store</strong><span className="arch-muted">the box's secret material</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="right-left" /></span>
-              <span><strong>Secret delivery</strong><span className="arch-muted">store to workloads</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="fingerprint" /></span>
-              <span><strong>Cluster identity</strong><span className="arch-muted">each managed cluster's store access</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="certificate" /></span>
-              <span><strong>Certificate issuance</strong><span className="arch-muted">TLS and internal PKI</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="id-card" /></span>
-              <span><strong>Identity provider</strong><span className="arch-muted">one per box</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="shield-halved" /></span>
-              <span><strong>Gateway and login</strong><span className="arch-muted">platform interfaces</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="scale-balanced" /></span>
-              <span><strong>Admission policy</strong><span className="arch-muted">what may run</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="network-wired" /></span>
-              <span><strong>Network and DNS</strong><span className="arch-muted">policy, records</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="database" /></span>
-              <span><strong>Platform database and cache</strong><span className="arch-muted">state of platform services</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="coins" /></span>
-              <span><strong>Credit Authority</strong><span className="arch-muted">per-organization credit ledger</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="chart-line" /></span>
-              <span><strong>Observability</strong><span className="arch-muted">stores, alerts, dashboards for every cluster</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="desktop" /></span>
-              <span><strong>Cluster console</strong><span className="arch-muted">sign in with your identity</span></span>
-            </div>
+          <div className="arch-inline-wire">
+            <span className="arch-wire"></span>
+            <span className="arch-wire-label">Provisions and reconciles</span>
           </div>
-          <span className="arch-label">Each managed cluster</span>
-          <div className="arch-row">
-            <div className="arch-box">
-              <span className="arch-icon arch-icon-neutral"><Icon icon="cubes" /></span>
-              <span><strong>Your applications</strong><span className="arch-muted">one namespace per app</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="shield-halved" /></span>
-              <span><strong>Gateway and login</strong></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="database" /></span>
-              <span><strong>Database</strong></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="wave-square" /></span>
-              <span><strong>Observability</strong><span className="arch-muted">metrics, logs, alerts</span></span>
-            </div>
-            <div className="arch-box">
-              <span className="arch-icon"><Icon icon="house" /></span>
-              <span><strong>On-premises nodes</strong><span className="arch-muted">optional</span></span>
-            </div>
+          <span className="arch-label">Your box · Managed clusters</span>
+          <div className="arch-caps">
+            <a className="arch-cap" href="/features/workloads/deploying-applications"><span className="arch-icon arch-icon-neutral"><Icon icon="cubes" /></span>Your applications</a>
+            <a className="arch-cap" href="/features/capabilities/gitops-and-composition"><span className="arch-icon"><Icon icon="code-merge" /></span>GitOps and composition</a>
+            <a className="arch-cap" href="/features/capabilities/secret-management"><span className="arch-icon"><Icon icon="key" /></span>Secret management</a>
+            <a className="arch-cap" href="/features/capabilities/certificate-management"><span className="arch-icon"><Icon icon="certificate" /></span>Certificate management</a>
+            <a className="arch-cap" href="/features/capabilities/gateway-and-login"><span className="arch-icon"><Icon icon="shield-halved" /></span>Gateway and login</a>
+            <a className="arch-cap" href="/features/capabilities/networking-and-dns"><span className="arch-icon"><Icon icon="network-wired" /></span>Networking and DNS</a>
+            <a className="arch-cap" href="/features/capabilities/admission-policy"><span className="arch-icon"><Icon icon="scale-balanced" /></span>Admission policy</a>
+            <a className="arch-cap" href="/features/capabilities/observability"><span className="arch-icon"><Icon icon="chart-line" /></span>Observability</a>
+            <a className="arch-cap" href="/features/capabilities/databases"><span className="arch-icon"><Icon icon="database" /></span>Databases</a>
+            <a className="arch-cap" href="/features/capabilities/console-and-platform-services"><span className="arch-icon"><Icon icon="desktop" /></span>Console and platform services</a>
+            <a className="arch-cap" href="/features/capabilities/cluster-lifecycle"><span className="arch-icon arch-icon-neutral"><Icon icon="house" /></span>On-premises nodes (optional)</a>
           </div>
         </div>
-        <div className="arch-box">
-          <span className="arch-icon arch-icon-neutral"><Icon icon="vault" /></span>
-          <span><strong>Break-glass escrow</strong><span className="arch-muted">admin credential, outside the box</span></span>
+        <div className="arch-caps">
+            <a className="arch-cap" href="/features/admin/escrow"><span className="arch-icon arch-icon-neutral"><Icon icon="vault" /></span>Break-glass escrow (outside the box)</a>
         </div>
       </div>
     </div>
@@ -157,21 +82,16 @@ Kamarkat's side is small: a release pipeline publishes bundle versions to a regi
     <div className="arch-zone arch-zone-key">
       <span className="arch-zone-tab">Kamarkat</span>
       <div className="arch-zone-body">
-        <span className="arch-label">Release</span>
-        <div className="arch-box">
-          <span className="arch-icon"><Icon icon="rocket" /></span>
-          <span><strong>Release pipeline</strong></span>
-        </div>
-        <div className="arch-box">
-          <span className="arch-icon"><Icon icon="box-archive" /></span>
-          <span><strong>Bundle registry</strong></span>
+        <div className="arch-caps">
+            <a className="arch-cap" href="/versions/overview"><span className="arch-icon"><Icon icon="rocket" /></span>Release pipeline</a>
+            <a className="arch-cap" href="/versions/overview"><span className="arch-icon"><Icon icon="box-archive" /></span>Bundle registry</a>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-The diagram above shows one box. Your GitOps repository is the only source of desired state. The GitOps engine on the management cluster reconciles it, and the cluster lifecycle provisions each managed cluster you declare. Your applications run on the managed clusters, each in its own namespace, alongside the gateway, database and observability stores that cluster needs.
+Select any part to read about it. Your GitOps repository is the only source of desired state: your control plane on the management cluster reconciles it and provisions each managed cluster you declare, where your applications run. Kamarkat only publishes versions, which your box pulls.
 
 ## Deployment boundaries
 

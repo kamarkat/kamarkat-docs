@@ -76,8 +76,7 @@
               "features/capabilities/admission-policy",
               "features/capabilities/console-and-platform-services",
               "features/capabilities/observability",
-              "features/capabilities/databases",
-              "features/capabilities/credits"
+              "features/capabilities/databases"
             ]
           },
           {

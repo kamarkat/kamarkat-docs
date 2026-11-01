@@ -185,50 +185,7 @@ A selectable capability is part of its boundary only when you select it in your 
 
 ## Components
 
-### Your git organization
-
-- **GitOps repository** (`<tenant>-gitops`): one directory per cluster, holding the bundle version that cluster runs and the values it runs with.
-- **Application repositories**: each application's source and chart. Its build publishes the chart to a registry in your organization and commits the new version to the GitOps repository.
-- **Upgrade automation**: a dependency-update bot that runs in your organization, watches for published bundle versions and opens pull requests against your GitOps repository.
-- **Day-0 runner**: your own CI, which creates the management cluster once under your credentials.
-
-### Management cluster
-
-- **GitOps engine**: reconciles everything in the box from your GitOps repository. An agent on each managed cluster applies what it is given.
-- **Composition**: turns the platform's own declarations, such as an application or a database, into the resources that realise them.
-- **Cluster lifecycle**: provisions and maintains the managed clusters you declare.
-- **Platform operator**: generates platform-owned secrets and renders the configuration each managed cluster needs.
-- **Organization provisioning**: creates each application's organization, project and clients in the identity provider.
-- **Control-plane API**: the platform's API for managing organizations and applications.
-- **Secret store**: the box's single store for secret material.
-- **Secret delivery**: delivers secrets from the store to the workloads that declare them. Each managed cluster pulls only its own.
-- **Cluster identity**: gives each managed cluster its own identity for reaching the secret store.
-- **Certificate issuance**: public TLS certificates and the box's internal certificate authority.
-- **Identity provider**: one instance for the box. Each application is its own project in your organization.
-- **Gateway and login**: authenticates browser traffic for the platform's own interfaces.
-- **Admission policy**: decides what may run, including required labels and digest-pinned images.
-- **Network and DNS**: default-deny network policy and the DNS records for the box's hostnames.
-- **Platform database and cache**: state for the platform's own services.
-- **Credit Authority**: a per-organization credit ledger with transactional guarantees.
-- **Observability**: the management cluster's own stores and alerting, plus the dashboards for every cluster in the box.
-- **Cluster console**: a web console for the clusters, signed in through the box's identity provider.
-
-### Each managed cluster
-
-- **Your applications**: one namespace per application, isolated by default.
-- **Gateway and login**: public traffic for your applications terminates on the cluster that runs them.
-- **Database**: a platform-maintained database cluster. Each application receives its own empty database and role.
-- **Observability**: collection, storage and alert evaluation for that cluster.
-- **On-premises nodes** (optional): worker nodes you add for workloads and burst capacity. They never hold cluster-machinery state.
-
-### Break-glass escrow
-
-The box's admin credential is escrowed outside the box, in a secret store in your own cloud account. You use it only when ordinary sign-in has failed. You sign in to the box through its identity provider.
-
-### Kamarkat
-
-- **Release pipeline**: builds and publishes each bundle version.
-- **Bundle registry**: holds every published version. Versions are immutable and never deleted.
+Each box in the diagram is a capability. What each one gives you, and the open-source projects it is built on, is on its page under [Capabilities](/features/capabilities/overview). Your git organization's part is described in [Git connection](/features/admin/git-connection), and the break-glass escrow in [Escrow](/features/admin/escrow).
 
 ## Connectivity model
 
@@ -247,7 +204,7 @@ Stopping using Kamarkat stops nothing running: your box holds everything it need
 
 **Application releases** follow the same shape. Your application's build publishes its chart and commits the new version to your GitOps repository, and the GitOps engine deploys it.
 
-See [The Bundle](/features/box/bundle), [Upgrades](/versions/upgrades) and [Deploying Applications](/features/capabilities/workloads) for details.
+See [The Bundle](/features/box/bundle), [Upgrades](/versions/upgrades) and [Deploying Applications](/features/workloads/deploying-applications) for details.
 
 ## Data residency
 

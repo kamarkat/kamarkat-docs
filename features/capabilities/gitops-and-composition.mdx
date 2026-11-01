@@ -1,0 +1,33 @@
+---
+title: "GitOps and composition"
+description: "How your box reconciles itself from your GitOps repository, and how one declaration becomes every resource behind it, on the GitOps engine and composition."
+keywords: ["gitops", "gitops engine", "composition", "reconcile", "agent"]
+---
+
+> Your GitOps repository is the only source of desired state. The GitOps engine makes the box match it, and composition turns each declaration into the resources behind it.
+
+## What it gives you
+
+- **Reconciliation.** The GitOps engine on the management cluster reconciles everything in the box from your GitOps repository. An agent on each managed cluster applies what it is given.
+- **Cluster registration.** Each cluster the platform creates is registered with the GitOps engine as it appears.
+- **Composition.** The platform's own declarations, such as an application or a database, become the set of resources that realise them.
+- **Configuration reloads.** A workload restarts when a secret or config map it reads changes.
+
+## What you own
+
+The contents of your GitOps repository. Every change to what runs reaches your clusters as a commit there.
+
+## Built on
+
+| Project | Role in your box | Runs on |
+| :- | :- | :- |
+| **Argo CD** | The GitOps engine | Both cluster types |
+| **Argo CD agent** | Applies, on each managed cluster, what the management cluster gives it | Managed clusters |
+| **capi2argo** | Registers each new cluster with the GitOps engine | Management cluster |
+| **Crossplane** | Composition | Both cluster types |
+| **Crossplane Kubernetes provider** | Lets a composition create objects in any cluster the platform manages | Both cluster types |
+| **Patch and transform function** | The function the platform's compositions are written in | Both cluster types |
+| **Reloader** | Restarts a workload when a secret or config map it reads changes | Both cluster types |
+| **Argo Rollouts** | Progressive delivery for application workloads | Managed clusters |
+
+Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.

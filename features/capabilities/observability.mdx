@@ -56,6 +56,20 @@ Anyone with the viewer role can query every application's telemetry in the box. 
 
 Usage records for billing never pass through the observability stack, and switching observability off cannot affect them.
 
+
+## Built on
+
+| Project | Role in your box | Runs on |
+| :- | :- | :- |
+| **Grafana Alloy** | Collects metrics and logs on every node and cluster | Both cluster types |
+| **VictoriaMetrics operator** | Runs the metrics stores | Both cluster types |
+| **Loki** | Log storage and search | Both cluster types |
+| **Grafana operator** | Manages dashboards and data sources as declarations | Management cluster |
+| **kube-state-metrics** | Exposes the state of Kubernetes objects as metrics | Both cluster types |
+| **metrics-server** | Resource metrics for autoscaling and kubectl top | Management cluster |
+
+Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.
+
 ## Frequently asked questions
 
 <AccordionGroup>

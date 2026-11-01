@@ -1,0 +1,25 @@
+---
+title: "Console and platform services"
+description: "The cluster console you sign in to through the identity provider, and the platform's own services that run your box: its operators, its API and job runners."
+keywords: ["console", "headlamp", "platform operator", "control-plane api", "sandbox"]
+---
+
+> A web console for every cluster, and the platform's own services that keep the box running.
+
+## What it gives you
+
+- **A cluster console** for the clusters in the box, signed in through the box's identity provider.
+- **The control-plane API,** the platform's API for managing organizations and applications.
+- **Short-lived jobs and sandboxes** on managed clusters for application work that needs isolation.
+
+## Built on
+
+| Project | Role in your box | Runs on |
+| :- | :- | :- |
+| **Headlamp** | The cluster console | Management cluster |
+| **Control-plane API** | The platform's API | Management cluster |
+| **Platform operator** | Reconciles the management cluster's own platform state | Management cluster |
+| **Ephemeral job operator** | Runs short-lived jobs on managed clusters | Managed clusters |
+| **Agent sandbox controller** | Runs isolated, short-lived sandboxes for application jobs | Managed clusters |
+
+Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.

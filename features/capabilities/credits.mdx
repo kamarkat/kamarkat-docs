@@ -1,0 +1,33 @@
+---
+title: "Credits"
+description: "How a box that grants and spends usage credits records them in a ledger, how to turn the Credit Authority on, and which open-source project the ledger runs on."
+keywords: ["credits", "credit authority", "ledger", "usage"]
+---
+
+> The Credit Authority is a ledger for a box that grants and spends credits.
+
+## What it gives you
+
+- **A credit ledger** for the box, with transactional guarantees.
+- **A route for it,** `credits.<hubDomain>`, through the gateway.
+
+## How to turn it on
+
+Credits are selectable and off by default:
+
+```yaml
+capabilities:
+  credits:
+    enabled: true
+```
+
+An application consumes it by declaring `capabilities.credits` in its own values.
+
+## Built on
+
+| Project | Role in your box | Runs on |
+| :- | :- | :- |
+| **Formance Ledger** | Records every credit grant and spend | Management cluster |
+| **agentgateway** | Serves the ledger's route | Management cluster |
+
+Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.

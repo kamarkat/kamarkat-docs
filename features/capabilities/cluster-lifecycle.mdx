@@ -56,6 +56,25 @@ You can add on-premises worker nodes to a cluster at any point in its life. They
 
 A workflow provisions once and then stops caring; a controller does not. That is why managed clusters are declarations reconciled continuously, not jobs run by CI.
 
+
+## Built on
+
+| Project | Role in your box | Runs on |
+| :- | :- | :- |
+| **Cluster API** | Creates, scales and replaces the management cluster and managed clusters | Management cluster |
+| **Cluster API provider for Hetzner** | Creates cluster machines, networks and load balancers in your cloud account | Management cluster |
+| **Kubernetes** | The control plane each cluster runs, created with kubeadm | Both cluster types |
+| **etcd** | The control plane's key-value store | Both cluster types |
+| **Kubernetes node tools** | kubelet, kubeadm and kubectl on every node | Both cluster types |
+| **containerd and runc** | The container runtime on every node | Both cluster types |
+| **Ubuntu** | The node operating system, the provider's stock image | Both cluster types |
+| **Hetzner cloud controller manager** | Node lifecycle and load balancers in your cloud account | Management cluster |
+| **Hetzner CSI driver** | Block-storage volumes for persistent data | Management cluster |
+| **Local path provisioner** | Node-local volumes on clusters without cloud block storage | Management cluster |
+| **clusterctl** | Moves cluster management onto the management cluster during Day-0; runs from the soloz CLI, on no cluster | Bootstrap only |
+
+Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.
+
 ## Frequently asked questions
 
 <AccordionGroup>

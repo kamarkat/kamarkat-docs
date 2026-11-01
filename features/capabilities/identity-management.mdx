@@ -1,0 +1,29 @@
+---
+title: "Identity management"
+description: "How your box gives each application its own project in your organization's identity provider, how people and services sign in, and which projects provide it."
+keywords: ["identity", "identity provider", "sign-in", "access tokens", "client credentials"]
+---
+
+> One identity provider serves the box. Each application is its own project in your organization.
+
+## What it gives you
+
+- **One identity provider** for the box. Your organization is an organization in it.
+- **A project per application,** with its clients created for you when the application is declared.
+- **Token rules every application follows:**
+  - An application's API accepts **access tokens**, never ID tokens.
+  - An application calling another on its own behalf uses **client credentials**.
+  - An application acting for a user carries **that user's own access token** for the target.
+
+## What you own
+
+Your users and the roles you give them.
+
+## Built on
+
+| Project | Role in your box | Runs on |
+| :- | :- | :- |
+| **ZITADEL** | The identity provider | Management cluster |
+| **Organization provisioning** | Creates each organization, its projects and clients from your GitOps repository | Management cluster |
+
+Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.

@@ -1,0 +1,38 @@
+---
+title: "Databases"
+description: "How your applications get their own PostgreSQL database and role on a platform-maintained database cluster, how to turn it on, and which projects run it."
+keywords: ["database", "postgresql", "cloudnativepg", "backups", "failover"]
+---
+
+> Declare that an application needs a database, and you receive an empty database and a role it owns.
+
+## What it gives you
+
+- **A database cluster** on each managed cluster, maintained by the platform, including replicas, backups and failover.
+- **An empty database and role per application,** created when the application declares it needs one.
+- **The platform's own database and cache** on the management cluster, for the platform's services.
+
+## What you own
+
+Everything inside your application's database: tables, functions, migrations and data.
+
+## How to turn it on
+
+Databases are selectable and on by default:
+
+```yaml
+capabilities:
+  database:
+    enabled: true
+```
+
+## Built on
+
+| Project | Role in your box | Runs on |
+| :- | :- | :- |
+| **CloudNativePG** | Runs PostgreSQL clusters with backups and failover | Managed clusters |
+| **PostgreSQL** | The database engine | Both cluster types |
+| **Crossplane SQL provider** | Creates each application's database and role | Managed clusters |
+| **Redis** | The platform cache | Both cluster types |
+
+Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.

@@ -1,0 +1,24 @@
+---
+title: "Gateway and login"
+description: "How traffic reaches your applications and the platform's interfaces through a gateway that terminates TLS and requires sign-in, and which projects provide it."
+keywords: ["gateway", "login", "tls", "routes", "public routes"]
+---
+
+> Every application's traffic passes through a gateway that handles TLS and sign-in, on the cluster that runs it.
+
+## What it gives you
+
+- **A gateway per managed cluster.** Public traffic for your applications terminates on the cluster that runs them.
+- **Sign-in at the gateway.** Your users sign in through the gateway, so login is part of the platform and not something each application builds.
+- **Routes that need no sign-in,** such as static assets or share links, only when you declare them; see [Deploying applications](/features/workloads/deploying-applications).
+- **Login for the platform's own interfaces** on the management cluster.
+
+## Built on
+
+| Project | Role in your box | Runs on |
+| :- | :- | :- |
+| **agentgateway** | The gateway that serves application and platform routes | Both cluster types |
+| **Login gateway** | Signs people in before a request reaches a protected route | Management cluster |
+| **NGINX** | Serves static pages and public assets | Managed clusters |
+
+Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.

@@ -1,0 +1,26 @@
+---
+title: "Networking and DNS"
+description: "How pods in your box reach each other under default-deny network policy, how cluster DNS works, and how public DNS records are published for your hostnames."
+keywords: ["networking", "dns", "network policy", "cilium", "externaldns"]
+---
+
+> Every cluster runs default-deny network policy, its own DNS, and publishes the DNS records for the box's hostnames.
+
+## What it gives you
+
+- **Container networking and network policy.** Traffic between workloads is denied unless a declaration allows it.
+- **Cluster DNS,** with a cache on every node.
+- **Public DNS records** for every hostname the box serves, published to your DNS provider.
+
+## Built on
+
+| Project | Role in your box | Runs on |
+| :- | :- | :- |
+| **Cilium** | Container networking, network policy and the Gateway API implementation | Both cluster types |
+| **CoreDNS** | Cluster DNS | Both cluster types |
+| **NodeLocal DNSCache** | A DNS cache on every node | Both cluster types |
+| **Cluster proportional autoscaler** | Scales cluster DNS with the size of the cluster | Management cluster |
+| **ExternalDNS** | Publishes DNS records for every public hostname | Both cluster types |
+| **ExternalDNS provider webhook** | Connects ExternalDNS to the provider's DNS service | Both cluster types |
+
+Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.

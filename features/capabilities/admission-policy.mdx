@@ -1,0 +1,24 @@
+---
+title: "Admission policy"
+description: "How your box decides what may run on every cluster, including required labels and digest-pinned images, and which open-source project enforces the policy."
+keywords: ["admission policy", "policy", "digest", "kyverno", "labels"]
+---
+
+> Every cluster checks what it is asked to run before it runs it.
+
+## What it gives you
+
+- **Admission checks** on everything a cluster admits, including required labels and images pinned by digest.
+- **The same rules on every cluster,** delivered with each bundle version.
+
+## What you own
+
+Meeting the rules in your charts. The platform workload library renders compliant objects; see [Deploying applications](/features/workloads/deploying-applications).
+
+## Built on
+
+| Project | Role in your box | Runs on |
+| :- | :- | :- |
+| **Kyverno** | Admission policy | Both cluster types |
+
+Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.

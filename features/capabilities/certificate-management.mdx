@@ -1,0 +1,27 @@
+---
+title: "Certificate management"
+description: "How your box issues and renews public TLS certificates for every hostname and runs its own internal certificate authority, and which projects provide them."
+keywords: ["certificates", "tls", "certificate authority", "dns-01", "renewal"]
+---
+
+> Every hostname gets a public TLS certificate, issued and renewed for you, and the box runs its own internal certificate authority.
+
+## What it gives you
+
+- **Public TLS certificates** for every gateway and webhook, issued and renewed automatically.
+- **Domain ownership proof** through your DNS provider.
+- **An internal certificate authority** for certificates used inside the box.
+
+## What you own
+
+Your domain and its DNS zone; see [Cloud account](/features/admin/cloud-account).
+
+## Built on
+
+| Project | Role in your box | Runs on |
+| :- | :- | :- |
+| **cert-manager** | Issues and renews certificates | Both cluster types |
+| **cert-manager DNS-01 webhook** | Proves domain ownership through the provider's DNS | Both cluster types |
+| **Infisical PKI issuer** | Issues internal certificates from the secret store's certificate authority | Both cluster types |
+
+Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.

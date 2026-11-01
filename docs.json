@@ -59,18 +59,33 @@
             "group": "Platform",
             "pages": [
               "features/box/overview",
-              "features/box/tenants-and-apps",
-              "features/box/environments",
-              "features/box/bundle",
-              "features/box/cluster-lifecycle"
+              "features/box/bundle"
             ]
           },
           {
             "group": "Capabilities",
             "pages": [
               "features/capabilities/overview",
-              "features/capabilities/workloads",
-              "features/capabilities/observability"
+              "features/capabilities/gitops-and-composition",
+              "features/capabilities/cluster-lifecycle",
+              "features/capabilities/secret-management",
+              "features/capabilities/certificate-management",
+              "features/capabilities/networking-and-dns",
+              "features/capabilities/gateway-and-login",
+              "features/capabilities/identity-management",
+              "features/capabilities/admission-policy",
+              "features/capabilities/console-and-platform-services",
+              "features/capabilities/observability",
+              "features/capabilities/databases",
+              "features/capabilities/credits"
+            ]
+          },
+          {
+            "group": "Workloads",
+            "pages": [
+              "features/workloads/organizations-and-applications",
+              "features/workloads/environments",
+              "features/workloads/deploying-applications"
             ]
           },
           {
@@ -119,5 +134,23 @@
     "socials": {
       "x": "https://x.com/kamarkat"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/features/capabilities/workloads",
+      "destination": "/features/workloads/deploying-applications"
+    },
+    {
+      "source": "/features/box/tenants-and-apps",
+      "destination": "/features/workloads/organizations-and-applications"
+    },
+    {
+      "source": "/features/box/environments",
+      "destination": "/features/workloads/environments"
+    },
+    {
+      "source": "/features/box/cluster-lifecycle",
+      "destination": "/features/capabilities/cluster-lifecycle"
+    }
+  ]
 }

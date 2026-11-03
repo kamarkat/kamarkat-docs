@@ -53,7 +53,19 @@
       ],
       "url": "https://github.com/agentgateway/agentgateway",
       "latest": "1.7.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: a third copy carries a digest with no tag, so its version is unreportable. A tag is restored alongside the digest in the next release.",
+          "target": "next release"
+        },
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: the gateway ships at two versions in one release, one on the management cluster and one in the managed-cluster catalogue. They converge in the next release.",
+          "target": "next release"
+        }
+      ]
     },
     {
       "name": "alertmanager",
@@ -80,7 +92,13 @@
       "digests": [],
       "url": "https://github.com/prometheus/alertmanager",
       "latest": "0.34.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A patch behind, delivered by the observability operator rather than pinned directly. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "argocd",
@@ -107,7 +125,13 @@
       "digests": [],
       "url": "https://github.com/argoproj/argo-cd",
       "latest": "3.5.6",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "declined",
+          "reason": "The newest release is a breaking major: it always enforces log access control, changes how resource ownership is tracked, and broadens the resources it ignores. The Day-0 seed installs this chart and an Application then adopts that same release, so both halves must move in one change or the engine upgrades itself while it is still reconciling the first boundary."
+        }
+      ]
     },
     {
       "name": "dex",
@@ -134,7 +158,14 @@
       "digests": [],
       "url": "https://github.com/dexidp/dex",
       "latest": "2.46.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: this row is the identity broker image shipped with the chart, recorded under the wrong component, so it is compared against the wrong upstream project. The catalog entry is corrected in the next release.",
+          "target": "next release"
+        }
+      ]
     },
     {
       "name": "busybox",
@@ -161,7 +192,13 @@
       ],
       "url": "https://git.busybox.net/busybox",
       "latest": "1.38.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A minor behind. A helper image in hand-written manifests, with no chart governing it."
+        }
+      ]
     },
     {
       "name": "capi2argo-cluster-operator",
@@ -213,7 +250,15 @@
       "digests": [],
       "url": "https://github.com/cert-manager/cert-manager",
       "latest": "1.21.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Installed before the GitOps engine exists, from a release URL held in a build constant, as a prerequisite of the cluster lifecycle controllers. It moves with that controller set.",
+          "blocked_by": "Cluster API",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "cert-manager-webhook",
@@ -238,7 +283,15 @@
       "digests": [],
       "url": "https://github.com/cert-manager/cert-manager",
       "latest": "1.21.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Installed before the GitOps engine exists, from a release URL held in a build constant, as a prerequisite of the cluster lifecycle controllers. It moves with that controller set.",
+          "blocked_by": "Cluster API",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "cert-manager-webhook-hetzner",
@@ -263,7 +316,13 @@
       "digests": [],
       "url": "https://github.com/hetzner/cert-manager-webhook-hetzner",
       "latest": "0.9.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A patch release behind, in a vendored render. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "cilium",
@@ -289,7 +348,15 @@
       ],
       "url": "https://github.com/cilium/cilium",
       "latest": "1.20.4",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The shipped release supports Kubernetes below 1.33, so it moves with Kubernetes rather than ahead of it. Upstream supports consecutive-minor upgrades only, and the delivered payload carries hand-applied patches that must be re-applied to any new render.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "operator-generic",
@@ -315,7 +382,15 @@
       ],
       "url": "https://github.com/cilium/cilium",
       "latest": "1.20.4",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The shipped release supports Kubernetes below 1.33, so it moves with Kubernetes rather than ahead of it. Upstream supports consecutive-minor upgrades only, and the delivered payload carries hand-applied patches that must be re-applied to any new render.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "cluster-api-controller",
@@ -341,7 +416,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes-sigs/cluster-api",
       "latest": "1.14.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Capped by the infrastructure provider, whose current line is tested against Cluster API 1.13 and below. The newest Cluster API is unreachable until that provider ships its next line.",
+          "blocked_by": "Cluster API provider for Hetzner",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "cluster-api-operator",
@@ -365,7 +448,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes-sigs/cluster-api-operator",
       "latest": "0.30.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The operator installs the provider versions it is given, so it moves with the provider set rather than on its own. Its manifest is vendored, so the version and the vendored copy move together.",
+          "blocked_by": "Cluster API",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kubeadm-bootstrap-controller",
@@ -391,7 +482,16 @@
       "digests": [],
       "url": "https://github.com/kubernetes-sigs/cluster-api",
       "latest": "1.14.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: the kubeadm bootstrap and control-plane providers were left behind the core provider, so one release ships a mismatched Cluster API set. They move to the core provider's version in the next release.",
+          "blocked_by": "Cluster API",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kubeadm-control-plane-controller",
@@ -417,7 +517,16 @@
       "digests": [],
       "url": "https://github.com/kubernetes-sigs/cluster-api",
       "latest": "1.14.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: the kubeadm bootstrap and control-plane providers were left behind the core provider, so one release ships a mismatched Cluster API set. They move to the core provider's version in the next release.",
+          "blocked_by": "Cluster API",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "caph",
@@ -443,7 +552,15 @@
       "digests": [],
       "url": "https://github.com/syself/cluster-api-provider-hetzner",
       "latest": "1.1.10",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The newer line drops Kubernetes 1.31, which the nodes still run, so it moves with Kubernetes. It also still implements the deprecated Cluster API contract, which is what caps Cluster API itself.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "spoke-identity-operator",
@@ -496,7 +613,13 @@
       "digests": [],
       "url": "https://github.com/kubernetes-sigs/cluster-proportional-autoscaler",
       "latest": "1.10.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A minor behind, pinned beside the DNS cache it scales. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "containerd",
@@ -574,7 +697,15 @@
       "digests": [],
       "url": "https://github.com/coredns/coredns",
       "latest": "1.15.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Not independently pinned. kubeadm chooses CoreDNS for the Kubernetes version in use, so this moves only when Kubernetes does.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "crossplane",
@@ -601,7 +732,14 @@
       "digests": [],
       "url": "https://github.com/crossplane/crossplane",
       "latest": "2.4.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "declined",
+          "reason": "The newest release is a breaking major: it removes claims, so every composite definition has to be re-declared before the engine can move. Taking it is a migration of the definitions that provision clusters and tenant databases, not a version bump.",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "provider-kubernetes",
@@ -626,7 +764,14 @@
       "digests": [],
       "url": "https://github.com/crossplane-contrib/provider-kubernetes",
       "latest": "1.4.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Crossplane: the provider line has to match the engine major, because the scope of its managed resources differs between them.",
+          "blocked_by": "Crossplane"
+        }
+      ]
     },
     {
       "name": "csi-attacher",
@@ -653,7 +798,14 @@
       "digests": [],
       "url": "https://github.com/kubernetes-csi/external-attacher",
       "latest": "4.13.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Five sidecars on five independent release series, pinned beside the storage driver's manifest. Each has its own newest release; none has been assessed.",
+          "blocked_by": "Hetzner CSI driver"
+        }
+      ]
     },
     {
       "name": "csi-node-driver-registrar",
@@ -680,7 +832,14 @@
       "digests": [],
       "url": "https://github.com/kubernetes-csi/node-driver-registrar",
       "latest": "2.18.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Five sidecars on five independent release series, pinned beside the storage driver's manifest. Each has its own newest release; none has been assessed.",
+          "blocked_by": "Hetzner CSI driver"
+        }
+      ]
     },
     {
       "name": "csi-provisioner",
@@ -707,7 +866,14 @@
       "digests": [],
       "url": "https://github.com/kubernetes-csi/external-provisioner",
       "latest": "6.4.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Five sidecars on five independent release series, pinned beside the storage driver's manifest. Each has its own newest release; none has been assessed.",
+          "blocked_by": "Hetzner CSI driver"
+        }
+      ]
     },
     {
       "name": "csi-resizer",
@@ -734,7 +900,14 @@
       "digests": [],
       "url": "https://github.com/kubernetes-csi/external-resizer",
       "latest": "2.3.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Five sidecars on five independent release series, pinned beside the storage driver's manifest. Each has its own newest release; none has been assessed.",
+          "blocked_by": "Hetzner CSI driver"
+        }
+      ]
     },
     {
       "name": "livenessprobe",
@@ -761,7 +934,14 @@
       "digests": [],
       "url": "https://github.com/kubernetes-csi/livenessprobe",
       "latest": "2.20.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Five sidecars on five independent release series, pinned beside the storage driver's manifest. Each has its own newest release; none has been assessed.",
+          "blocked_by": "Hetzner CSI driver"
+        }
+      ]
     },
     {
       "name": "curl",
@@ -788,7 +968,14 @@
       ],
       "url": "https://github.com/curl/curl",
       "latest": "8.23.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: pinned by digest with no tag, so its version is unreportable. A tag is restored alongside the digest in the next release.",
+          "target": "next release"
+        }
+      ]
     },
     {
       "name": "etcd",
@@ -813,7 +1000,15 @@
       "digests": [],
       "url": "https://github.com/etcd-io/etcd",
       "latest": "3.7.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Not independently pinned. kubeadm chooses etcd for the Kubernetes version in use, so this moves only when Kubernetes does and will not reach etcd's own newest release.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "external-secrets",
@@ -840,7 +1035,13 @@
       "digests": [],
       "url": "https://github.com/external-secrets/external-secrets",
       "latest": "2.14.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors. Nobody has assessed the move; the operator serves the API versions the platform's objects already use, so no object migration is expected."
+        }
+      ]
     },
     {
       "name": "external-dns",
@@ -867,7 +1068,13 @@
       ],
       "url": "https://github.com/kubernetes-sigs/external-dns",
       "latest": "0.24.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors, pinned as an image rather than installed from a chart. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "external-dns-hetzner-webhook",
@@ -894,7 +1101,14 @@
       ],
       "url": "https://github.com/hetzner/external-dns-hetzner-webhook",
       "latest": "0.5.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by two minors and paired with the DNS controller above. Nobody has assessed the move.",
+          "blocked_by": "ExternalDNS"
+        }
+      ]
     },
     {
       "name": "ledger",
@@ -921,7 +1135,14 @@
       ],
       "url": "https://github.com/formancehq/ledger",
       "latest": "2.4.17",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: pinned by digest with no tag, so the release cannot report which ledger version it runs. A tag is restored alongside the digest in the next release.",
+          "target": "next release"
+        }
+      ]
     },
     {
       "name": "grafana",
@@ -948,7 +1169,15 @@
       "digests": [],
       "url": "https://github.com/grafana/grafana",
       "latest": "13.3.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: the instance carries no image at all, so its version is whatever the operator release defaults to and an operator bump moves it silently. An explicit image is pinned in the next release.",
+          "blocked_by": "Grafana operator",
+          "target": "next release"
+        }
+      ]
     },
     {
       "name": "alloy",
@@ -976,7 +1205,13 @@
       ],
       "url": "https://github.com/grafana/alloy",
       "latest": "1.21.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A patch behind, in a vendored render. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "grafana-operator",
@@ -1003,7 +1238,13 @@
       ],
       "url": "https://github.com/grafana/grafana-operator",
       "latest": "5.25.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A minor behind. Nobody has assessed the move; it also sets the instance version today, which is the defect recorded against the instance."
+        }
+      ]
     },
     {
       "name": "headlamp",
@@ -1028,7 +1269,13 @@
       "digests": [],
       "url": "https://github.com/headlamp-k8s/headlamp",
       "latest": "0.46.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A minor behind. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "hetzner-cloud-controller-manager",
@@ -1082,7 +1329,13 @@
       "digests": [],
       "url": "https://github.com/hetznercloud/csi-driver",
       "latest": "2.24.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors. Nobody has assessed the move; the driver is delivered as a hand-assembled manifest, so its sidecars are pinned here rather than by a chart."
+        }
+      ]
     },
     {
       "name": "infisical",
@@ -1107,7 +1360,13 @@
       "digests": [],
       "url": "https://github.com/Infisical/infisical",
       "latest": "0.167.4",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several patch releases, in a vendored chart. Nobody has assessed the move, and it runs database migrations on start, so it needs its own validation."
+        }
+      ]
     },
     {
       "name": "pki-issuer",
@@ -1132,7 +1391,13 @@
       "digests": [],
       "url": "https://github.com/Infisical/infisical-issuer",
       "latest": "1.0.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "The newest release is a major. Nobody has assessed what it changes for the issuer the platform declares."
+        }
+      ]
     },
     {
       "name": "kube-state-metrics",
@@ -1159,7 +1424,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kube-state-metrics",
       "latest": "2.20.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Each release of this exporter is built against one Kubernetes client version, and the project supports only the pairing. The release matching the target Kubernetes is not the newest one, so this is capped by the Kubernetes destination rather than free to move.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kubectl",
@@ -1185,7 +1458,15 @@
       ],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Kubernetes: this is the client the node bootstrap and init containers run, held within one minor of the API server.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kube-apiserver",
@@ -1210,7 +1491,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The newest policy engine release supports Kubernetes 1.33 to 1.35, and its webhooks gate every deployment, so the newest Kubernetes is not reachable while it is in the stack. 1.35.10 is the destination; 1.37.2 is not available at any policy-engine version.",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kube-controller-manager",
@@ -1235,7 +1524,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The newest policy engine release supports Kubernetes 1.33 to 1.35, and its webhooks gate every deployment, so the newest Kubernetes is not reachable while it is in the stack. 1.35.10 is the destination; 1.37.2 is not available at any policy-engine version.",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kube-proxy",
@@ -1261,7 +1558,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The newest policy engine release supports Kubernetes 1.33 to 1.35, and its webhooks gate every deployment, so the newest Kubernetes is not reachable while it is in the stack. 1.35.10 is the destination; 1.37.2 is not available at any policy-engine version.",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kube-scheduler",
@@ -1286,7 +1591,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The newest policy engine release supports Kubernetes 1.33 to 1.35, and its webhooks gate every deployment, so the newest Kubernetes is not reachable while it is in the stack. 1.35.10 is the destination; 1.37.2 is not available at any policy-engine version.",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "pause",
@@ -1337,7 +1650,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Kubernetes: kubelet, kubeadm and kubectl are installed from the repository the node's Kubernetes version names.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kubectl",
@@ -1362,7 +1683,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Kubernetes: kubelet, kubeadm and kubectl are installed from the repository the node's Kubernetes version names.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kubelet",
@@ -1387,7 +1716,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Kubernetes: kubelet, kubeadm and kubectl are installed from the repository the node's Kubernetes version names.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "k8s",
@@ -1414,7 +1751,15 @@
       "digests": [],
       "url": "https://github.com/alpine-docker/k8s",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Kubernetes: the image tracks the cluster's Kubernetes minor.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "background-controller",
@@ -1441,7 +1786,15 @@
       "digests": [],
       "url": "https://github.com/kyverno/kyverno",
       "latest": "1.19.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "cleanup-controller",
@@ -1468,7 +1821,15 @@
       "digests": [],
       "url": "https://github.com/kyverno/kyverno",
       "latest": "1.19.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kyverno",
@@ -1495,7 +1856,15 @@
       "digests": [],
       "url": "https://github.com/kyverno/kyverno",
       "latest": "1.19.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kyverno-cli",
@@ -1522,7 +1891,15 @@
       "digests": [],
       "url": "https://github.com/kyverno/kyverno",
       "latest": "1.19.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kyvernopre",
@@ -1549,7 +1926,15 @@
       "digests": [],
       "url": "https://github.com/kyverno/kyverno",
       "latest": "1.19.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "readiness-checker",
@@ -1576,7 +1961,20 @@
       "digests": [],
       "url": "https://github.com/kyverno/kyverno",
       "latest": "1.19.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: the readiness-checker image is pinned to a moving tag, so what it runs is whatever the registry served last. It is pinned by digest in the next release.",
+          "target": "next release"
+        },
+        {
+          "status": "scheduled",
+          "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "reports-controller",
@@ -1603,7 +2001,15 @@
       "digests": [],
       "url": "https://github.com/kyverno/kyverno",
       "latest": "1.19.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "local-path-provisioner",
@@ -1629,7 +2035,13 @@
       "digests": [],
       "url": "https://github.com/rancher/local-path-provisioner",
       "latest": "0.0.37",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several patch releases, pinned in a hand-assembled manifest. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "auth-proxy",
@@ -1710,7 +2122,13 @@
       "digests": [],
       "url": "https://github.com/kubernetes-sigs/metrics-server",
       "latest": "0.9.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The newest application release has no chart yet, and this is installed from a chart, so the reachable version is the newest the chart ships."
+        }
+      ]
     },
     {
       "name": "k8s-dns-node-cache",
@@ -1736,7 +2154,13 @@
       "digests": [],
       "url": "https://github.com/kubernetes/dns",
       "latest": "1.26.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors, pinned in a hand-assembled manifest on both the management and managed clusters. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "kube-sbt",
@@ -1788,7 +2212,14 @@
       "digests": [],
       "url": "https://github.com/crossplane-contrib/function-patch-and-transform",
       "latest": "0.11.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Crossplane: composition functions are resolved by the engine, so the function moves with it.",
+          "blocked_by": "Crossplane"
+        }
+      ]
     },
     {
       "name": "hub-operator",
@@ -1844,7 +2275,14 @@
       ],
       "url": "https://github.com/postgres/postgres",
       "latest": "18.6",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "declined",
+          "reason": "Each application selects the newest major it supports, so these differ on purpose. The newest major is declined where a consumer does not support it: the identity store documents support but has an unresolved fresh-install failure on it, and the secret store documents only a floor.",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "redis",
@@ -1877,7 +2315,19 @@
       ],
       "url": "https://github.com/redis/redis",
       "latest": "8.10.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: three different versions of the same cache ship in one release, from separate manifests that were never reconciled. They converge on one version in the next release.",
+          "target": "next release"
+        },
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: one copy is pinned by digest with no tag, so the release cannot report what it runs and nobody can tell whether it is current. A tag is restored alongside the digest in the next release.",
+          "target": "next release"
+        }
+      ]
     },
     {
       "name": "reloader",
@@ -1904,7 +2354,13 @@
       "digests": [],
       "url": "https://github.com/stakater/Reloader",
       "latest": "1.4.23",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "runc",
@@ -1956,7 +2412,14 @@
       ],
       "url": "https://github.com/soloz-io/zero-ops",
       "latest": "c08a0d6f",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: this release ships the 2026-09-13 build. A later build exists, but the commit that pins it back into the deployment never landed, so the newer image was published and never shipped. The pin-back lands in the next release.",
+          "target": "next release"
+        }
+      ]
     },
     {
       "name": "tailscale",
@@ -2004,7 +2467,14 @@
       "digests": [],
       "url": "https://launchpad.net/ubuntu",
       "latest": "26.04",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The node image is the provider's own published system image, named by the exact string the provider uses. Whether the newest release is published in the cloud catalogue, and under what name, is not readable without provider credentials and has not been confirmed. The newest image may also be built for a narrower processor baseline than the machine types in use, which is a separate question from availability.",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "victoria-metrics",
@@ -2031,7 +2501,13 @@
       "digests": [],
       "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
       "latest": "1.155.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by three patch releases, in a vendored render whose values are recorded in prose rather than a values file, so re-rendering has to be reconstructed before it can be trusted."
+        }
+      ]
     },
     {
       "name": "vmalert",
@@ -2058,7 +2534,13 @@
       "digests": [],
       "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
       "latest": "1.155.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by three patch releases, in a vendored render whose values are recorded in prose rather than a values file, so re-rendering has to be reconstructed before it can be trusted."
+        }
+      ]
     },
     {
       "name": "vmauth",
@@ -2085,7 +2567,13 @@
       "digests": [],
       "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
       "latest": "1.155.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by three patch releases, in a vendored render whose values are recorded in prose rather than a values file, so re-rendering has to be reconstructed before it can be trusted."
+        }
+      ]
     },
     {
       "name": "operator",
@@ -2115,7 +2603,13 @@
       ],
       "url": "https://github.com/VictoriaMetrics/operator",
       "latest": "0.75.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Two patch releases behind, in the same vendored render as the stores. The operator and its config reloader move together because one render produces both."
+        }
+      ]
     },
     {
       "name": "wait4x",
@@ -2142,7 +2636,13 @@
       "digests": [],
       "url": "https://github.com/wait4x/wait4x",
       "latest": "3.7.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by patch releases. A helper image used by init containers to wait on dependencies."
+        }
+      ]
     },
     {
       "name": "zitadel",
@@ -2169,7 +2669,13 @@
       "digests": [],
       "url": "https://github.com/zitadel/zitadel",
       "latest": "4.20.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors within the same major, in a vendored chart. It runs database migrations on start, so the move needs its own validation."
+        }
+      ]
     },
     {
       "name": "zitadel-login",
@@ -2196,7 +2702,13 @@
       "digests": [],
       "url": "https://github.com/zitadel/zitadel",
       "latest": "4.20.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors within the same major, in a vendored chart. It runs database migrations on start, so the move needs its own validation."
+        }
+      ]
     },
     {
       "name": "agent-sandbox-controller",
@@ -2220,7 +2732,13 @@
       "digests": [],
       "url": "https://github.com/kubernetes-sigs/agent-sandbox",
       "latest": "1.0.9",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "The newest release is a major, crossing 1.0. Nobody has assessed what it changes for the sandbox resources the platform declares."
+        }
+      ]
     },
     {
       "name": "agentgateway",
@@ -2245,7 +2763,14 @@
       ],
       "url": "https://github.com/agentgateway/agentgateway",
       "latest": "1.7.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: the gateway ships at two versions in one release, one on the management cluster and one in the managed-cluster catalogue. They converge in the next release.",
+          "target": "next release"
+        }
+      ]
     },
     {
       "name": "alertmanager",
@@ -2271,7 +2796,13 @@
       "digests": [],
       "url": "https://github.com/prometheus/alertmanager",
       "latest": "0.34.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A patch behind, delivered by the observability operator rather than pinned directly. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "argocd",
@@ -2297,7 +2828,14 @@
       "digests": [],
       "url": "https://github.com/argoproj/argo-cd",
       "latest": "3.5.6",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: the managed clusters run a hand-assembled minimal install that was never moved with the management cluster's, so one release ships two Argo CD versions three minors apart. The newest upstream equivalent configures through far more environment values than the local copy carries, so it is re-derived from upstream rather than bumped.",
+          "target": "next release"
+        }
+      ]
     },
     {
       "name": "argocd-agent",
@@ -2325,7 +2863,13 @@
       ],
       "url": "https://github.com/argoproj-labs/argocd-agent",
       "latest": "0.10.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The agent and the hub-side principal are one pair and are pinned to the same build, so this moves as a pair rather than per side."
+        }
+      ]
     },
     {
       "name": "argo-rollouts",
@@ -2349,7 +2893,13 @@
       "digests": [],
       "url": "https://github.com/argoproj/argo-rollouts",
       "latest": "1.10.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A minor behind. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "busybox",
@@ -2373,7 +2923,13 @@
       "digests": [],
       "url": "https://git.busybox.net/busybox",
       "latest": "1.38.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A minor behind. A helper image in hand-written manifests, with no chart governing it."
+        }
+      ]
     },
     {
       "name": "cert-manager-cainjector",
@@ -2397,7 +2953,13 @@
       "digests": [],
       "url": "https://github.com/cert-manager/cert-manager",
       "latest": "1.21.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "The managed-cluster copy is vendored separately from the prerequisite above and nobody has assessed its move; the two are at different versions as a result."
+        }
+      ]
     },
     {
       "name": "cert-manager-controller",
@@ -2421,7 +2983,13 @@
       "digests": [],
       "url": "https://github.com/cert-manager/cert-manager",
       "latest": "1.21.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "The managed-cluster copy is vendored separately from the prerequisite above and nobody has assessed its move; the two are at different versions as a result."
+        }
+      ]
     },
     {
       "name": "cert-manager-startupapicheck",
@@ -2444,7 +3012,13 @@
       "digests": [],
       "url": "https://github.com/cert-manager/cert-manager",
       "latest": "1.21.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "The managed-cluster copy is vendored separately from the prerequisite above and nobody has assessed its move; the two are at different versions as a result."
+        }
+      ]
     },
     {
       "name": "cert-manager-webhook",
@@ -2468,7 +3042,13 @@
       "digests": [],
       "url": "https://github.com/cert-manager/cert-manager",
       "latest": "1.21.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "The managed-cluster copy is vendored separately from the prerequisite above and nobody has assessed its move; the two are at different versions as a result."
+        }
+      ]
     },
     {
       "name": "cert-manager-webhook-hetzner",
@@ -2492,7 +3072,13 @@
       "digests": [],
       "url": "https://github.com/hetzner/cert-manager-webhook-hetzner",
       "latest": "0.9.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A patch release behind, in a vendored render. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "cilium",
@@ -2520,7 +3106,15 @@
       ],
       "url": "https://github.com/cilium/cilium",
       "latest": "1.20.4",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The shipped release supports Kubernetes below 1.33, so it moves with Kubernetes rather than ahead of it. Upstream supports consecutive-minor upgrades only, and the delivered payload carries hand-applied patches that must be re-applied to any new render.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "operator-generic",
@@ -2548,7 +3142,15 @@
       ],
       "url": "https://github.com/cilium/cilium",
       "latest": "1.20.4",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The shipped release supports Kubernetes below 1.33, so it moves with Kubernetes rather than ahead of it. Upstream supports consecutive-minor upgrades only, and the delivered payload carries hand-applied patches that must be re-applied to any new render.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "cloudnative-pg",
@@ -2572,7 +3174,15 @@
       "digests": [],
       "url": "https://github.com/cloudnative-pg/cloudnative-pg",
       "latest": "1.30.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The newest release supports Kubernetes 1.34 to 1.36, above what the nodes run, so the operator waits on the Kubernetes move. 1.29.x is already out of upstream support.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "containerd",
@@ -2624,7 +3234,15 @@
       "digests": [],
       "url": "https://github.com/coredns/coredns",
       "latest": "1.15.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Not independently pinned. kubeadm chooses CoreDNS for the Kubernetes version in use, so this moves only when Kubernetes does.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "crossplane",
@@ -2648,7 +3266,14 @@
       "digests": [],
       "url": "https://github.com/crossplane/crossplane",
       "latest": "2.4.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "declined",
+          "reason": "The newest release is a breaking major: it removes claims, so every composite definition has to be re-declared before the engine can move. Taking it is a migration of the definitions that provision clusters and tenant databases, not a version bump.",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "provider-kubernetes",
@@ -2671,7 +3296,14 @@
       "digests": [],
       "url": "https://github.com/crossplane-contrib/provider-kubernetes",
       "latest": "1.4.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Crossplane: the provider line has to match the engine major, because the scope of its managed resources differs between them.",
+          "blocked_by": "Crossplane"
+        }
+      ]
     },
     {
       "name": "provider-sql",
@@ -2694,7 +3326,14 @@
       "digests": [],
       "url": "https://github.com/crossplane-contrib/provider-sql",
       "latest": "0.16.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Crossplane, for the same managed-resource scope reason as the other provider.",
+          "blocked_by": "Crossplane"
+        }
+      ]
     },
     {
       "name": "ephemeral-job-operator",
@@ -2745,7 +3384,15 @@
       "digests": [],
       "url": "https://github.com/etcd-io/etcd",
       "latest": "3.7.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Not independently pinned. kubeadm chooses etcd for the Kubernetes version in use, so this moves only when Kubernetes does and will not reach etcd's own newest release.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "external-secrets",
@@ -2769,7 +3416,13 @@
       "digests": [],
       "url": "https://github.com/external-secrets/external-secrets",
       "latest": "2.14.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors. Nobody has assessed the move; the operator serves the API versions the platform's objects already use, so no object migration is expected."
+        }
+      ]
     },
     {
       "name": "external-dns",
@@ -2795,7 +3448,13 @@
       ],
       "url": "https://github.com/kubernetes-sigs/external-dns",
       "latest": "0.24.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors, pinned as an image rather than installed from a chart. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "external-dns-hetzner-webhook",
@@ -2821,7 +3480,14 @@
       ],
       "url": "https://github.com/hetzner/external-dns-hetzner-webhook",
       "latest": "0.5.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by two minors and paired with the DNS controller above. Nobody has assessed the move.",
+          "blocked_by": "ExternalDNS"
+        }
+      ]
     },
     {
       "name": "alloy",
@@ -2847,7 +3513,13 @@
       ],
       "url": "https://github.com/grafana/alloy",
       "latest": "1.21.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A patch behind, in a vendored render. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "pki-issuer",
@@ -2871,7 +3543,13 @@
       "digests": [],
       "url": "https://github.com/Infisical/infisical-issuer",
       "latest": "1.0.1",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "The newest release is a major. Nobody has assessed what it changes for the issuer the platform declares."
+        }
+      ]
     },
     {
       "name": "kube-state-metrics",
@@ -2897,7 +3575,15 @@
       ],
       "url": "https://github.com/kubernetes/kube-state-metrics",
       "latest": "2.20.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Each release of this exporter is built against one Kubernetes client version, and the project supports only the pairing. The release matching the target Kubernetes is not the newest one, so this is capped by the Kubernetes destination rather than free to move.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kubectl",
@@ -2925,7 +3611,15 @@
       ],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Kubernetes: this is the client the node bootstrap and init containers run, held within one minor of the API server.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kube-apiserver",
@@ -2950,7 +3644,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The newest policy engine release supports Kubernetes 1.33 to 1.35, and its webhooks gate every deployment, so the newest Kubernetes is not reachable while it is in the stack. 1.35.10 is the destination; 1.37.2 is not available at any policy-engine version.",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kube-controller-manager",
@@ -2975,7 +3677,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The newest policy engine release supports Kubernetes 1.33 to 1.35, and its webhooks gate every deployment, so the newest Kubernetes is not reachable while it is in the stack. 1.35.10 is the destination; 1.37.2 is not available at any policy-engine version.",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kube-scheduler",
@@ -3000,7 +3710,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The newest policy engine release supports Kubernetes 1.33 to 1.35, and its webhooks gate every deployment, so the newest Kubernetes is not reachable while it is in the stack. 1.35.10 is the destination; 1.37.2 is not available at any policy-engine version.",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "pause",
@@ -3052,7 +3770,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Kubernetes: kubelet, kubeadm and kubectl are installed from the repository the node's Kubernetes version names.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kubectl",
@@ -3078,7 +3804,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Kubernetes: kubelet, kubeadm and kubectl are installed from the repository the node's Kubernetes version names.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kubelet",
@@ -3104,7 +3838,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes/kubernetes",
       "latest": "1.37.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Kubernetes: kubelet, kubeadm and kubectl are installed from the repository the node's Kubernetes version names.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "background-controller",
@@ -3128,7 +3870,15 @@
       "digests": [],
       "url": "https://github.com/kyverno/kyverno",
       "latest": "1.19.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "cleanup-controller",
@@ -3152,7 +3902,15 @@
       "digests": [],
       "url": "https://github.com/kyverno/kyverno",
       "latest": "1.19.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kyverno",
@@ -3176,7 +3934,15 @@
       "digests": [],
       "url": "https://github.com/kyverno/kyverno",
       "latest": "1.19.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "kyvernopre",
@@ -3200,7 +3966,15 @@
       "digests": [],
       "url": "https://github.com/kyverno/kyverno",
       "latest": "1.19.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "reports-controller",
@@ -3224,7 +3998,15 @@
       "digests": [],
       "url": "https://github.com/kyverno/kyverno",
       "latest": "1.19.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
+          "target": "next release",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "loki",
@@ -3274,7 +4056,13 @@
       ],
       "url": "https://github.com/nginx/nginx",
       "latest": "1.31.8",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors, in a vendored chart's values. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "k8s-dns-node-cache",
@@ -3298,7 +4086,13 @@
       "digests": [],
       "url": "https://github.com/kubernetes/dns",
       "latest": "1.26.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors, pinned in a hand-assembled manifest on both the management and managed clusters. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "function-patch-and-transform",
@@ -3321,7 +4115,14 @@
       "digests": [],
       "url": "https://github.com/crossplane-contrib/function-patch-and-transform",
       "latest": "0.11.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Waits on Crossplane: composition functions are resolved by the engine, so the function moves with it.",
+          "blocked_by": "Crossplane"
+        }
+      ]
     },
     {
       "name": "postgresql",
@@ -3344,7 +4145,14 @@
       "digests": [],
       "url": "https://github.com/postgres/postgres",
       "latest": "18.6",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The shared managed-cluster store serves tenant applications, which do not select their own major, so it moves only when a major is known good for every consumer on the box.",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "redis",
@@ -3370,7 +4178,14 @@
       "digests": [],
       "url": "https://github.com/redis/redis",
       "latest": "8.10.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: three different versions of the same cache ship in one release, from separate manifests that were never reconciled. They converge on one version in the next release.",
+          "target": "next release"
+        }
+      ]
     },
     {
       "name": "reloader",
@@ -3396,7 +4211,13 @@
       ],
       "url": "https://github.com/stakater/Reloader",
       "latest": "1.4.23",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors. Nobody has assessed the move."
+        }
+      ]
     },
     {
       "name": "runc",
@@ -3448,7 +4269,14 @@
       ],
       "url": "https://github.com/soloz-io/zero-ops",
       "latest": "c08a0d6f",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "scheduled",
+          "reason": "DEFECT, not a hold: this release ships the 2026-09-13 build. A later build exists, but the commit that pins it back into the deployment never landed, so the newer image was published and never shipped. The pin-back lands in the next release.",
+          "target": "next release"
+        }
+      ]
     },
     {
       "name": "tailscale",
@@ -3500,7 +4328,14 @@
       "digests": [],
       "url": "https://launchpad.net/ubuntu",
       "latest": "26.04",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The node image is the provider's own published system image, named by the exact string the provider uses. Whether the newest release is published in the cloud catalogue, and under what name, is not readable without provider credentials and has not been confirmed. The newest image may also be built for a narrower processor baseline than the machine types in use, which is a separate question from availability.",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     },
     {
       "name": "victoria-metrics",
@@ -3525,7 +4360,13 @@
       "digests": [],
       "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
       "latest": "1.155.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by three patch releases, in a vendored render whose values are recorded in prose rather than a values file, so re-rendering has to be reconstructed before it can be trusted."
+        }
+      ]
     },
     {
       "name": "vmalert",
@@ -3551,7 +4392,13 @@
       "digests": [],
       "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
       "latest": "1.155.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by three patch releases, in a vendored render whose values are recorded in prose rather than a values file, so re-rendering has to be reconstructed before it can be trusted."
+        }
+      ]
     },
     {
       "name": "vmauth",
@@ -3577,7 +4424,13 @@
       "digests": [],
       "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
       "latest": "1.155.0",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by three patch releases, in a vendored render whose values are recorded in prose rather than a values file, so re-rendering has to be reconstructed before it can be trusted."
+        }
+      ]
     },
     {
       "name": "operator",
@@ -3605,7 +4458,13 @@
       ],
       "url": "https://github.com/VictoriaMetrics/operator",
       "latest": "0.75.2",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Two patch releases behind, in the same vendored render as the stores. The operator and its config reloader move together because one render produces both."
+        }
+      ]
     },
     {
       "name": "clusterctl",
@@ -3626,7 +4485,15 @@
       "digests": [],
       "url": "https://github.com/kubernetes-sigs/cluster-api",
       "latest": "1.14.3",
-      "current": false
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Capped by the infrastructure provider, whose current line is tested against Cluster API 1.13 and below. The newest Cluster API is unreachable until that provider ships its next line.",
+          "blocked_by": "Cluster API provider for Hetzner",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
     }
   ],
   "previous": "0.1.16-rc.186",

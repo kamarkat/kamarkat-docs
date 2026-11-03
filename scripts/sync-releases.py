@@ -2,6 +2,7 @@
 """Generate the release pages from the component inventory of each bundle version.
 
     sync-releases.py [--fetch <version>...] [--owner soloz-io] [--catalog <component-catalog.yaml>]
+    sync-releases.py --check <components.json> [--catalog <component-catalog.yaml>]
 
 Every published bundle chart carries `components.json`, its component inventory.
 `--fetch` pulls it for each named version into data/releases/ and records, as of
@@ -11,6 +12,12 @@ the day the version was published to the registry:
     url                 where each component's title links (the catalog's repo)
     latest              the newest release its upstream repository had published
     current             whether the version shipped is that release
+    behind              for one that is not, the catalog's reasons for the versions
+                        it ships; a version with none fails the fetch
+
+`--check` runs the same lookups on an inventory not yet published (a rehearsal's
+components.json), as of today, and names every version behind its latest release
+that the catalog does not explain. It writes nothing.
 
 The catalog is zero-ops' manifests/architecture/component-catalog.yaml, read from
 the checkout beside this one. The pages are then generated from whatever
@@ -278,6 +285,41 @@ def annotate(doc: dict, released: str, catalog: list[dict], upstream: Upstream) 
         c["latest"], c["current"] = latest(t, c, released, upstream)
 
 
+STATUSES = ("held", "scheduled", "not assessed", "declined")
+
+
+def unexplained(doc: dict, catalog: list[dict]) -> list[str]:
+    """Copy onto each component behind its latest the catalog's `behind` items for
+    the versions it ships, and name every version no item explains. A reason is for
+    the version it names, so a changed pin needs a new one."""
+    entries = {e["name"]: e for e in catalog}
+    missing = []
+    for c in doc["components"]:
+        c.pop("behind", None)
+        if c["current"] is not False:
+            continue
+        items = [i for i in entries[c["component"]].get("behind") or []
+                 if i.get("reason") and i.get("status") in STATUSES]
+        found = []
+        for v in (t.strip() for t in c["version"].split(",")):
+            item = next((i for i in items if v in i.get("versions", [])), None)
+            if not item:
+                missing.append(f"{c['component']} [{v}]")
+            elif item not in found:
+                found.append(item)
+        c["behind"] = [{k: i[k] for k in ("status", "reason", "blocked_by", "target", "ref") if i.get(k)}
+                       for i in found]
+    return sorted(set(missing))
+
+
+def explain(doc: dict, catalog: list[dict]) -> None:
+    missing = unexplained(doc, catalog)
+    if missing:
+        sys.exit(f"sync-releases: {doc['version']} ships versions behind their latest release that the "
+                 f"catalog does not explain. Add a `behind` item for each to its entry in {CATALOG.name}:\n  "
+                 + "\n  ".join(missing))
+
+
 def fetch(versions: list[str], owner: str, catalog: list[dict]) -> None:
     DATA.mkdir(parents=True, exist_ok=True)
     days = published(owner)
@@ -297,9 +339,23 @@ def fetch(versions: list[str], owner: str, catalog: list[dict]) -> None:
                          f"zero-ops scripts/package/backfill-inventory.sh and copy it into {DATA}.")
             doc = json.loads(src.read_text())
         annotate(doc, days[v], catalog, upstream)
+        explain(doc, catalog)
         (DATA / f"{v}.json").write_text(json.dumps(doc, indent=2) + "\n")
         behind = sum(1 for c in doc["components"] if c["current"] is False)
         print(f"fetched {v}: {behind} of {len(doc['components'])} components behind their latest release")
+
+
+def check(inventory: str, catalog: list[dict]) -> None:
+    """Before a version is published: which of its components are behind their latest
+    release today with no reason in the catalog. Writes nothing."""
+    doc = json.loads(Path(inventory).read_text())
+    annotate(doc, datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"), catalog, Upstream())
+    missing = unexplained(doc, catalog)
+    behind = sum(1 for c in doc["components"] if c["current"] is False)
+    print(f"check: {behind} of {len(doc['components'])} components behind their latest release, "
+          f"{len(missing)} without a reason")
+    if missing:
+        sys.exit("  " + "\n  ".join(missing))
 
 
 def day(at: str) -> str:
@@ -336,7 +392,7 @@ import {{ release }} from "/snippets/releases/{slug(v)}.jsx";
 
 Your box has one management cluster and the managed clusters it provisions. Each has control plane nodes and worker nodes. Choose a cluster, then a node role, to see what runs there. A version marked **unpinned** is installed at whatever version its source serves when a node is created.
 
-**Latest (as of release date)** is the newest release the component's project had published on {day(r['released'])}. A version in green is that release; a version in red is behind it, or cannot be shown to match it. For an image the platform builds, latest is the newest build, and green means the version shipped it.
+**Latest (as of release date)** is the newest release the component's project had published on {day(r['released'])}. A version in green is that release; a version in red is behind it, or cannot be shown to match it. For an image the platform builds, latest is the newest build, and green means the version shipped it. Hover or focus the ⓘ beside a red version for why it is behind.
 
 <ReleaseComponents release={{release}} />
 
@@ -371,19 +427,25 @@ def main() -> None:
     ap.add_argument("--fetch", nargs="*", default=[])
     ap.add_argument("--owner", default="soloz-io")
     ap.add_argument("--catalog", default=str(CATALOG))
+    ap.add_argument("--check", metavar="COMPONENTS_JSON")
     a = ap.parse_args()
-    if a.fetch:
+    if a.fetch or a.check:
         catalog_file = Path(a.catalog)
         if not catalog_file.exists():
             sys.exit(f"sync-releases: no component catalog at {catalog_file}. Check out zero-ops beside "
                      f"this repository, or pass --catalog.")
-        fetch(a.fetch, a.owner, yaml.safe_load(catalog_file.read_text())["components"])
+        catalog = yaml.safe_load(catalog_file.read_text())["components"]
+        if a.check:
+            check(a.check, catalog)
+            return
+        fetch(a.fetch, a.owner, catalog)
 
     releases = [json.loads(p.read_text()) for p in sorted(DATA.glob("*.json"))] if DATA.exists() else []
     for r in releases:
-        if "released" not in r or any("url" not in c for c in r["components"]):
-            sys.exit(f"sync-releases: {r['version']} was fetched without its release date and upstream "
-                     f"versions. Fetch it again: --fetch {r['version']}")
+        if ("released" not in r or any("url" not in c for c in r["components"])
+                or any(c["current"] is False and not c.get("behind") for c in r["components"])):
+            sys.exit(f"sync-releases: {r['version']} was fetched without its release date, upstream "
+                     f"versions or the reasons components are behind. Fetch it again: --fetch {r['version']}")
     releases.sort(key=lambda r: semver_key(r["version"]), reverse=True)
 
     for d in (PAGES, LINES, SNIPPETS):

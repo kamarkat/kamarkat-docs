@@ -133,6 +133,48 @@ export const BootstrapTools = ({ release }) => {
   );
 };
 
+// Why a version is behind its latest release, from the catalog's `behind` items,
+// shown on hover or keyboard focus of the icon. Placed against the window: the
+// table scrolls sideways, and a tip positioned inside it would be clipped.
+export const BehindReason = ({ items }) => {
+  const [at, setAt] = useState(null);
+  const open = (e) => {
+    const b = e.currentTarget.getBoundingClientRect();
+    const width = Math.min(340, window.innerWidth - 32);
+    setAt({
+      left: Math.max(16, Math.min(b.left + b.width / 2 - width / 2, window.innerWidth - width - 16)),
+      width,
+      ...(b.top > window.innerHeight / 2 ? { bottom: window.innerHeight - b.top + 8 } : { top: b.bottom + 8 }),
+    });
+  };
+  const close = () => setAt(null);
+  return (
+    <span
+      className="rel-why"
+      tabIndex={0}
+      aria-label="Why this version is behind"
+      onMouseEnter={open}
+      onMouseLeave={close}
+      onFocus={open}
+      onBlur={close}
+    >
+      ⓘ
+      {at && (
+        <span className="rel-why-tip" role="tooltip" style={at}>
+          {items.map((i, n) => (
+            <span key={n} className="rel-why-item">
+              <span className="rel-why-status">{i.status}</span>
+              {i.reason}
+              {i.blocked_by && <span className="rel-why-meta">Waits on {i.blocked_by}</span>}
+              {i.target && <span className="rel-why-meta">Target: {i.target}</span>}
+            </span>
+          ))}
+        </span>
+      )}
+    </span>
+  );
+};
+
 export const ComponentRows = ({ rows, changed }) => (
   <div className="rel-table-wrap">
     <table className="rel-table">
@@ -181,6 +223,7 @@ export const ComponentRows = ({ rows, changed }) => (
               </td>
               <td className="rel-muted">
                 <span className="rel-version">{r.latest || "—"}</span>
+                {r.behind && r.behind.length > 0 && <BehindReason items={r.behind} />}
               </td>
               <td>
                 <span className="rel-type">{r.type}</span>

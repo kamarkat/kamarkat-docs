@@ -1,0 +1,86 @@
+---
+title: "Applications"
+description: "Publish your applications' hostnames, and supply the secrets they declare."
+keywords: ["soloz fleet", "secrets", "hosts aggregate", "application"]
+---
+
+> These commands act on the applications your GitOps repository declares. Run them from the root of that repository: each one reads the tenant and the cell from the application's own `values.yaml` rather than asking you to retype them.
+
+## Hostnames
+
+### soloz fleet hosts aggregate
+
+Regenerates the public hostname aggregate for a managed cluster's shared gateway. The gateway's listeners come from every application's `public.hosts`, so the aggregate is what turns a declaration into a hostname that resolves.
+
+```bash
+soloz fleet hosts aggregate
+git add environments registry && git commit -m "Declare shop" && git push
+```
+
+Run it whenever you add or change `public.hosts`. A check fails review if the aggregate does not match the declarations, so a forgotten run cannot become a hostname that never resolves.
+
+`--repo` points at your GitOps repository when you are not in it.
+
+## Secrets
+
+Three kinds of value reach a workload, and only one of them is yours to supply. Platform credentials are generated and delivered for you; configuration lives in `config` in the application's `values.yaml`; your own secrets are declared under `secrets` and supplied with the commands below. See [Supply your secrets](/quickstart/supply-secrets) for the declaration itself.
+
+### soloz fleet secrets set
+
+Writes one value to the application's secret path.
+
+```bash
+soloz fleet secrets set dev shop PAYMENTS_API_KEY
+```
+
+The value is read from the terminal with echo disabled, or from stdin with `--stdin` so a password manager can pipe into it. There is deliberately no flag that takes the value: a secret passed as an argument is in your shell history and in the process table for anyone on the machine.
+
+One key per invocation. Re-running is how you rotate a secret — the value is replaced, the secret store delivers it within its refresh interval, and the workload restarts on the change.
+
+### soloz fleet secrets status
+
+Joins what the application declares against what you have supplied, and prints key **names** only.
+
+```bash
+soloz fleet secrets status dev shop
+```
+
+A declared secret that is absent is reported with the capability it serves and the workloads it takes down, because secrets reach a workload as one object: one absent key withholds every other key with it. The command exits non-zero when anything declared is absent, so a pipeline can gate on it.
+
+### soloz fleet secrets template
+
+Prints a `.env` skeleton with one empty entry per declared secret, each commented with the capability it serves.
+
+```bash
+soloz fleet secrets template dev shop > shop.env
+```
+
+The skeleton carries no values. Fill it in, supply the values with `import` below, then delete it — regenerating it is one command, and a file of secrets is not.
+
+Run it again whenever an application's `secrets:` list changes: the skeleton is generated from the declaration, so the keys you fill in are always the keys the app declares.
+
+### soloz fleet secrets import
+
+Reads a `KEY=VALUE` file and writes every declared key it carries. Keys the application does not declare are ignored, so configuration left in the file never becomes a secret.
+
+```bash
+soloz fleet secrets import dev shop --from-env .env --confirm
+```
+
+Without `--confirm` it lists the key names it would write and writes nothing. An entry left empty is never written, so a half-filled file cannot blank a secret you already supplied.
+
+<Warning>
+The file holds your secrets in plaintext. Keep it out of git and local to your machine, and prefer `set` for a single key — it touches no file at all.
+</Warning>
+
+Re-running `import` with a new value rotates that key.
+
+## What you need to know
+
+### Secrets survive a rebuild
+
+You supply each secret once for the life of the box. Rebuilding a cluster does not mean re-entering them: the secret store is backed up, and its master keys are in your [escrow](/features/admin/escrow).
+
+### An absent key is reported by name
+
+Every declared secret is checked before an application's workloads start. Because `status` prints names and never values, you can paste its output into a ticket.

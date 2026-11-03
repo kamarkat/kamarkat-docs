@@ -10,7 +10,7 @@ keywords: ["cluster lifecycle", "day-0", "cluster template", "soloz tenant add-c
 
 A box comes into existence in two phases.
 
-**Day-0** creates the management cluster. The first cluster cannot reconcile itself into existence, so a command-line tool runs it from outside the box, in your own execution context (for example, a CI workflow in your organization), against your own cloud account. It establishes trust, identity and configuration, then hands over.
+**Day-0** creates the management cluster. The first cluster cannot reconcile itself into existence, so a command-line tool runs it from outside the box, in your own execution context (for example, a CI workflow in your git organization), against your own cloud account. It establishes trust, identity and configuration, then hands over.
 
 **Day-1 onwards** is declarative. The management cluster reconciles everything from your GitOps repository, including any further clusters. Nothing is triggered and nothing is applied from outside.
 
@@ -22,7 +22,7 @@ You supply both. Cloud credentials stay in your box and are never given to Kamar
 
 ### 2. Scaffold your GitOps repository
 
-`soloz tenant scaffold` creates `<tenant>-gitops` in your organization. It writes only the facts unique to you: organization, domain, region and cluster names.
+`soloz tenant scaffold` creates `<tenant>-gitops` in your git organization. It writes only the facts unique to you: your tenant, that git organization, your domain, region and cluster names.
 
 ### 3. Run Day-0
 

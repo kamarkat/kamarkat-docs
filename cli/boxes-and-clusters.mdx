@@ -1,0 +1,242 @@
+---
+title: "Boxes and clusters"
+description: "Scaffold a box, create its clusters, check that they converge, and take them down."
+keywords: ["soloz tenant", "scaffold", "verify", "teardown", "reseed", "proposal"]
+---
+
+> These commands create a box and the clusters in it, confirm they converged, and destroy them. Everything they write lands in your GitOps repository or your own cloud account.
+
+## Create
+
+### soloz tenant scaffold
+
+Creates `<org>/<tenant>-gitops`, renders it from the platform template, stores your credentials on it as repository secrets, and starts Day-0.
+
+```bash
+soloz tenant scaffold \
+  --tenant acme \
+  --org acme-inc \
+  --domain acme.example \
+  --region hel1 \
+  --environment dev
+```
+
+Scaffolding happens once. Every change after it is a commit or a pull request. See [Scaffold your repository](/quickstart/scaffold-your-repository) for the credentials it expects and what the repository contains.
+
+| Flag | Meaning |
+| :- | :- |
+| `--tenant` | Your tenant identifier, lower-case. Required. It names the repository and your box |
+| `--org` | The git organization the repository is created in. Required |
+| `--domain` | Your base domain. Required |
+| `--subdomain` | A DNS label every hostname sits under; empty publishes on the apex |
+| `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines |
+| `--region` | The cloud region your clusters run in. Defaults to `hel1` |
+| `--environment` | `dev` (default), `stg` or `prod` |
+| `--cluster` | The management cluster's name. Defaults to `<tenant>-hub` |
+| `--box-id` | The logical box, **pinned forever**. Defaults to the cluster name |
+| `--workers` | Cloud worker nodes the box starts with. Defaults to 2. Pass `0` to run on nodes on your own premises alone, which then have to be there |
+| `--private` | Create the repository private. Default `true` |
+| `--private-registry` | Your applications run private images, which makes a registry credential required |
+| `--bundle-version` | The platform version the box starts on. Defaults to the version the CLI carries |
+| `--dry-run` | Render only; create and push nothing |
+| `--out` | Render to this directory instead of a temporary one |
+| `--no-prompt` | Never prompt. Stops after creating the repository if a credential is missing |
+
+<Warning>
+`--box-id` is chosen once and never changes. Your escrow is keyed by it, so every escrow command takes the same value — and a box that is rebuilt keeps it, which is how the new management cluster finds the old one's keys. Leave it unset unless you have a reason, and record what it resolved to.
+</Warning>
+
+<Note>
+`--private` interacts with your git plan. On GitHub's free plan, git organization secrets reach public repositories only, so a private repository's builds receive an empty credential. [Deploy your app](/quickstart/deploy-your-app#step-1-give-your-builds-write-access-to-the-gitops-repository) covers the per-repository alternative.
+</Note>
+
+### soloz tenant add-cluster
+
+Declares an additional managed cluster. It renders the cluster template your GitOps repository carries; the management cluster provisions the cluster from your commit.
+
+```bash
+soloz tenant add-cluster \
+  --mgmt-cluster acme-hub \
+  --name acme-02 \
+  --tenant acme \
+  --bundle-version <version> \
+  --gitops-repo-url https://github.com/acme-inc/acme-gitops
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--mgmt-cluster` | The management cluster that creates this one. Required |
+| `--name` | The managed cluster, and this cell's id. Required |
+| `--tenant` | The tenant that owns it. Required |
+| `--bundle-version` | The platform version this cluster starts on. Required |
+| `--gitops-repo-url` | Your GitOps repository's URL. Required |
+| `--provider`, `--region`, `--environment` | Where and what it is, if it differs from the defaults |
+| `--workers` | Cloud worker nodes it starts with. Defaults to 2 on `hetzner` |
+| `--public-tls-issuer` | The ACME issuer for public certificates. Defaults to `letsencrypt-prod` |
+| `--gitops-dir` | Your GitOps repository. Defaults to the current directory |
+
+<Warning>
+`--name` becomes the cell id for the cluster's whole life. Applications name the cell they run on, so renaming it later is not an edit — it is a new cluster.
+</Warning>
+
+### soloz tenant set-gitops-token
+
+Publishes the credential your application builds use to pin a chart version. Scaffolding does this already; re-run it when the scaffold-time token lacked your git organization's **Secrets: write** permission.
+
+```bash
+soloz tenant set-gitops-token --org acme-inc
+```
+
+The token is read from stdin when `--token` is omitted, which keeps it out of your shell history. `--repo owner/name` publishes on one repository instead of the whole git organization, and `--discover --gitops-repo acme-inc/acme-gitops` finds the repositories whose workflows write to it.
+
+## Day-0, one step at a time
+
+Day-0 runs as a workflow in your GitOps repository and calls these for you. Run them directly only when you are working on a box deliberately.
+
+### soloz bootstrap-mgmt
+
+Creates the management cluster and stops there. The gates that decide whether the box is usable — secrets present, the secret store reachable, databases provisioned, declared managed clusters actually up — are separate steps.
+
+```bash
+soloz bootstrap-mgmt --name acme-hub --provider hetzner --region hel1 --environment dev
+```
+
+<Warning>
+This gives you a reconciled management cluster and no assurance about anything else. A box is bootstrapped when Day-0 has run every step in order, not when this command exits.
+</Warning>
+
+Notable flags: `--workers` (pass `0` to run on your own premises alone), `--on-prem` with `--tailnet-name` to accept nodes that join over your tailnet, `--oidc-issuer-url` with `--oidc-client-id` to name the identity provider the API server accepts tokens from, `--dry-run` to validate prerequisites and render manifests without provisioning, and `--gating` to choose whether boundaries activate in phase order or reconcile concurrently.
+
+### soloz init-secrets
+
+Generates the bootstrap secrets the secret store starts from, and creates the machine identity the platform authenticates with afterwards. Aliased as `soloz bootstrap-secrets`.
+
+```bash
+soloz init-secrets --environment dev
+```
+
+### soloz configure-github-access
+
+Gives the GitOps engine access to your repositories, and supplies the pull credential for your private images. It runs before `init-secrets`, because the GitOps engine creates the namespaces that step writes into.
+
+```bash
+soloz configure-github-access --org-url https://github.com/acme-inc
+```
+
+### soloz configure-tailscale
+
+Supplies the auth key and hostname a control plane uses to join your tailnet, for boxes that accept nodes on your own premises. It runs before a managed cluster is provisioned on that path.
+
+```bash
+soloz configure-tailscale
+```
+
+Values default to `k8-secrets/tailscale/authkey` and `k8-secrets/tailscale/hostname`, which stay out of git.
+
+## Check
+
+### soloz verify
+
+Polls the invariants a cluster must satisfy before it serves — nodes Ready, secret stores valid, secrets synced, Applications Synced and Healthy, pods Running — until they all hold or the budget elapses. It reports which invariant is outstanding and what it is waiting on, so a cluster that is still settling reads differently from one that is stuck.
+
+```bash
+soloz verify --cluster acme-hub --timeout 15m
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--cluster` | The cluster to verify. Its kubeconfig is read from `k8-secrets/kubeconfig/<cluster>.kubeconfig` |
+| `--kubeconfig` | Where to reach it, when that is not where Day-0 put it |
+| `--timeout` | How long to wait before reporting what is outstanding. Defaults to 15m |
+
+### soloz bundle-version
+
+Prints the platform version this binary carries. It reports the constant the release wrote into the binary; it never derives it. `development` means no version was injected, so platform content comes from a working tree rather than a published bundle.
+
+```bash
+soloz bundle-version
+```
+
+### soloz proposal preflight
+
+Produces the verdict for a proposed version against the cluster it targets: that the release's declared minimum permits the step, that the version is published where your box pulls from, and that the cluster is reconciling now.
+
+```bash
+soloz proposal preflight --candidate <version> --cluster acme-hub
+```
+
+A check that cannot run returns unverified rather than passing. `--fail-on-unverified` exits non-zero on that, `--out` writes the markdown verdict to a file and `--json` writes it as JSON. See [Upgrades](/versions/upgrades) for how proposals reach you.
+
+### soloz spoke match-inventory
+
+Lists the machines your management cluster holds for a managed cluster alongside the servers your provider actually has, and classifies every relationship between them. Matched means one server carries that machine's name in the provider's own labels.
+
+```bash
+soloz spoke match-inventory --cluster acme-02
+```
+
+Read-only. It changes nothing in either the cluster or the provider, and unresolved rows stay unresolved — nothing here adopts or remediates. `--hcloud-token` is taken explicitly, or from `HCLOUD_TOKEN`, rather than read from the cluster, because during a reconstruction the cluster's own copy is itself restored state.
+
+## Repair
+
+### soloz reseed
+
+Re-renders the Day-0 seed from the current CLI and applies it. Use it after a seed parameter changes, which otherwise reaches only newly created clusters.
+
+```bash
+soloz reseed --kubeconfig acme-hub.kubeconfig
+```
+
+The environment, provider and topology come from the cluster's existing seed, so a reseed cannot change which cluster the seed describes. The version is left as the cluster records it; `--bundle-version` moves it deliberately, and the move is printed against the version it replaces.
+
+### soloz spoke restore-pki
+
+Writes a managed cluster's escrowed trust roots into a replacement management cluster, so it can issue node certificates for a cluster that is already running.
+
+```bash
+soloz spoke restore-pki --box acme-hub --cluster acme-02 --kubeconfig new-hub.kubeconfig
+```
+
+For reconstruction, not for provisioning: a new managed cluster gets new trust roots on the ordinary declarative path. It refuses to run unless cluster lifecycle is paused on that cluster, fails closed when the escrow holds nothing, and fails explicitly when a live value disagrees with the escrow rather than overwriting either. Safe to re-run, and it reports fingerprints only.
+
+## Destroy
+
+### soloz teardown
+
+Deletes a box: the management cluster, the managed clusters it holds, and the cloud infrastructure behind them. It reads the managed clusters from the management cluster, so one run takes the box.
+
+```bash
+soloz teardown --name acme-hub --gitops-dir . --confirm
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--name` | The management cluster to destroy. Required |
+| `--confirm` | Confirm deletion. Required |
+| `--gitops-dir` | The GitOps repository this box was bootstrapped from, which holds its state and kubeconfig |
+| `--tenant` | The box's name prefix. Every server whose name or label starts with it belongs to this box |
+| `--spoke` | A managed cluster this box declares, repeatable. For when the management cluster can no longer be reached |
+| `--dns-only` | Release this box's DNS records and nothing else |
+| `--dns-owner`, `--dns-zone` | Which records, and the zone they live in, when the cluster can no longer be read |
+
+<Warning>
+This destroys infrastructure in your cloud account and is not reversible.
+
+Pass `--gitops-dir`. Day-0 writes the box's state and kubeconfig there, and a teardown run from anywhere else reads an empty cluster, destroys nothing, and reports success.
+</Warning>
+
+<Note>
+`--tenant` and `--spoke` exist for a box that is already partly gone. The managed-cluster list normally comes from the management cluster; once that cluster is unreachable it answers nothing, and its clusters survive a teardown that was meant to take them — their servers carry their own names and mention the management cluster nowhere. `--dns-only` covers the matching case for DNS: records whose owner no longer exists are ignored rather than reclaimed, so a hostname resolves to a decommissioned address until someone releases it.
+</Note>
+
+### soloz spoke teardown
+
+Deletes managed clusters directly through your provider's API, discovering them from server labels and names. Omit `--name` and it deletes all of them; `--mgmt-cluster` is excluded.
+
+```bash
+soloz spoke teardown --name acme-02 --force --mgmt-cluster acme-hub
+```
+
+<Warning>
+`--force` is required, because graceful deletion needs the management cluster. This destroys infrastructure in your cloud account.
+</Warning>

@@ -63,6 +63,22 @@
             ]
           },
           {
+            "group": "Workloads",
+            "pages": [
+              "features/workloads/tenant-and-applications",
+              "features/workloads/environments",
+              "features/workloads/deploying-applications"
+            ]
+          },
+          {
+            "group": "Administration",
+            "pages": [
+              "features/admin/cloud-account",
+              "features/admin/git-connection",
+              "features/admin/escrow"
+            ]
+          },
+          {
             "group": "Capabilities",
             "pages": [
               "features/capabilities/overview",
@@ -78,21 +94,20 @@
               "features/capabilities/observability",
               "features/capabilities/databases"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "CLI",
+        "groups": [
           {
-            "group": "Workloads",
+            "group": "Commands",
             "pages": [
-              "features/workloads/organizations-and-applications",
-              "features/workloads/environments",
-              "features/workloads/deploying-applications"
-            ]
-          },
-          {
-            "group": "Administration",
-            "pages": [
-              "features/admin/cloud-account",
-              "features/admin/git-connection",
-              "features/admin/escrow"
+              "cli/overview",
+              "cli/boxes-and-clusters",
+              "cli/applications",
+              "cli/escrow-and-encryption",
+              "cli/support"
             ]
           }
         ]
@@ -141,7 +156,11 @@
     },
     {
       "source": "/features/box/tenants-and-apps",
-      "destination": "/features/workloads/organizations-and-applications"
+      "destination": "/features/workloads/tenant-and-applications"
+    },
+    {
+      "source": "/features/workloads/organizations-and-applications",
+      "destination": "/features/workloads/tenant-and-applications"
     },
     {
       "source": "/features/box/environments",

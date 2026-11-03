@@ -4,7 +4,7 @@ description: "Create your GitOps repository from the platform template, store yo
 keywords: ["soloz tenant scaffold", "gitops repository", "scaffold", "repository secrets"]
 ---
 
-`soloz tenant scaffold` creates `<org>/<tenant>-gitops` in your organization and renders it from the platform template. It writes only the facts unique to you: your organization, domain, region and cluster names. Scaffolding happens once; every change after it is a commit or a pull request.
+`soloz tenant scaffold` creates `<org>/<tenant>-gitops` in your git organization and renders it from the platform template. It writes only the facts unique to you: your tenant, that git organization, your domain, region and cluster names. Scaffolding happens once; every change after it is a commit or a pull request.
 
 ## Step 1: Preview what you will receive
 
@@ -76,7 +76,6 @@ acme-gitops/
 ├── registry/clusters/<cluster>/   one directory per cluster: bundle.yaml (version), values.yaml (yours)
 ├── environments/<env>/<app>/      one directory per application, added in "Run your first app"
 ├── templates/                     what you copy to add a cluster, an app or a workload
-├── scripts/seed-secrets.sh        first-time secret supply for an app
 └── renovate.json                  proposes new platform versions as pull requests
 ```
 

@@ -24,7 +24,7 @@ Kamarkat is free and open source. The stack is tested as one set, published as o
 
 ## How Kamarkat is organized
 
-Everything starts with a **box**. Each box belongs to one **organization** (the `tenant` in configuration), and holds one management cluster plus any number of managed clusters.
+Everything starts with a **box**. Each box belongs to one **tenant**, and holds one management cluster plus any number of managed clusters.
 
 A **GitOps repository**, `<tenant>-gitops`, is the single source of desired state for the box. For each cluster it records two things: the platform version that cluster runs, and the values it runs with.
 

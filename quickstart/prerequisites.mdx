@@ -45,7 +45,7 @@ Day-0 runs under secrets stored on your GitOps repository. Gather these now. You
 | Secret | What it is |
 | :- | :- |
 | `HCLOUD_TOKEN` | Your cloud API token, read and write. Your clusters are created with it. |
-| `GITOPS_TOKEN` | Write access to your organization's repositories, plus the organization's **Secrets: write** permission. Day-0 commits what it generates with it, and your application builds inherit it. |
+| `GITOPS_TOKEN` | Write access to your git organization's repositories, plus that organization's **Secrets: write** permission. Day-0 commits what it generates with it, and your application builds inherit it. |
 | `INFISICAL_ESCROW_URL`, `INFISICAL_ESCROW_PROJECT_ID`, `INFISICAL_ESCROW_CLIENT_ID`, `INFISICAL_ESCROW_CLIENT_SECRET` | Your escrow. Scaffolding refuses without them, because an escrow cannot be added after the fact. |
 
 ### Required for what your box runs

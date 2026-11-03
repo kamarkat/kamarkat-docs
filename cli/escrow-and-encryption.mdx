@@ -1,0 +1,173 @@
+---
+title: "Escrow and encryption"
+description: "Create and check the escrow your box depends on, retrieve break-glass access, and encrypt Secrets at rest."
+keywords: ["soloz escrow", "soloz kubeconfig", "soloz encryption", "break-glass", "at-rest encryption"]
+---
+
+> Your [escrow](/features/admin/escrow) is a secret manager you control, outside the box, holding its master keys and each cluster's break-glass admin kubeconfig. These commands create it, report what it actually holds, and use it.
+
+## Conventions
+
+Every command here reads the escrow with the same four values:
+
+```bash
+export INFISICAL_ESCROW_URL=https://app.infisical.com
+export INFISICAL_ESCROW_PROJECT_ID=<project-id>
+export INFISICAL_ESCROW_CLIENT_ID=<machine-identity-client-id>
+export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
+```
+
+`--box` names the logical box the escrow is keyed by — the value `soloz tenant scaffold --box-id` pinned, which defaults to the management cluster's name. `--cluster` names the cluster within it. A box keeps its `--box` value across a rebuild, which is how a replacement management cluster finds the keys the old one escrowed.
+
+These commands report fingerprints and never values.
+
+## Create
+
+### soloz escrow init
+
+Creates the project your boxes escrow to. You create the account and one machine identity; this creates the project and the escrow adds that identity to it as an admin, so the access it needs comes with it.
+
+```bash
+soloz escrow init \
+  --name acme-escrow \
+  --owner-email platform@acme.example \
+  --client-id <machine-identity-client-id> \
+  --client-secret <machine-identity-client-secret>
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--name` | The project name. Required |
+| `--owner-email` | The account that owns the project. Required |
+| `--client-id`, `--client-secret` | The machine identity. Required |
+| `--url` | The escrow's address. Defaults to `https://app.infisical.com` |
+| `--out` | Directory holding the `INFISICAL_ESCROW_*` files. Defaults to `k8-secrets/infisical` |
+
+The project id is written where the rest of the tooling already reads it, so there is one fewer value to supply by hand.
+
+## Check
+
+### soloz escrow verify
+
+Reports which artefacts your box cannot be rebuilt without are actually present, by fingerprint — so a missing one is visible before a recovery rather than during one.
+
+```bash
+soloz escrow verify --box acme-hub --cluster acme-hub --hub
+soloz escrow verify --box acme-hub --cluster acme-02 --workload
+```
+
+Pass `--hub` for the management cluster, where every artefact applies, and `--workload` for a managed cluster, where the management-cluster-only artefacts do not.
+
+<Tip>
+Run this after Day-0. An escrow cannot be added to a box afterwards, so the one time to find out it is empty is before you need it.
+</Tip>
+
+### soloz escrow verify-recovery
+
+Decrypts one value, exactly as the cluster stored it, using the key held in the escrow.
+
+```bash
+soloz escrow verify-recovery --box acme-hub --cluster acme-hub --from /tmp/probe.bin
+```
+
+Presence is not recovery. `escrow verify` reports that a key exists; this reports whether that key is the one your cluster's API server is actually encrypting with. A key that decrypts nothing looks identical to a working one in a presence check, and the difference surfaces during a rebuild — the one moment it cannot be fixed.
+
+`--from` takes a file holding one stored value, obtained on a control-plane node so it never leaves the host. Use a probe Secret you created for this, not a real one: the file is ciphertext, but it is one command from plaintext and there is no reason for it to be a credential. Neither the key nor the decrypted value is printed.
+
+## Use
+
+### soloz kubeconfig
+
+Retrieves a cluster's admin kubeconfig from the escrow.
+
+```bash
+soloz kubeconfig --box acme-hub --cluster acme-hub --out acme-hub.kubeconfig
+kubectl --kubeconfig acme-hub.kubeconfig get nodes
+```
+
+<Warning>
+This is break-glass access. Normal access is through your own identity provider, where each person authenticates as themselves. Use this when that is not available: the identity provider is down, the cluster is broken, or nobody can sign in. The credential is cluster-admin, is not tied to a person, and must never be committed.
+</Warning>
+
+The escrow holds one kubeconfig per cluster, so pass the cluster you need. Without `--out` it prints to stdout.
+
+### soloz escrow migrate-paths
+
+Copies a box's admin kubeconfig and both at-rest encryption key generations onto the per-cluster paths a cluster now has.
+
+```bash
+soloz escrow migrate-paths --box acme-hub --cluster acme-hub --cluster acme-02
+```
+
+It copies and never generates, derives or rotates. It refuses to overwrite a destination holding different bytes, reads every destination back and compares it with its source before reporting an artefact migrated, and leaves the old copies in place.
+
+## Management-state backups
+
+Your box's management state is backed up to object storage you own, encrypted under a customer-supplied key. Both the key and the store credential live in the escrow rather than in the box's own secret store, because they have to work when the management cluster that wrote the backups is gone.
+
+<Note>
+These two commands exist and are documented here for completeness. The capability they serve does not deploy yet, so there is nothing to deliver credentials into on a box built today.
+</Note>
+
+### soloz escrow enroll-store-credential
+
+Reads the object-store credential for management-state backups from stdin and preserves it in the escrow.
+
+```bash
+soloz escrow enroll-store-credential --box acme-hub < credential.ini
+```
+
+The credential is yours and is never generated here. It arrives on stdin, so it is not in a command argument, a shell history or a process list, and it is never printed back. Enrolment is one-time: a credential already escrowed is left alone unless `--rotate` is given.
+
+### soloz escrow deliver-backup-credentials
+
+Creates the two Secrets a cluster needs to read its management-state backups: the customer-supplied key the objects are encrypted under, and the store credential that reaches the bucket.
+
+```bash
+soloz escrow deliver-backup-credentials --box acme-hub --kubeconfig acme-hub.kubeconfig
+```
+
+Create-only. An identical Secret is accepted as already present; a different one is refused and left alone. A missing escrowed key fails closed and is never replaced by a new one, because a new key cannot decrypt a backup written under the old. `--dry-run` compares and writes nothing.
+
+## At-rest encryption
+
+### soloz encryption enable
+
+Delivers what at-rest encryption of Secrets needs to a cluster that already exists: the Secret its control plane reads its encryption provider configuration from. The key is restored from the escrow when one holds it, and generated otherwise — and a generated key is escrowed before anything is applied.
+
+```bash
+soloz encryption enable --box acme-hub --cluster acme-hub \
+  --apply-class --kubeconfig acme-hub.kubeconfig
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--box`, `--cluster` | The box the escrow is keyed by, and whose key this is. Both required |
+| `--apply-class` | Also apply the control-plane template. Required for the management cluster, whose template nothing reconciles. Not needed for a managed cluster, where the GitOps engine already carries it |
+| `--kubeconfig` | The management cluster, which is where the configuration Secret lives even for a managed cluster |
+| `--dry-run` | Say what would be applied, change nothing |
+| `--no-plaintext-fallback` | Render the configuration without the plaintext reader |
+
+<Warning>
+Run this against the management cluster for any cluster, and run it as the first step of enabling encryption, not the only one. Adopting a new control-plane template replaces each node. `--no-plaintext-fallback` belongs only after every Secret has been rewritten and verified encrypted: any Secret still in plaintext becomes unreadable.
+</Warning>
+
+### soloz encryption rotate
+
+Replaces the key Secrets are encrypted with, in two stages, without losing data already written.
+
+```bash
+soloz encryption rotate --box acme-hub --cluster acme-hub --kubeconfig acme-hub.kubeconfig
+# roll the control plane, rewrite every Secret, verify, then:
+soloz encryption rotate --box acme-hub --cluster acme-hub --finalize
+```
+
+Stage one mints a new key, makes it the write key and retains the current one for reads, so nothing is unreadable at any point. Stage two, with `--finalize`, removes the retained key; it refuses unless the live configuration is actually mid-rotation.
+
+Both stages escrow before they apply, and during a rotation the escrow holds both keys — a cluster that loses its control plane mid-rotation needs both to recover.
+
+<Warning>
+Do not run `--finalize` until you have verified that every Secret carries the new key's name. Anything still sealed under the old key becomes unreadable.
+</Warning>
+
+The cryptoperiod is 90 days. A key you know has been disclosed is an incident rather than a scheduling question: replace it now, because waiting for the next window keeps a compromised key in force for a quarter.

@@ -24,8 +24,9 @@ These are hard constraints — never deviate.
 | hub | management cluster |
 | spoke | managed cluster |
 | fleet | application (or app) |
-| tenant (in prose) | organization; keep `tenant` only in literal values such as `tenantId` and `--tenant` |
+| organization, for anything the platform owns | **tenant** — see the rule below |
 | tenant repository | GitOps repository |
+| organization provisioning | tenant provisioning |
 | platform tools (alone) | capabilities, introduced as "the platform tools your apps need" |
 | catalog, register an app | none: every capability ships in the bundle, and an app exists because its declaration is committed |
 | catalogue, catalog (of components) | capability, bundle |
@@ -33,7 +34,26 @@ These are hard constraints — never deviate.
 | Kamarkat manages / operates your box | Kamarkat delivers the platform into your box |
 | upgrade (as something Kamarkat does) | upgrade proposal you accept |
 | SaaS, hosted platform | delivered into your box |
-| internal component names (`hub-operator`, `kube-sbt`, `mcp-server`) | the capability they provide (platform operator, organization provisioning, control-plane API) |
+| internal component names (`hub-operator`, `kube-sbt`, `mcp-server`) | the capability they provide (platform operator, tenant provisioning, control-plane API) |
+
+### Tenant, not organization
+
+**Tenant** is the platform's word for the owner of a box: its clusters, its
+applications, its costs and its isolation boundary. Use it in prose, not only in
+`tenantId` and `--tenant`.
+
+**Organization** means one thing and nothing else: the identity provider's own
+container for users, projects and clients. A tenant is bound to one. That is the only
+place the word may carry the platform's meaning.
+
+The one other legitimate use is **"git organization"**, which names the reader's entity
+in their git provider — what `--org` sets, and where their repositories, runners and
+package registry live. Always qualify it with "git". A bare "your organization" is
+forbidden precisely because it has meant both the tenant and the git organization,
+sometimes in the same sentence.
+
+For plain English about companies, write "teams" or name them: "built for teams without
+a platform team".
 
 ### No vendor names
 
@@ -56,6 +76,23 @@ Never state a fact in two places; link to its home instead.
 ### No internal references
 
 Customer documentation never cites ADR numbers, internal file paths of the platform repository, ticket ids or design history. Describe only the current design, never what it replaced.
+
+### Only the CLI, never a script
+
+Every procedure in these docs is a `soloz` command. Never document a script that ships
+in the GitOps repository, and never put one in a command block, a repository tree or a
+prerequisite — `./scripts/anything.sh` must not appear on a page.
+
+The reason is that two interfaces mean two contracts. A script in a tenant's repository
+is a copy: it ages with the repository it was rendered into, while the CLI the reader
+installs carries the platform version. Documenting both leaves a reader with two answers
+and no way to tell which is current.
+
+`git`, `gh` and `kubectl` are fine — they are tools the reader already installed, named
+in the prerequisites. The rule is about scripts the platform ships, not about other CLIs.
+
+When a procedure can only be done with a script, that is a gap in the CLI. Report it;
+do not document your way around it.
 
 ## Page anatomy
 
@@ -109,6 +146,35 @@ Every page under **Features › Capabilities** other than the overview follows t
 ```
 
 Roles come from `component-catalog.yaml` in the platform repository; **Runs on** comes from the latest release inventory. Never write a version number on a capability page.
+
+### CLI reference pages
+
+Pages under **CLI** document the command surface. One page per command family, plus an
+overview that indexes every command:
+
+```
+> One or two sentences: what this family of commands acts on.
+
+## <Verb>                   group commands by what the reader is doing: Create, Check,
+                            Repair, Destroy. Never alphabetically
+### soloz <command>         one per command, in the order a reader meets them
+                            1-3 sentences, then the command in a fenced bash block,
+                            then a flag table where a flag changes what happens
+## What you need to know    only where semantics outlive a single command
+```
+
+Rules specific to these pages:
+
+- The overview's index must list **every** command the CLI exposes. Walk the built
+  binary's help, not the source, and do not omit a command because it is dangerous or
+  deprecated — a reader who sees it in `--help` and not here will assume the docs are
+  stale. Say what it does and whether to run it.
+- Document the flags that change behaviour, not every flag. Point to
+  `soloz <command> --help` for the complete set.
+- A destructive command gets its own group heading with the word Destroy in it, and a
+  `<Warning>`. Never file one under a heading about checking or running.
+- Never carry the CLI's help text across verbatim. It cites decision records, platform
+  file paths and internal component names, all of which are forbidden here.
 
 ### Quickstart pages
 
@@ -169,7 +235,7 @@ Do not pad to fill space. Do not truncate to save space.
 This is the most important section. Get this wrong and all the writing will be wrong.
 
 **What Kamarkat is:**
-Kamarkat is an open-source platform a startup runs its business on. It delivers a complete platform into a box in the customer's own cloud account, for organizations that want a golden path and cannot yet staff a platform team.
+Kamarkat is an open-source platform a startup runs its business on. It delivers a complete platform into a box in the customer's own cloud account, for teams that want a golden path and cannot yet staff a platform team.
 
 **Scope: open source only.** The docs describe the open-source, turnkey platform. Commercial content (support, maintenance commitments, credits, billing, metering, pricing) is out of scope until it is added deliberately; drafts live in `scratch/deferred/`. A customer's own cloud bill is infrastructure cost, not commercial content.
 
@@ -185,7 +251,7 @@ Kamarkat is an open-source platform a startup runs its business on. It delivers 
 - Kamarkat **provides the capability**; the customer **owns its use**
 
 **Core vocabulary:**
-- Use **"box"** for what a customer owns, **"tenant"** for the organization, **"application"** for a product running on it
+- Use **"box"** for what a customer owns, **"tenant"** for whoever owns it, **"application"** for a product running on it
 - Use **"capability"** — not "feature", not "service", not "module" — for what the platform provides
 - Use **"propose"** for upgrades, **"reconcile"** for what the control plane does
 
@@ -197,7 +263,7 @@ Kamarkat is an open-source platform a startup runs its business on. It delivers 
 A management cluster running the customer's control plane, plus the managed clusters it provisions. It runs in the customer's cloud account under credentials only the customer holds, belongs to one tenant, and keeps running whether or not Kamarkat is reachable.
 
 **Tenant and application**
-The tenant is the organization that owns the box (`tenantId`). An application is a product running on it (`appId`), and the unit of isolation: its own namespace `tenant-<tenantId>-<appId>`, database, identity project, secret path and network policy. Being in the same tenant never grants access; only a declaration does.
+The tenant owns the box (`tenantId`), and is bound to one organization in the identity provider. An application is a product running on it (`appId`), and the unit of isolation: its own namespace `tenant-<tenantId>-<appId>`, database, identity project, secret path and network policy. Being in the same tenant never grants access; only a declaration does.
 
 **Cell**
 A managed cluster's name, chosen by the customer and fixed for life. Applications name the cell they run on. Policy attaches to cells.

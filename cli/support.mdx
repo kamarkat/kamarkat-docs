@@ -1,0 +1,49 @@
+---
+title: "Support"
+description: "See exactly what your box would report outward, before anything is sent."
+keywords: ["soloz support", "scope", "preview", "support agent", "allowlist"]
+---
+
+> The Support Agent runs on every cluster and does nothing until you enrol. These two commands tell you what it may send and what it would send, and neither of them transmits anything.
+
+## soloz support scope
+
+Lists every field that may leave this box: the platform's allowlist, minus anything you have denied.
+
+```bash
+soloz support scope
+```
+
+Nothing outside this list can be emitted. No value on your box can add to it — the list widens only when the platform publishes a version, which reaches you as a pull request you review.
+
+`--deny` subtracts a collector or a single field, as `collector` or `collector.field`, and the output shows the effective scope with that subtraction applied.
+
+## soloz support preview
+
+Runs every collector in the effective scope against this cluster and prints the result. Nothing is transmitted.
+
+```bash
+soloz support preview
+soloz support preview --json
+```
+
+A collector that could not run is listed with the reason rather than omitted: a payload quietly missing a collector would look the same as a box where the thing it watches is fine.
+
+| Flag | Meaning |
+| :- | :- |
+| `--json` | Print the payload as JSON |
+| `--deny` | Collectors or fields to subtract |
+| `--gitops-dir` | Your GitOps repository, which some collectors read. Defaults to the current directory |
+| `--cert`, `--key` | The client certificate whose subject is the identity this box reports as |
+
+## What you need to know
+
+### The identity comes from the certificate
+
+`preview` takes the reporting identity from the client certificate, exactly as the agent does. Typing a name instead would let the preview show a payload labelled differently from the one that would actually be sent, which defeats the point of reading it first.
+
+An unenrolled box has no certificate. That is the normal state, and `preview` still renders what it would send — which is most of why the command exists.
+
+### Fields, not values, are the contract
+
+`scope` is the list you review and agree to. `preview` is how you confirm what those fields contain on your box today, before you enrol.

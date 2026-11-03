@@ -13,15 +13,15 @@ Kamarkat uses your git organization for four things:
 | Use | What it needs |
 | :- | :- |
 | **GitOps repository** | `<tenant>-gitops`, created once by `soloz tenant scaffold` |
-| **Day-0** | The **Bootstrap cluster** workflow, running in your organization's CI |
+| **Day-0** | The **Bootstrap cluster** workflow, running in your git organization's CI |
 | **Application builds** | Write access to your GitOps repository, to pin each new version |
-| **Charts and images** | Your organization's package registry, at `oci://ghcr.io/<org>/charts` |
+| **Charts and images** | Your git organization's package registry, at `oci://ghcr.io/<org>/charts` |
 
 ## Getting started
 
 ### 1. Create the GitOps token
 
-Create a token with write access to your organization's repositories and the organization's **Secrets: write** permission. Day-0 commits what it generates with it, and your application builds pin their versions with it.
+Create a token with write access to your git organization's repositories and that organization's **Secrets: write** permission. Day-0 commits what it generates with it, and your application builds pin their versions with it.
 
 ### 2. Store it on your GitOps repository
 
@@ -37,7 +37,7 @@ gh secret set GITOPS_TOKEN --repo acme-inc/acme-gitops
 soloz tenant set-gitops-token --org acme-inc
 ```
 
-The token is read from stdin, so it stays out of your shell history. Every repository in the organization inherits it, including ones you create later.
+The token is read from stdin, so it stays out of your shell history. Every repository in that git organization inherits it, including ones you create later.
 
 ### 4. Let your clusters pull your private images
 
@@ -58,11 +58,11 @@ soloz tenant set-gitops-token --discover --gitops-repo acme-inc/acme-gitops
 
 ### Upgrade proposals come from your own automation
 
-Your GitOps repository carries a `renovate.json`. Your organization's dependency-update automation reads it, watches for new platform versions and opens pull requests. Kamarkat holds no access to your repository.
+Your GitOps repository carries a `renovate.json`. Your git organization's dependency-update automation reads it, watches for new platform versions and opens pull requests. Kamarkat holds no access to your repository.
 
 ### Protect what matters
 
-Your GitOps repository is administered by your organization. Use its review rules to require reviewers on production clusters and environments, and enable automatic merges where you want them.
+Your GitOps repository is administered by your git organization. Use its review rules to require reviewers on production clusters and environments, and enable automatic merges where you want them.
 
 ## Frequently asked questions
 

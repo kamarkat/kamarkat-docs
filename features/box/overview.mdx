@@ -8,7 +8,7 @@ keywords: ["box", "management cluster", "managed cluster", "custody"]
 
 ## What it is
 
-A box is everything Kamarkat gives you: a **management cluster** that runs your control plane, and the **managed clusters** it creates and reconciles. It runs in your cloud account, under credentials you hold, and it belongs to exactly one organization.
+A box is everything Kamarkat gives you: a **management cluster** that runs your control plane, and the **managed clusters** it creates and reconciles. It runs in your cloud account, under credentials you hold, and it belongs to exactly one tenant.
 
 The control plane is **delivered, not hosted**. It is the same control plane Kamarkat tests and publishes, not a reduced edition. Once it is running it reconciles your clusters from your own repository and depends on nothing Kamarkat operates.
 
@@ -21,7 +21,7 @@ The control plane is **delivered, not hosted**. It is the same control plane Kam
 | Secret material | Your box's secret store |
 | Write access to your repository | Your own automation |
 
-Because no Kamarkat component serves more than one organization, a compromise of Kamarkat cannot reach your running infrastructure. Isolation between customers comes from the topology itself: there is no shared control plane to break into.
+Because no Kamarkat component serves more than one tenant, a compromise of Kamarkat cannot reach your running infrastructure. Isolation between customers comes from the topology itself: there is no shared control plane to break into.
 
 ## How a change reaches your box
 
@@ -49,7 +49,7 @@ No Kamarkat component opens a connection into your box, holds a credential for i
 
 ### Every box carries a full control plane
 
-There is no shared control plane between organizations. That is what makes the custody claim true, and it sets the floor on what a box costs.
+There is no shared control plane between tenants. That is what makes the custody claim true, and it sets the floor on what a box costs.
 
 ## Frequently asked questions
 

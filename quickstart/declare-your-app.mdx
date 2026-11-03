@@ -25,7 +25,7 @@ cp templates/fleet/values.yaml environments/dev/shop/values.yaml
 ```
 
 ```yaml environments/dev/shop/values.yaml
-tenantId: acme          # the organization that owns the box, the same in every app
+tenantId: acme          # the tenant that owns the box, the same in every app
 appId: shop             # this product; it gets namespace tenant-acme-shop
 cellId: acme-01         # the managed cluster it runs on
 
@@ -50,7 +50,7 @@ secrets: []             # secrets you supply; see "Supply your secrets"
 
 | Field | Meaning |
 | :- | :- |
-| `tenantId` | Your organization. The same value in every app's file. |
+| `tenantId` | Your tenant. The same value in every app's file. |
 | `appId` | The product, and its isolation unit. It never defaults to `tenantId`. |
 | `cellId` | Must match the managed cluster's name, or nothing is generated for the app. |
 | `public.hosts` | Public hostnames. An empty list publishes nothing. |

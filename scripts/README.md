@@ -14,9 +14,18 @@ mint validate && mint broken-links
 git add -A && git commit -m "docs(releases): <version>" && git push
 ```
 
-`--fetch` pulls the chart with `helm` (logged in to `ghcr.io`) and copies its
-inventory to `data/releases/<version>.json`. The script then regenerates every
-page from `data/releases/`.
+`--fetch` pulls the chart with `helm` (logged in to `ghcr.io`) and writes its
+inventory to `data/releases/<version>.json` with, read through `gh` as of the day
+the version was published to the registry:
+
+- the release date;
+- each component's repository link, from zero-ops' component catalog (a zero-ops
+  checkout beside this one, or `--catalog <path>`);
+- the newest release that repository had published, and whether the version
+  shipped is it. The pages show it green when it is, red when it is not.
+
+These are recorded once, so a page keeps showing what was latest on its release
+date. The script then regenerates every page from `data/releases/`.
 
 ## Regenerate without fetching
 
@@ -28,7 +37,7 @@ python3 scripts/sync-releases.py
 
 | Path | Content |
 | :- | :- |
-| `data/releases/<version>.json` | The inventory, copied from the chart |
+| `data/releases/<version>.json` | The inventory from the chart, with release date, links and latest versions |
 | `versions/releases/<version>.mdx` | One page per version |
 | `versions/lines/<major>-<minor>.mdx` | Every version on a minor line |
 | `snippets/releases/*.jsx` | The data each page renders |

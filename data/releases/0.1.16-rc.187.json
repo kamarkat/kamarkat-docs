@@ -50,7 +50,10 @@
       "digests": [
         "sha256:9d3e6044ddcdc0878b1787f77bd401252b95e22684203fb5e874c4c42d2ed90c",
         "sha256:efd79355b89094a8225a9db465d9a01dc656b377f0bab458761b935a13231d29"
-      ]
+      ],
+      "url": "https://github.com/agentgateway/agentgateway",
+      "latest": "1.7.0",
+      "current": false
     },
     {
       "name": "alertmanager",
@@ -74,7 +77,10 @@
         "VictoriaMetrics operator v0.75.0"
       ],
       "version": "v0.34.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/prometheus/alertmanager",
+      "latest": "0.34.2",
+      "current": false
     },
     {
       "name": "argocd",
@@ -98,7 +104,10 @@
         "chart argo-cd 7.9.1"
       ],
       "version": "v2.14.11",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/argoproj/argo-cd",
+      "latest": "3.5.6",
+      "current": false
     },
     {
       "name": "dex",
@@ -122,7 +131,10 @@
         "chart argo-cd 7.9.1"
       ],
       "version": "v2.42.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/dexidp/dex",
+      "latest": "2.46.1",
+      "current": false
     },
     {
       "name": "busybox",
@@ -146,7 +158,10 @@
       "version": "1.37.0",
       "digests": [
         "sha256:9db7b59979c38555a39def84a31fb98b5296952f9e3afd4f6f11f05b07adfab0"
-      ]
+      ],
+      "url": "https://git.busybox.net/busybox",
+      "latest": "1.38.0",
+      "current": false
     },
     {
       "name": "capi2argo-cluster-operator",
@@ -170,7 +185,10 @@
       "version": "v1.5.0",
       "digests": [
         "sha256:fb8c6457ef6e44d4c4d8a3468feb0d19e973867e0544d6cbc38f837411f3498c"
-      ]
+      ],
+      "url": "https://github.com/dntosas/capi2argo-cluster-operator",
+      "latest": "1.5.0",
+      "current": true
     },
     {
       "name": "cert-manager-controller",
@@ -192,7 +210,10 @@
       ],
       "via": [],
       "version": "v1.20.2",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/cert-manager/cert-manager",
+      "latest": "1.21.3",
+      "current": false
     },
     {
       "name": "cert-manager-webhook",
@@ -214,7 +235,10 @@
       ],
       "via": [],
       "version": "v1.20.2",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/cert-manager/cert-manager",
+      "latest": "1.21.3",
+      "current": false
     },
     {
       "name": "cert-manager-webhook-hetzner",
@@ -236,7 +260,10 @@
       ],
       "via": [],
       "version": "v0.9.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/hetzner/cert-manager-webhook-hetzner",
+      "latest": "0.9.1",
+      "current": false
     },
     {
       "name": "cilium",
@@ -259,7 +286,10 @@
       "version": "v1.17.18",
       "digests": [
         "sha256:2f2c611db8de2f9c4846ee80fa3371617218dcd0cce42cf0d7d40b4d06458a23"
-      ]
+      ],
+      "url": "https://github.com/cilium/cilium",
+      "latest": "1.20.4",
+      "current": false
     },
     {
       "name": "operator-generic",
@@ -282,7 +312,10 @@
       "version": "v1.17.18",
       "digests": [
         "sha256:ec68d574d2288f2d8cb0ae50778c1a0b08a6165cfcb6ba5bc5595d99ed3f7bda"
-      ]
+      ],
+      "url": "https://github.com/cilium/cilium",
+      "latest": "1.20.4",
+      "current": false
     },
     {
       "name": "cluster-api-controller",
@@ -305,7 +338,10 @@
         "core provider v1.10.0"
       ],
       "version": "v1.10.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/cluster-api",
+      "latest": "1.14.3",
+      "current": false
     },
     {
       "name": "cluster-api-operator",
@@ -326,7 +362,10 @@
       "boundaries": [],
       "via": [],
       "version": "v0.13.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/cluster-api-operator",
+      "latest": "0.30.0",
+      "current": false
     },
     {
       "name": "kubeadm-bootstrap-controller",
@@ -349,7 +388,10 @@
         "bootstrap provider v1.8.5"
       ],
       "version": "v1.8.5",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/cluster-api",
+      "latest": "1.14.3",
+      "current": false
     },
     {
       "name": "kubeadm-control-plane-controller",
@@ -372,7 +414,10 @@
         "control-plane provider v1.8.5"
       ],
       "version": "v1.8.5",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/cluster-api",
+      "latest": "1.14.3",
+      "current": false
     },
     {
       "name": "caph",
@@ -395,7 +440,10 @@
         "infrastructure provider v1.0.7"
       ],
       "version": "v1.0.7",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/syself/cluster-api-provider-hetzner",
+      "latest": "1.1.10",
+      "current": false
     },
     {
       "name": "spoke-identity-operator",
@@ -419,7 +467,10 @@
       "version": "digest-pinned",
       "digests": [
         "sha256:c265343a0d8546312f2f3bf4fa78ed9a6ed6227ff49f9857e05c2d94c3245218"
-      ]
+      ],
+      "url": "https://github.com/soloz-io/zero-ops",
+      "latest": "c08a0d6f",
+      "current": true
     },
     {
       "name": "cluster-proportional-autoscaler",
@@ -442,7 +493,10 @@
       ],
       "via": [],
       "version": "v1.9.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/cluster-proportional-autoscaler",
+      "latest": "1.10.3",
+      "current": false
     },
     {
       "name": "containerd",
@@ -464,7 +518,10 @@
       "boundaries": [],
       "via": [],
       "version": "2.4.2",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/containerd/containerd",
+      "latest": "2.4.2",
+      "current": true
     },
     {
       "name": "mcp-server",
@@ -488,7 +545,10 @@
       "version": "digest-pinned",
       "digests": [
         "sha256:990bfec09d9e6e89ac6e375f8137d014ce870ad19cec61b40bbfb464838928e0"
-      ]
+      ],
+      "url": "https://github.com/soloz-io/zero-ops",
+      "latest": "d8adecf4",
+      "current": true
     },
     {
       "name": "coredns",
@@ -511,7 +571,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "v1.11.3",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/coredns/coredns",
+      "latest": "1.15.0",
+      "current": false
     },
     {
       "name": "crossplane",
@@ -535,7 +598,10 @@
         "chart crossplane 1.20.5"
       ],
       "version": "v1.20.5",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/crossplane/crossplane",
+      "latest": "2.4.3",
+      "current": false
     },
     {
       "name": "provider-kubernetes",
@@ -557,7 +623,10 @@
       ],
       "via": [],
       "version": "v1.3.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/crossplane-contrib/provider-kubernetes",
+      "latest": "1.4.1",
+      "current": false
     },
     {
       "name": "csi-attacher",
@@ -581,7 +650,10 @@
       ],
       "via": [],
       "version": "v4.8.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-csi/external-attacher",
+      "latest": "4.13.0",
+      "current": false
     },
     {
       "name": "csi-node-driver-registrar",
@@ -605,7 +677,10 @@
       ],
       "via": [],
       "version": "v2.13.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-csi/node-driver-registrar",
+      "latest": "2.18.0",
+      "current": false
     },
     {
       "name": "csi-provisioner",
@@ -629,7 +704,10 @@
       ],
       "via": [],
       "version": "v5.2.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-csi/external-provisioner",
+      "latest": "6.4.0",
+      "current": false
     },
     {
       "name": "csi-resizer",
@@ -653,7 +731,10 @@
       ],
       "via": [],
       "version": "v1.13.2",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-csi/external-resizer",
+      "latest": "2.3.0",
+      "current": false
     },
     {
       "name": "livenessprobe",
@@ -677,7 +758,10 @@
       ],
       "via": [],
       "version": "v2.15.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-csi/livenessprobe",
+      "latest": "2.20.0",
+      "current": false
     },
     {
       "name": "curl",
@@ -701,7 +785,10 @@
       "version": "digest-pinned",
       "digests": [
         "sha256:11e64e28c5f58c8d93ee95fcf22ac055f48b0bc440e0ce7d8013bbb5ad6aa8ac"
-      ]
+      ],
+      "url": "https://github.com/curl/curl",
+      "latest": "8.23.0",
+      "current": false
     },
     {
       "name": "etcd",
@@ -723,7 +810,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "3.5.15-0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/etcd-io/etcd",
+      "latest": "3.7.3",
+      "current": false
     },
     {
       "name": "external-secrets",
@@ -747,7 +837,10 @@
         "chart external-secrets 2.2.0"
       ],
       "version": "v2.2.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/external-secrets/external-secrets",
+      "latest": "2.14.0",
+      "current": false
     },
     {
       "name": "external-dns",
@@ -771,7 +864,10 @@
       "version": "v0.15.0",
       "digests": [
         "sha256:338dd8c526e1337a12db0c8ee81a59ce5815ea51b73756affcd1e5dca530105c"
-      ]
+      ],
+      "url": "https://github.com/kubernetes-sigs/external-dns",
+      "latest": "0.24.0",
+      "current": false
     },
     {
       "name": "external-dns-hetzner-webhook",
@@ -795,7 +891,10 @@
       "version": "v0.3.4",
       "digests": [
         "sha256:17d6d7f09b3419e27eb1abd4a4a0d7fddac84192a2c681e65c356056fc3a9253"
-      ]
+      ],
+      "url": "https://github.com/hetzner/external-dns-hetzner-webhook",
+      "latest": "0.5.1",
+      "current": false
     },
     {
       "name": "ledger",
@@ -819,7 +918,10 @@
       "version": "digest-pinned",
       "digests": [
         "sha256:fc624af4dde0b9fa8b43ae02b7297fc3f15266df7c9806edec794f1420b40e62"
-      ]
+      ],
+      "url": "https://github.com/formancehq/ledger",
+      "latest": "2.4.17",
+      "current": false
     },
     {
       "name": "grafana",
@@ -843,7 +945,10 @@
         "Grafana operator v5.24.0"
       ],
       "version": "13.0.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/grafana/grafana",
+      "latest": "13.3.0",
+      "current": false
     },
     {
       "name": "alloy",
@@ -868,7 +973,10 @@
       "version": "v1.20.1",
       "digests": [
         "sha256:2aa2099af76c0098d4af7a4d6e48f86cb66dc1a000222ad927a1c67c6542d13f"
-      ]
+      ],
+      "url": "https://github.com/grafana/alloy",
+      "latest": "1.21.3",
+      "current": false
     },
     {
       "name": "grafana-operator",
@@ -892,7 +1000,10 @@
       "version": "v5.24.0",
       "digests": [
         "sha256:e72d11ac579a000fe0ddcc0c3341a5103a1c93a28fbc394dc7c7009ed071d1a7"
-      ]
+      ],
+      "url": "https://github.com/grafana/grafana-operator",
+      "latest": "5.25.0",
+      "current": false
     },
     {
       "name": "headlamp",
@@ -914,7 +1025,10 @@
       ],
       "via": [],
       "version": "v0.45.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/headlamp-k8s/headlamp",
+      "latest": "0.46.0",
+      "current": false
     },
     {
       "name": "hetzner-cloud-controller-manager",
@@ -938,7 +1052,10 @@
       ],
       "via": [],
       "version": "v2.0.7",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/syself/hetzner-cloud-controller-manager",
+      "latest": "2.0.7",
+      "current": true
     },
     {
       "name": "hcloud-csi-driver",
@@ -962,7 +1079,10 @@
       ],
       "via": [],
       "version": "v2.13.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/hetznercloud/csi-driver",
+      "latest": "2.24.1",
+      "current": false
     },
     {
       "name": "infisical",
@@ -984,7 +1104,10 @@
       ],
       "via": [],
       "version": "v0.160.11",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/Infisical/infisical",
+      "latest": "0.167.4",
+      "current": false
     },
     {
       "name": "pki-issuer",
@@ -1006,7 +1129,10 @@
       ],
       "via": [],
       "version": "v0.2.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/Infisical/infisical-issuer",
+      "latest": "1.0.1",
+      "current": false
     },
     {
       "name": "kube-state-metrics",
@@ -1030,7 +1156,10 @@
         "chart kube-state-metrics 5.27.0"
       ],
       "version": "v2.14.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kube-state-metrics",
+      "latest": "2.20.0",
+      "current": false
     },
     {
       "name": "kubectl",
@@ -1053,7 +1182,10 @@
       "version": "v1.31.6",
       "digests": [
         "sha256:0340f50e46e77889398f41becf071e8d0f6be7672652a30e209112002147c06f"
-      ]
+      ],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "kube-apiserver",
@@ -1075,7 +1207,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "v1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "kube-controller-manager",
@@ -1097,7 +1232,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "v1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "kube-proxy",
@@ -1120,7 +1258,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "v1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "kube-scheduler",
@@ -1142,7 +1283,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "v1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "pause",
@@ -1165,7 +1309,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "3.10",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes/tree/master/build/pause",
+      "latest": "3.10.2",
+      "current": true
     },
     {
       "name": "kubeadm",
@@ -1187,7 +1334,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "kubectl",
@@ -1209,7 +1359,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "kubelet",
@@ -1231,7 +1384,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "k8s",
@@ -1255,7 +1411,10 @@
         "chart zitadel 10.0.4"
       ],
       "version": "1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/alpine-docker/k8s",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "background-controller",
@@ -1279,7 +1438,10 @@
         "chart kyverno 3.9.1"
       ],
       "version": "v1.19.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": false
     },
     {
       "name": "cleanup-controller",
@@ -1303,7 +1465,10 @@
         "chart kyverno 3.9.1"
       ],
       "version": "v1.19.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": false
     },
     {
       "name": "kyverno",
@@ -1327,7 +1492,10 @@
         "chart kyverno 3.9.1"
       ],
       "version": "v1.19.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": false
     },
     {
       "name": "kyverno-cli",
@@ -1351,7 +1519,10 @@
         "chart kyverno 3.9.1"
       ],
       "version": "v1.19.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": false
     },
     {
       "name": "kyvernopre",
@@ -1375,7 +1546,10 @@
         "chart kyverno 3.9.1"
       ],
       "version": "v1.19.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": false
     },
     {
       "name": "readiness-checker",
@@ -1399,7 +1573,10 @@
         "chart kyverno 3.9.1"
       ],
       "version": "latest, v1.19.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": false
     },
     {
       "name": "reports-controller",
@@ -1423,7 +1600,10 @@
         "chart kyverno 3.9.1"
       ],
       "version": "v1.19.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": false
     },
     {
       "name": "local-path-provisioner",
@@ -1446,7 +1626,10 @@
       ],
       "via": [],
       "version": "v0.0.30",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/rancher/local-path-provisioner",
+      "latest": "0.0.37",
+      "current": false
     },
     {
       "name": "auth-proxy",
@@ -1470,7 +1653,10 @@
       "version": "digest-pinned",
       "digests": [
         "sha256:ff22acc366654f3d0a7a38d7a31464ddde4aa59490f515dfbfe5ff2649d8eef6"
-      ]
+      ],
+      "url": "https://github.com/soloz-io/zero-ops",
+      "latest": "7220ad92",
+      "current": true
     },
     {
       "name": "loki",
@@ -1494,7 +1680,10 @@
       "version": "3.7.9",
       "digests": [
         "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
-      ]
+      ],
+      "url": "https://github.com/grafana/loki",
+      "latest": "3.7.9",
+      "current": true
     },
     {
       "name": "metrics-server",
@@ -1518,7 +1707,10 @@
         "chart metrics-server 3.12.2"
       ],
       "version": "v0.7.2",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/metrics-server",
+      "latest": "0.9.1",
+      "current": false
     },
     {
       "name": "k8s-dns-node-cache",
@@ -1541,7 +1733,10 @@
       ],
       "via": [],
       "version": "1.23.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/dns",
+      "latest": "1.26.0",
+      "current": false
     },
     {
       "name": "kube-sbt",
@@ -1565,7 +1760,10 @@
       "version": "digest-pinned",
       "digests": [
         "sha256:f705cd09a4d88b6a2c3c079b203c0341ac0d03c50eccd5415ad712f07a1044bd"
-      ]
+      ],
+      "url": "https://github.com/soloz-io/zero-ops",
+      "latest": "efd8edd1",
+      "current": true
     },
     {
       "name": "function-patch-and-transform",
@@ -1587,7 +1785,10 @@
       ],
       "via": [],
       "version": "v0.8.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/crossplane-contrib/function-patch-and-transform",
+      "latest": "0.11.2",
+      "current": false
     },
     {
       "name": "hub-operator",
@@ -1611,7 +1812,10 @@
       "version": "digest-pinned",
       "digests": [
         "sha256:ff309121b7b558b604b0790bf3a596cc31e9044f620f77e211c7995683807811"
-      ]
+      ],
+      "url": "https://github.com/soloz-io/zero-ops",
+      "latest": "efd8edd1",
+      "current": true
     },
     {
       "name": "postgres",
@@ -1637,7 +1841,10 @@
       "version": "15-alpine, 16-alpine",
       "digests": [
         "sha256:fe0737ba566a2c5b2a28f34433c0a423261900ec17b9bf7ad115e1aae7e57f1b"
-      ]
+      ],
+      "url": "https://github.com/postgres/postgres",
+      "latest": "18.6",
+      "current": false
     },
     {
       "name": "redis",
@@ -1667,7 +1874,10 @@
       "version": "7.2.8-alpine, 8.6-alpine, digest-pinned",
       "digests": [
         "sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2"
-      ]
+      ],
+      "url": "https://github.com/redis/redis",
+      "latest": "8.10.3",
+      "current": false
     },
     {
       "name": "reloader",
@@ -1691,7 +1901,10 @@
         "chart reloader 1.2.1"
       ],
       "version": "v1.2.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/stakater/Reloader",
+      "latest": "1.4.23",
+      "current": false
     },
     {
       "name": "runc",
@@ -1713,7 +1926,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.5.2",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/opencontainers/runc",
+      "latest": "1.5.2",
+      "current": true
     },
     {
       "name": "support-agent",
@@ -1737,7 +1953,10 @@
       "version": "digest-pinned",
       "digests": [
         "sha256:b0522975b8305072ef0a765329467c4f1719da4feba5b7151915c0147fb23541"
-      ]
+      ],
+      "url": "https://github.com/soloz-io/zero-ops",
+      "latest": "c08a0d6f",
+      "current": false
     },
     {
       "name": "tailscale",
@@ -1757,7 +1976,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.104.4",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/tailscale/tailscale",
+      "latest": "1.104.4",
+      "current": true
     },
     {
       "name": "ubuntu",
@@ -1779,7 +2001,10 @@
       "boundaries": [],
       "via": [],
       "version": "24.04",
-      "digests": []
+      "digests": [],
+      "url": "https://launchpad.net/ubuntu",
+      "latest": "26.04",
+      "current": false
     },
     {
       "name": "victoria-metrics",
@@ -1803,7 +2028,10 @@
         "VictoriaMetrics operator v0.75.0"
       ],
       "version": "v1.152.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+      "latest": "1.155.0",
+      "current": false
     },
     {
       "name": "vmalert",
@@ -1827,7 +2055,10 @@
         "VictoriaMetrics operator v0.75.0"
       ],
       "version": "v1.152.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+      "latest": "1.155.0",
+      "current": false
     },
     {
       "name": "vmauth",
@@ -1851,7 +2082,10 @@
         "VictoriaMetrics operator v0.75.0"
       ],
       "version": "v1.152.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+      "latest": "1.155.0",
+      "current": false
     },
     {
       "name": "operator",
@@ -1878,7 +2112,10 @@
       "version": "config-reloader-v0.75.0, v0.75.0",
       "digests": [
         "sha256:78da26b41a819093707be2ab6a65a5dc19f43d58ec52f30b49a545c2c6b7bd55"
-      ]
+      ],
+      "url": "https://github.com/VictoriaMetrics/operator",
+      "latest": "0.75.2",
+      "current": false
     },
     {
       "name": "wait4x",
@@ -1902,7 +2139,10 @@
         "chart zitadel 10.0.4"
       ],
       "version": "3.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/wait4x/wait4x",
+      "latest": "3.7.3",
+      "current": false
     },
     {
       "name": "zitadel",
@@ -1926,7 +2166,10 @@
         "chart zitadel 10.0.4"
       ],
       "version": "v4.15.3",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/zitadel/zitadel",
+      "latest": "4.20.0",
+      "current": false
     },
     {
       "name": "zitadel-login",
@@ -1950,7 +2193,10 @@
         "chart zitadel 10.0.4"
       ],
       "version": "v4.15.3",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/zitadel/zitadel",
+      "latest": "4.20.0",
+      "current": false
     },
     {
       "name": "agent-sandbox-controller",
@@ -1971,7 +2217,10 @@
       "boundaries": [],
       "via": [],
       "version": "v0.5.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/agent-sandbox",
+      "latest": "1.0.9",
+      "current": false
     },
     {
       "name": "agentgateway",
@@ -1993,7 +2242,10 @@
       "version": "v1.6.0",
       "digests": [
         "sha256:9d3e6044ddcdc0878b1787f77bd401252b95e22684203fb5e874c4c42d2ed90c"
-      ]
+      ],
+      "url": "https://github.com/agentgateway/agentgateway",
+      "latest": "1.7.0",
+      "current": false
     },
     {
       "name": "alertmanager",
@@ -2016,7 +2268,10 @@
         "VictoriaMetrics operator v0.75.0"
       ],
       "version": "v0.34.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/prometheus/alertmanager",
+      "latest": "0.34.2",
+      "current": false
     },
     {
       "name": "argocd",
@@ -2039,7 +2294,10 @@
       ],
       "via": [],
       "version": "v2.11.2",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/argoproj/argo-cd",
+      "latest": "3.5.6",
+      "current": false
     },
     {
       "name": "argocd-agent",
@@ -2064,7 +2322,10 @@
       "version": "v0.9.0",
       "digests": [
         "sha256:394b9166d03895146a82c3a8f33ae5c99fda9f54e3b903bbd15737ea9890a766"
-      ]
+      ],
+      "url": "https://github.com/argoproj-labs/argocd-agent",
+      "latest": "0.10.0",
+      "current": false
     },
     {
       "name": "argo-rollouts",
@@ -2085,7 +2346,10 @@
       "boundaries": [],
       "via": [],
       "version": "v1.9.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/argoproj/argo-rollouts",
+      "latest": "1.10.1",
+      "current": false
     },
     {
       "name": "busybox",
@@ -2106,7 +2370,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.37.0",
-      "digests": []
+      "digests": [],
+      "url": "https://git.busybox.net/busybox",
+      "latest": "1.38.0",
+      "current": false
     },
     {
       "name": "cert-manager-cainjector",
@@ -2127,7 +2394,10 @@
       "boundaries": [],
       "via": [],
       "version": "v1.21.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/cert-manager/cert-manager",
+      "latest": "1.21.3",
+      "current": false
     },
     {
       "name": "cert-manager-controller",
@@ -2148,7 +2418,10 @@
       "boundaries": [],
       "via": [],
       "version": "v1.21.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/cert-manager/cert-manager",
+      "latest": "1.21.3",
+      "current": false
     },
     {
       "name": "cert-manager-startupapicheck",
@@ -2168,7 +2441,10 @@
       "boundaries": [],
       "via": [],
       "version": "v1.21.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/cert-manager/cert-manager",
+      "latest": "1.21.3",
+      "current": false
     },
     {
       "name": "cert-manager-webhook",
@@ -2189,7 +2465,10 @@
       "boundaries": [],
       "via": [],
       "version": "v1.21.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/cert-manager/cert-manager",
+      "latest": "1.21.3",
+      "current": false
     },
     {
       "name": "cert-manager-webhook-hetzner",
@@ -2210,7 +2489,10 @@
       "boundaries": [],
       "via": [],
       "version": "v0.9.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/hetzner/cert-manager-webhook-hetzner",
+      "latest": "0.9.1",
+      "current": false
     },
     {
       "name": "cilium",
@@ -2235,7 +2517,10 @@
       "version": "v1.17.18",
       "digests": [
         "sha256:2f2c611db8de2f9c4846ee80fa3371617218dcd0cce42cf0d7d40b4d06458a23"
-      ]
+      ],
+      "url": "https://github.com/cilium/cilium",
+      "latest": "1.20.4",
+      "current": false
     },
     {
       "name": "operator-generic",
@@ -2260,7 +2545,10 @@
       "version": "v1.17.18",
       "digests": [
         "sha256:ec68d574d2288f2d8cb0ae50778c1a0b08a6165cfcb6ba5bc5595d99ed3f7bda"
-      ]
+      ],
+      "url": "https://github.com/cilium/cilium",
+      "latest": "1.20.4",
+      "current": false
     },
     {
       "name": "cloudnative-pg",
@@ -2281,7 +2569,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.29.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/cloudnative-pg/cloudnative-pg",
+      "latest": "1.30.1",
+      "current": false
     },
     {
       "name": "containerd",
@@ -2304,7 +2595,10 @@
       "boundaries": [],
       "via": [],
       "version": "2.4.2",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/containerd/containerd",
+      "latest": "2.4.2",
+      "current": true
     },
     {
       "name": "coredns",
@@ -2327,7 +2621,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "v1.11.3",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/coredns/coredns",
+      "latest": "1.15.0",
+      "current": false
     },
     {
       "name": "crossplane",
@@ -2348,7 +2645,10 @@
       "boundaries": [],
       "via": [],
       "version": "v1.20.5",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/crossplane/crossplane",
+      "latest": "2.4.3",
+      "current": false
     },
     {
       "name": "provider-kubernetes",
@@ -2368,7 +2668,10 @@
       "boundaries": [],
       "via": [],
       "version": "v1.3.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/crossplane-contrib/provider-kubernetes",
+      "latest": "1.4.1",
+      "current": false
     },
     {
       "name": "provider-sql",
@@ -2388,7 +2691,10 @@
       "boundaries": [],
       "via": [],
       "version": "v0.14.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/crossplane-contrib/provider-sql",
+      "latest": "0.16.2",
+      "current": false
     },
     {
       "name": "ephemeral-job-operator",
@@ -2411,7 +2717,10 @@
       "version": "digest-pinned",
       "digests": [
         "sha256:55970a56f8ab4a88ad55df16593164a9a6d2f94d110ec544034d3c611fa25828"
-      ]
+      ],
+      "url": "https://github.com/soloz-io/zero-ops",
+      "latest": "c08a0d6f",
+      "current": true
     },
     {
       "name": "etcd",
@@ -2433,7 +2742,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "3.5.15-0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/etcd-io/etcd",
+      "latest": "3.7.3",
+      "current": false
     },
     {
       "name": "external-secrets",
@@ -2454,7 +2766,10 @@
       "boundaries": [],
       "via": [],
       "version": "v2.2.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/external-secrets/external-secrets",
+      "latest": "2.14.0",
+      "current": false
     },
     {
       "name": "external-dns",
@@ -2477,7 +2792,10 @@
       "version": "v0.15.0",
       "digests": [
         "sha256:338dd8c526e1337a12db0c8ee81a59ce5815ea51b73756affcd1e5dca530105c"
-      ]
+      ],
+      "url": "https://github.com/kubernetes-sigs/external-dns",
+      "latest": "0.24.0",
+      "current": false
     },
     {
       "name": "external-dns-hetzner-webhook",
@@ -2500,7 +2818,10 @@
       "version": "v0.3.4",
       "digests": [
         "sha256:17d6d7f09b3419e27eb1abd4a4a0d7fddac84192a2c681e65c356056fc3a9253"
-      ]
+      ],
+      "url": "https://github.com/hetzner/external-dns-hetzner-webhook",
+      "latest": "0.5.1",
+      "current": false
     },
     {
       "name": "alloy",
@@ -2523,7 +2844,10 @@
       "version": "v1.20.1",
       "digests": [
         "sha256:2aa2099af76c0098d4af7a4d6e48f86cb66dc1a000222ad927a1c67c6542d13f"
-      ]
+      ],
+      "url": "https://github.com/grafana/alloy",
+      "latest": "1.21.3",
+      "current": false
     },
     {
       "name": "pki-issuer",
@@ -2544,7 +2868,10 @@
       "boundaries": [],
       "via": [],
       "version": "v0.2.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/Infisical/infisical-issuer",
+      "latest": "1.0.1",
+      "current": false
     },
     {
       "name": "kube-state-metrics",
@@ -2567,7 +2894,10 @@
       "version": "v2.14.0",
       "digests": [
         "sha256:37d841299325c23b56e5951176ce8ef317d537447c0f1b2d2437dddbb1f51165"
-      ]
+      ],
+      "url": "https://github.com/kubernetes/kube-state-metrics",
+      "latest": "2.20.0",
+      "current": false
     },
     {
       "name": "kubectl",
@@ -2592,7 +2922,10 @@
       "version": "v1.31.6",
       "digests": [
         "sha256:0340f50e46e77889398f41becf071e8d0f6be7672652a30e209112002147c06f"
-      ]
+      ],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "kube-apiserver",
@@ -2614,7 +2947,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "v1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "kube-controller-manager",
@@ -2636,7 +2972,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "v1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "kube-scheduler",
@@ -2658,7 +2997,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "v1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "pause",
@@ -2681,7 +3023,10 @@
         "kubeadm v1.31.6"
       ],
       "version": "3.10",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes/tree/master/build/pause",
+      "latest": "3.10.2",
+      "current": true
     },
     {
       "name": "kubeadm",
@@ -2704,7 +3049,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "kubectl",
@@ -2727,7 +3075,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "kubelet",
@@ -2750,7 +3101,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.31.6",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false
     },
     {
       "name": "background-controller",
@@ -2771,7 +3125,10 @@
       "boundaries": [],
       "via": [],
       "version": "v1.19.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": false
     },
     {
       "name": "cleanup-controller",
@@ -2792,7 +3149,10 @@
       "boundaries": [],
       "via": [],
       "version": "v1.19.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": false
     },
     {
       "name": "kyverno",
@@ -2813,7 +3173,10 @@
       "boundaries": [],
       "via": [],
       "version": "v1.19.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": false
     },
     {
       "name": "kyvernopre",
@@ -2834,7 +3197,10 @@
       "boundaries": [],
       "via": [],
       "version": "v1.19.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": false
     },
     {
       "name": "reports-controller",
@@ -2855,7 +3221,10 @@
       "boundaries": [],
       "via": [],
       "version": "v1.19.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": false
     },
     {
       "name": "loki",
@@ -2877,7 +3246,10 @@
       "version": "3.7.9",
       "digests": [
         "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
-      ]
+      ],
+      "url": "https://github.com/grafana/loki",
+      "latest": "3.7.9",
+      "current": true
     },
     {
       "name": "nginx-unprivileged",
@@ -2899,7 +3271,10 @@
       "version": "1.27-alpine",
       "digests": [
         "sha256:65e3e85dbaed8ba248841d9d58a899b6197106c23cb0ff1a132b7bfe0547e4c0"
-      ]
+      ],
+      "url": "https://github.com/nginx/nginx",
+      "latest": "1.31.8",
+      "current": false
     },
     {
       "name": "k8s-dns-node-cache",
@@ -2920,7 +3295,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.23.1",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes/dns",
+      "latest": "1.26.0",
+      "current": false
     },
     {
       "name": "function-patch-and-transform",
@@ -2940,7 +3318,10 @@
       "boundaries": [],
       "via": [],
       "version": "v0.8.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/crossplane-contrib/function-patch-and-transform",
+      "latest": "0.11.2",
+      "current": false
     },
     {
       "name": "postgresql",
@@ -2960,7 +3341,10 @@
       "boundaries": [],
       "via": [],
       "version": "16.2",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/postgres/postgres",
+      "latest": "18.6",
+      "current": false
     },
     {
       "name": "redis",
@@ -2983,7 +3367,10 @@
       ],
       "via": [],
       "version": "7.2-alpine",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/redis/redis",
+      "latest": "8.10.3",
+      "current": false
     },
     {
       "name": "reloader",
@@ -3006,7 +3393,10 @@
       "version": "v1.2.1",
       "digests": [
         "sha256:e989909133e9fa2b0e69d814b7d1f313696b626a54e3e9b53626f3d968cf15c8"
-      ]
+      ],
+      "url": "https://github.com/stakater/Reloader",
+      "latest": "1.4.23",
+      "current": false
     },
     {
       "name": "runc",
@@ -3029,7 +3419,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.5.2",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/opencontainers/runc",
+      "latest": "1.5.2",
+      "current": true
     },
     {
       "name": "support-agent",
@@ -3052,7 +3445,10 @@
       "version": "digest-pinned",
       "digests": [
         "sha256:b0522975b8305072ef0a765329467c4f1719da4feba5b7151915c0147fb23541"
-      ]
+      ],
+      "url": "https://github.com/soloz-io/zero-ops",
+      "latest": "c08a0d6f",
+      "current": false
     },
     {
       "name": "tailscale",
@@ -3075,7 +3471,10 @@
       "boundaries": [],
       "via": [],
       "version": "1.104.4",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/tailscale/tailscale",
+      "latest": "1.104.4",
+      "current": true
     },
     {
       "name": "ubuntu",
@@ -3098,7 +3497,10 @@
       "boundaries": [],
       "via": [],
       "version": "24.04",
-      "digests": []
+      "digests": [],
+      "url": "https://launchpad.net/ubuntu",
+      "latest": "26.04",
+      "current": false
     },
     {
       "name": "victoria-metrics",
@@ -3120,7 +3522,10 @@
         "VictoriaMetrics operator v0.75.0"
       ],
       "version": "v1.152.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+      "latest": "1.155.0",
+      "current": false
     },
     {
       "name": "vmalert",
@@ -3143,7 +3548,10 @@
         "VictoriaMetrics operator v0.75.0"
       ],
       "version": "v1.152.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+      "latest": "1.155.0",
+      "current": false
     },
     {
       "name": "vmauth",
@@ -3166,7 +3574,10 @@
         "VictoriaMetrics operator v0.75.0"
       ],
       "version": "v1.152.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+      "latest": "1.155.0",
+      "current": false
     },
     {
       "name": "operator",
@@ -3191,7 +3602,10 @@
       "version": "config-reloader-v0.75.0, v0.75.0",
       "digests": [
         "sha256:78da26b41a819093707be2ab6a65a5dc19f43d58ec52f30b49a545c2c6b7bd55"
-      ]
+      ],
+      "url": "https://github.com/VictoriaMetrics/operator",
+      "latest": "0.75.2",
+      "current": false
     },
     {
       "name": "clusterctl",
@@ -3209,9 +3623,13 @@
       "boundaries": [],
       "via": [],
       "version": "v1.10.0",
-      "digests": []
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/cluster-api",
+      "latest": "1.14.3",
+      "current": false
     }
   ],
   "previous": "0.1.16-rc.186",
-  "changes": []
+  "changes": [],
+  "released": "2026-11-02T05:19:37Z"
 }

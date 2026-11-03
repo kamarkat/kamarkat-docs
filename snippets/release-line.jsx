@@ -12,7 +12,7 @@ export const ReleaseLine = ({ line }) => {
               {r.latest && <span className="vlc-pill is-latest">Latest</span>}
               {r.prerelease && <span className="vlc-pill">Prerelease</span>}
               <span className="rel-muted rel-item-meta">
-                {r.components} components
+                {r.released} · {r.components} components · {r.behind} behind latest
                 {r.changes ? ` · ${changes.length} changed since ${r.previous}` : ""}
               </span>
             </button>

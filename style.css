@@ -844,6 +844,13 @@
   font-weight: 600;
 }
 
+.rel-version.is-current { color: #15803d; font-weight: 600; }
+.rel-version.is-behind { color: #b91c1c; font-weight: 600; }
+.dark .rel-version.is-current { color: #4ade80; }
+.dark .rel-version.is-behind { color: #f87171; }
+a.rel-name { text-decoration: underline; text-decoration-color: var(--arch-border); text-underline-offset: 3px; }
+a.rel-name:hover { text-decoration-color: currentColor; }
+
 /* Compact, linked capability chips in the architecture diagram. */
 
 .arch-caps {

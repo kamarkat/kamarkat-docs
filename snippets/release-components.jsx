@@ -140,6 +140,7 @@ export const ComponentRows = ({ rows, changed }) => (
         <tr>
           <th>Name</th>
           <th>Version</th>
+          <th>Latest (as of release date)</th>
           <th>Type</th>
           <th>License</th>
         </tr>
@@ -151,7 +152,9 @@ export const ComponentRows = ({ rows, changed }) => (
           return (
             <tr key={r.cluster + r.type + r.name}>
               <td>
-                <span className="rel-name">{r.name}</span>
+                <a className="rel-name" href={r.url} target="_blank" rel="noreferrer">
+                  {r.name}
+                </a>
                 <span className="rel-desc">
                   {r.component}. {r.description}
                 </span>
@@ -159,13 +162,25 @@ export const ComponentRows = ({ rows, changed }) => (
               </td>
               <td>
                 <span
-                  className={"rel-version" + (r.version === "unpinned" ? " is-unpinned" : "")}
+                  className={
+                    "rel-version" +
+                    (r.version === "unpinned"
+                      ? " is-unpinned"
+                      : r.current === true
+                      ? " is-current"
+                      : r.current === false
+                      ? " is-behind"
+                      : "")
+                  }
                   title={r.digests.join("\n")}
                 >
                   {r.version}
                 </span>
                 {c && c.kind === "changed" && <span className="rel-from">from {c.from}</span>}
                 {c && c.kind === "added" && <span className="rel-from">new</span>}
+              </td>
+              <td className="rel-muted">
+                <span className="rel-version">{r.latest || "—"}</span>
               </td>
               <td>
                 <span className="rel-type">{r.type}</span>
@@ -176,7 +191,7 @@ export const ComponentRows = ({ rows, changed }) => (
         })}
         {rows.length === 0 && (
           <tr>
-            <td colSpan={4} className="rel-muted">
+            <td colSpan={5} className="rel-muted">
               No components match.
             </td>
           </tr>

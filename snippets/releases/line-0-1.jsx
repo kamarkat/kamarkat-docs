@@ -3,21 +3,14 @@ export const line = {
   "releases": [
     {
       "version": "0.1.16-rc.187",
+      "released": "2 Nov 2026",
       "href": "/versions/releases/0-1-16-rc-187",
       "latest": false,
       "prerelease": true,
       "components": 139,
+      "behind": 121,
       "previous": "0.1.16-rc.186",
       "changes": []
-    },
-    {
-      "version": "0.1.16-rc.183",
-      "href": "/versions/releases/0-1-16-rc-183",
-      "latest": false,
-      "prerelease": true,
-      "components": 149,
-      "previous": "0.1.16-rc.182",
-      "changes": null
     }
   ]
 };

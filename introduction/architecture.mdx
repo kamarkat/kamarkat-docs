@@ -93,8 +93,8 @@ A box is two kinds of cluster, and every cluster has two kinds of node.
 Select any part to read about it.
 
 - **Control plane nodes** run Kubernetes on every cluster. Nothing of yours runs on them.
-- **The management cluster's workers** run the platform's services. Your applications never run there.
-- **A managed cluster's workers** run your applications. The management cluster creates each managed cluster, then delivers its platform and your apps to it; the managed cluster reads its secrets and identities from the management cluster and reports its telemetry back.
+- **The management cluster's workers** run the platform's services, grouped into [capabilities](/features/capabilities/overview). Your applications never run there.
+- **A managed cluster's workers** run your applications: see [Deploying applications](/features/workloads/deploying-applications). The management cluster creates each managed cluster, then delivers its platform and your apps to it; the managed cluster reads its secrets and identities from the management cluster and reports its telemetry back.
 
 To see every component on each node type, open any version under [Releases](/versions/lines/0-1).
 

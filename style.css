@@ -911,6 +911,7 @@ a.arch-cl-node:hover {
   font-size: 14px;
   font-weight: 600;
   color: var(--arch-text);
+  text-decoration: none;
 }
 
 .arch-cl-detail {

@@ -1,30 +1,30 @@
 ---
 title: "Support"
 description: "See exactly what your box would report outward, before anything is sent."
-keywords: ["soloz support", "scope", "preview", "support agent", "allowlist"]
+keywords: ["kakt support", "scope", "preview", "support agent", "allowlist"]
 ---
 
 > The Support Agent runs on every cluster and does nothing until you enrol. These two commands tell you what it may send and what it would send, and neither of them transmits anything.
 
-## soloz support scope
+## kakt support scope
 
 Lists every field that may leave this box: the platform's allowlist, minus anything you have denied.
 
 ```bash
-soloz support scope
+kakt support scope
 ```
 
 Nothing outside this list can be emitted. No value on your box can add to it — the list widens only when the platform publishes a version, which reaches you as a pull request you review.
 
 `--deny` subtracts a collector or a single field, as `collector` or `collector.field`, and the output shows the effective scope with that subtraction applied.
 
-## soloz support preview
+## kakt support preview
 
 Runs every collector in the effective scope against this cluster and prints the result. Nothing is transmitted.
 
 ```bash
-soloz support preview
-soloz support preview --json
+kakt support preview
+kakt support preview --json
 ```
 
 A collector that could not run is listed with the reason rather than omitted: a payload quietly missing a collector would look the same as a box where the thing it watches is fine.

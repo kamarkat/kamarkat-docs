@@ -11,13 +11,13 @@ Your application's repository holds its source and its chart. Its build publishe
 Publish the credential your builds use, once, at the git organization level:
 
 ```bash
-soloz tenant set-gitops-token --org acme-inc
+kakt tenant set-gitops-token --org acme-inc
 ```
 
 The command reads the token from stdin, so it stays out of your shell history. Every repository in that git organization inherits it, including ones you create later.
 
 <Warning>
-On GitHub's free plan, organization secrets reach **public** repositories only. A private repository's workflow receives an empty value and fails with *"Invalid username or token"*. On the free plan, publish per repository instead: `soloz tenant set-gitops-token --repo acme-inc/shop`, or let `--discover --gitops-repo acme-inc/acme-gitops` find the repositories whose workflows write to it.
+On GitHub's free plan, organization secrets reach **public** repositories only. A private repository's workflow receives an empty value and fails with *"Invalid username or token"*. On the free plan, publish per repository instead: `kakt tenant set-gitops-token --repo acme-inc/shop`, or let `--discover --gitops-repo acme-inc/acme-gitops` find the repositories whose workflows write to it.
 </Warning>
 
 ## Step 2: Build your chart on the platform library

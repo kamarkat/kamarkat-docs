@@ -1,7 +1,7 @@
 ---
 title: "Cluster lifecycle"
 description: "Day-0 creates your management cluster once, under your control. After that, every cluster is a declaration in your repository, reconciled by your own control plane."
-keywords: ["cluster lifecycle", "day-0", "cluster template", "soloz tenant add-cluster"]
+keywords: ["cluster lifecycle", "day-0", "cluster template", "kakt tenant add-cluster"]
 ---
 
 > Day-0 runs once. After that, your repository is the only authority.
@@ -22,7 +22,7 @@ You supply both. Cloud credentials stay in your box and are never given to Kamar
 
 ### 2. Scaffold your GitOps repository
 
-`soloz tenant scaffold` creates `<tenant>-gitops` in your git organization. It writes only the facts unique to you: your tenant, that git organization, your domain, region and cluster names.
+`kakt tenant scaffold` creates `<tenant>-gitops` in your git organization. It writes only the facts unique to you: your tenant, that git organization, your domain, region and cluster names.
 
 ### 3. Run Day-0
 
@@ -71,7 +71,7 @@ A workflow provisions once and then stops caring; a controller does not. That is
 | **Hetzner cloud controller manager** | Node lifecycle and load balancers in your cloud account | Management cluster |
 | **Hetzner CSI driver** | Block-storage volumes for persistent data | Management cluster |
 | **Local path provisioner** | Node-local volumes on clusters without cloud block storage | Management cluster |
-| **clusterctl** | Moves cluster management onto the management cluster during Day-0; runs from the soloz CLI, on no cluster | Bootstrap only |
+| **clusterctl** | Moves cluster management onto the management cluster during Day-0; runs from the kakt CLI, on no cluster | Bootstrap only |
 
 Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.
 

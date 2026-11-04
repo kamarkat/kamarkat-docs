@@ -1,10 +1,10 @@
 ---
 title: "Overview"
-description: "The soloz CLI: every command it supports, and the conventions they share."
-keywords: ["soloz", "cli", "commands", "reference"]
+description: "The kakt CLI: every command it supports, and the conventions they share."
+keywords: ["kakt", "cli", "commands", "reference"]
 ---
 
-> `soloz` is the one tool you run against your box. It scaffolds your GitOps repository, creates your management cluster, supplies your applications' secrets, and reaches your escrow when nothing else can.
+> `kakt` is the one tool you run against your box. It scaffolds your GitOps repository, creates your management cluster, supplies your applications' secrets, and reaches your escrow when nothing else can.
 
 ## What it is
 
@@ -15,33 +15,33 @@ The binary carries the platform version it was built for. A box starts on the ve
 ## Install it
 
 ```bash
-export SOLOZ_VERSION=<version>
-curl -fsSL -o soloz \
-  "https://github.com/soloz-io/zero-ops/releases/download/v${SOLOZ_VERSION}/soloz-linux-amd64"
-chmod +x soloz && sudo mv soloz /usr/local/bin/
-soloz bundle-version
+export KAKT_VERSION=<version>
+curl -fsSL -o kakt \
+  "https://github.com/kamarkat/kamarkat/releases/download/v${KAKT_VERSION}/kakt-linux-amd64"
+chmod +x kakt && sudo mv kakt /usr/local/bin/
+kakt bundle-version
 ```
 
 ## Every command
 
 <Note>
-Run `soloz <command> --help` for the complete flag set of any command. This page lists what exists; the pages below document the flags that change what a command does.
+Run `kakt <command> --help` for the complete flag set of any command. This page lists what exists; the pages below document the flags that change what a command does.
 </Note>
 
 ### Create and declare
 
 | Command | What it does |
 | :- | :- |
-| `soloz tenant scaffold` | Create your GitOps repository and start Day-0 |
-| `soloz tenant add-cluster` | Declare an additional managed cluster |
-| `soloz tenant set-gitops-token` | Publish the credential your application builds use |
-| `soloz bootstrap-mgmt` | Create the management cluster, as one step rather than a whole box |
-| `soloz init-secrets` | Generate the bootstrap secrets the secret store starts from |
-| `soloz configure-github-access` | Give the GitOps engine access to your repositories |
-| `soloz configure-tailscale` | Supply the auth key nodes on your own premises join with |
+| `kakt tenant scaffold` | Create your GitOps repository and start Day-0 |
+| `kakt tenant add-cluster` | Declare an additional managed cluster |
+| `kakt tenant set-gitops-token` | Publish the credential your application builds use |
+| `kakt bootstrap-mgmt` | Create the management cluster, as one step rather than a whole box |
+| `kakt init-secrets` | Generate the bootstrap secrets the secret store starts from |
+| `kakt configure-github-access` | Give the GitOps engine access to your repositories |
+| `kakt configure-tailscale` | Supply the auth key nodes on your own premises join with |
 
 <Warning>
-`soloz --help` also lists `configure-eso`. It is deprecated and does not belong in any procedure: running it replaces the machine identity your box authenticates with and stops every platform operator. `soloz init-secrets` creates that identity, and nothing else should write it.
+`kakt --help` also lists `configure-eso`. It is deprecated and does not belong in any procedure: running it replaces the machine identity your box authenticates with and stops every platform operator. `kakt init-secrets` creates that identity, and nothing else should write it.
 </Warning>
 
 [Boxes and clusters →](/cli/boxes-and-clusters)
@@ -50,12 +50,12 @@ Run `soloz <command> --help` for the complete flag set of any command. This page
 
 | Command | What it does |
 | :- | :- |
-| `soloz verify` | Wait for a cluster to converge, and report what is outstanding |
-| `soloz bundle-version` | Print the platform version this binary carries |
-| `soloz proposal preflight` | Judge a proposed version against the cluster it targets |
-| `soloz reseed` | Re-apply the Day-0 seed to an existing cluster |
-| `soloz spoke match-inventory` | Compare a cluster's machines with the servers your provider holds |
-| `soloz spoke restore-pki` | Restore a managed cluster's escrowed trust roots into a replacement management cluster |
+| `kakt verify` | Wait for a cluster to converge, and report what is outstanding |
+| `kakt bundle-version` | Print the platform version this binary carries |
+| `kakt proposal preflight` | Judge a proposed version against the cluster it targets |
+| `kakt reseed` | Re-apply the Day-0 seed to an existing cluster |
+| `kakt spoke match-inventory` | Compare a cluster's machines with the servers your provider holds |
+| `kakt spoke restore-pki` | Restore a managed cluster's escrowed trust roots into a replacement management cluster |
 
 [Boxes and clusters →](/cli/boxes-and-clusters)
 
@@ -63,16 +63,16 @@ Run `soloz <command> --help` for the complete flag set of any command. This page
 
 | Command | What it does |
 | :- | :- |
-| `soloz spoke teardown` | Destroy managed clusters, through your provider's API |
-| `soloz teardown` | Destroy a whole box: its management cluster, the managed clusters it holds, and their infrastructure |
+| `kakt spoke teardown` | Destroy managed clusters, through your provider's API |
+| `kakt teardown` | Destroy a whole box: its management cluster, the managed clusters it holds, and their infrastructure |
 
 <Warning>
 These delete infrastructure in your cloud account and are not reversible. Both require an explicit confirmation flag.
 </Warning>
 
-`soloz teardown` takes the whole box: it reads the managed clusters from the management cluster and removes them with it. `soloz spoke teardown` is for taking managed clusters down on their own, and for the case where the management cluster is already gone and its clusters would otherwise be left running.
+`kakt teardown` takes the whole box: it reads the managed clusters from the management cluster and removes them with it. `kakt spoke teardown` is for taking managed clusters down on their own, and for the case where the management cluster is already gone and its clusters would otherwise be left running.
 
-Removing an **application** is not a command. Delete its directory under `environments/<env>/<app>/`, regenerate the hostname aggregate with `soloz fleet hosts aggregate`, and commit — your control plane removes what the declaration no longer asks for.
+Removing an **application** is not a command. Delete its directory under `environments/<env>/<app>/`, regenerate the hostname aggregate with `kakt fleet hosts aggregate`, and commit — your control plane removes what the declaration no longer asks for.
 
 [Boxes and clusters →](/cli/boxes-and-clusters#destroy)
 
@@ -80,11 +80,11 @@ Removing an **application** is not a command. Delete its directory under `enviro
 
 | Command | What it does |
 | :- | :- |
-| `soloz fleet hosts aggregate` | Regenerate the public hostname aggregate your gateway serves |
-| `soloz fleet secrets set` | Supply one declared secret |
-| `soloz fleet secrets status` | Report which declared secrets are present, by name |
-| `soloz fleet secrets template` | Print a `.env` skeleton holding exactly the declared keys |
-| `soloz fleet secrets import` | Write every declared key from a `KEY=VALUE` file, once |
+| `kakt fleet hosts aggregate` | Regenerate the public hostname aggregate your gateway serves |
+| `kakt fleet secrets set` | Supply one declared secret |
+| `kakt fleet secrets status` | Report which declared secrets are present, by name |
+| `kakt fleet secrets template` | Print a `.env` skeleton holding exactly the declared keys |
+| `kakt fleet secrets import` | Write every declared key from a `KEY=VALUE` file, once |
 
 [Applications →](/cli/applications)
 
@@ -92,15 +92,15 @@ Removing an **application** is not a command. Delete its directory under `enviro
 
 | Command | What it does |
 | :- | :- |
-| `soloz escrow init` | Create the escrow project your boxes keep their master keys in |
-| `soloz escrow verify` | Report which escrow artefacts exist, by fingerprint |
-| `soloz escrow verify-recovery` | Prove the escrowed key decrypts what your cluster actually stored |
-| `soloz escrow enroll-store-credential` | Escrow the object-store credential your management-state backups use |
-| `soloz escrow deliver-backup-credentials` | Deliver the escrowed backup credentials into a cluster |
-| `soloz escrow migrate-paths` | Copy a box's escrow artefacts onto their per-cluster paths |
-| `soloz kubeconfig` | Retrieve a cluster's break-glass admin kubeconfig |
-| `soloz encryption enable` | Put at-rest encryption of Secrets on an existing cluster |
-| `soloz encryption rotate` | Replace a cluster's at-rest encryption key, in two stages |
+| `kakt escrow init` | Create the escrow project your boxes keep their master keys in |
+| `kakt escrow verify` | Report which escrow artefacts exist, by fingerprint |
+| `kakt escrow verify-recovery` | Prove the escrowed key decrypts what your cluster actually stored |
+| `kakt escrow enroll-store-credential` | Escrow the object-store credential your management-state backups use |
+| `kakt escrow deliver-backup-credentials` | Deliver the escrowed backup credentials into a cluster |
+| `kakt escrow migrate-paths` | Copy a box's escrow artefacts onto their per-cluster paths |
+| `kakt kubeconfig` | Retrieve a cluster's break-glass admin kubeconfig |
+| `kakt encryption enable` | Put at-rest encryption of Secrets on an existing cluster |
+| `kakt encryption rotate` | Replace a cluster's at-rest encryption key, in two stages |
 
 [Escrow and encryption →](/cli/escrow-and-encryption)
 
@@ -108,8 +108,8 @@ Removing an **application** is not a command. Delete its directory under `enviro
 
 | Command | What it does |
 | :- | :- |
-| `soloz support scope` | List every field that may leave this box |
-| `soloz support preview` | Render the payload this box would send, and send nothing |
+| `kakt support scope` | List every field that may leave this box |
+| `kakt support preview` | Render the payload this box would send, and send nothing |
 
 [Support →](/cli/support)
 
@@ -119,11 +119,11 @@ For the platform team, which publishes the versions your box installs. You do no
 
 | Command | What it does |
 | :- | :- |
-| `soloz release check` | Rehearse the next version, and check every component behind its latest release has a reason |
-| `soloz release publish` | Publish the next version, promote the tenant to it and verify the box reached it |
-| `soloz release promote` | Promote the tenant to a version already published |
-| `soloz release sync` | Sync the box to a promoted version and verify it reached it |
-| `soloz release docs` | Add published versions to the release pages, and render every release page |
+| `kakt release check` | Rehearse the next version, and check every component behind its latest release has a reason |
+| `kakt release publish` | Publish the next version, promote the tenant to it and verify the box reached it |
+| `kakt release promote` | Promote the tenant to a version already published |
+| `kakt release sync` | Sync the box to a promoted version and verify it reached it |
+| `kakt release docs` | Add published versions to the release pages, and render every release page |
 
 [Releases →](/cli/releases)
 
@@ -131,8 +131,8 @@ For the platform team, which publishes the versions your box installs. You do no
 
 | Command | What it does |
 | :- | :- |
-| `soloz completion <shell>` | Print the autocompletion script for your shell |
-| `soloz help <command>` | Help for any command |
+| `kakt completion <shell>` | Print the autocompletion script for your shell |
+| `kakt help <command>` | Help for any command |
 
 ## Conventions these commands share
 

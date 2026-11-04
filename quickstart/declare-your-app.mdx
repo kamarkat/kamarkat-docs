@@ -83,7 +83,7 @@ The placeholder version cannot resolve, on purpose. An empty dependency list wou
 Your managed cluster has one shared gateway whose listeners come from every app's `public.hosts`. Regenerate it, then commit:
 
 ```bash
-soloz fleet hosts aggregate
+kakt fleet hosts aggregate
 git add environments registry
 git commit -m "Declare shop"
 git push

@@ -1,7 +1,7 @@
 ---
 title: "Prerequisites"
 description: "The accounts, tools and credentials you need before you scaffold a box."
-keywords: ["prerequisites", "soloz cli", "install", "credentials", "domain"]
+keywords: ["prerequisites", "kakt cli", "install", "credentials", "domain"]
 ---
 
 Everything below belongs to you. Kamarkat never receives any of it: the credentials are stored as secrets on your own GitOps repository and used only by your own CI.
@@ -18,27 +18,27 @@ Everything below belongs to you. Kamarkat never receives any of it: the credenti
 
 ## Step 2: Install the tools
 
-You need `git`, `kubectl` and the GitHub CLI `gh`, plus the `soloz` CLI.
+You need `git`, `kubectl` and the GitHub CLI `gh`, plus the `kakt` CLI.
 
-The `soloz` binary is published with each platform release. Use the version you want your box to start on:
+The `kakt` binary is published with each platform release. Use the version you want your box to start on:
 
 ```bash
-export SOLOZ_VERSION=<version>
-curl -fsSL -o soloz \
-  "https://github.com/soloz-io/zero-ops/releases/download/v${SOLOZ_VERSION}/soloz-linux-amd64"
-chmod +x soloz && sudo mv soloz /usr/local/bin/
-soloz bundle-version
+export KAKT_VERSION=<version>
+curl -fsSL -o kakt \
+  "https://github.com/kamarkat/kamarkat/releases/download/v${KAKT_VERSION}/kakt-linux-amd64"
+chmod +x kakt && sudo mv kakt /usr/local/bin/
+kakt bundle-version
 ```
 
-`soloz bundle-version` prints the platform version the binary carries.
+`kakt bundle-version` prints the platform version the binary carries.
 
 <Note>
-The release publishes a Linux amd64 binary. On other platforms, build it from source with Go: `go install github.com/soloz-io/zero-ops/cmd/soloz@v<version>`.
+The release publishes a Linux amd64 binary. On other platforms, build it from source with Go: `go install github.com/kamarkat/kamarkat/cmd/kakt@v<version>`.
 </Note>
 
 ## Step 3: Gather your credentials
 
-Day-0 runs under secrets stored on your GitOps repository. Gather these now. You pass them to `soloz tenant scaffold`, which stores them on the repository it creates.
+Day-0 runs under secrets stored on your GitOps repository. Gather these now. You pass them to `kakt tenant scaffold`, which stores them on the repository it creates.
 
 ### Required
 

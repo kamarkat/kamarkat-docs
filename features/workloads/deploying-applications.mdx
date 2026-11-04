@@ -46,7 +46,7 @@ Every value your workloads read is declared in your GitOps repository, split by 
 | :- | :- |
 | **Platform credentials**, such as your database or login client | Declared as a capability. You never see or copy the value. |
 | **Configuration** | In your values, delivered as a config map |
-| **Secrets you choose**, such as a third-party API key | Declared in git, supplied with `soloz fleet secrets` |
+| **Secrets you choose**, such as a third-party API key | Declared in git, supplied with `kakt fleet secrets` |
 
 A secret's value is never in your repository in any form. Before your workloads start, every declared secret is checked and any missing key is reported by name.
 

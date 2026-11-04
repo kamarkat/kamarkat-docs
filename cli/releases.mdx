@@ -1,31 +1,31 @@
 ---
 title: "Releases"
 description: "How the platform team rehearses, publishes and promotes a bundle version."
-keywords: ["soloz release", "publish", "promote", "bundle version", "release"]
+keywords: ["kakt release", "publish", "promote", "bundle version", "release"]
 ---
 
 > These commands are for the platform team. They publish the bundle versions every box installs. You never run them on your own box: a new version reaches you as an upgrade proposal you accept.
 
-Each command runs from the root of a `zero-ops` checkout and runs that checkout's own release scripts, so there is one release path. Without an installed `soloz`, use `go run ./cmd/soloz release …` from the checkout.
+Each command runs from the root of a `kamarkat` checkout (the platform repository) and runs that checkout's own release scripts, so there is one release path. Without an installed `kakt`, use `go run ./cmd/kakt release …` from the checkout.
 
-## soloz release check
+## kakt release check
 
 Rehearses the next version and checks every component behind its latest release has a reason. Nothing is pushed, so the version stays free.
 
 ```bash
-soloz release check
+kakt release check
 ```
 
 It runs every packaging step and release gate for the next version. It then lists every component behind its project's newest release today that the component catalog does not explain, and every reason that promised a change in this release which the release does not carry. Each [release page](/versions/lines/0-1) shows those reasons beside red versions, and a version that cannot be explained cannot be documented. It ends with `Ready. <version> can be released.`
 
-## soloz release publish
+## kakt release publish
 
 Publishes the next version, promotes the tenant to it, and verifies the box reached it.
 
 ```bash
-soloz release publish --dry-run
-soloz release publish
-soloz release publish --version 0.1.17-rc.1
+kakt release publish --dry-run
+kakt release publish
+kakt release publish --version 0.1.17-rc.1
 ```
 
 The steps run in a fixed order:
@@ -44,12 +44,12 @@ It ends with `Done. <version> is published, promoted and running.` A version is 
 | `--no-promote` | Publish only |
 | `--no-sync` | Publish and promote; do not sync the box |
 
-## soloz release promote
+## kakt release promote
 
 Promotes the tenant to a version already published, then syncs and verifies the box. This is for a stable version, which is published when a release is created on GitHub.
 
 ```bash
-soloz release promote --version 0.1.17
+kakt release promote --version 0.1.17
 ```
 
 The version must be named and must already be in the registry: promoting first would write a reference to nothing.
@@ -59,30 +59,30 @@ The version must be named and must already be in the registry: promoting first w
 | `--dry-run` | Say what each step would do; change nothing |
 | `--no-sync` | Promote; do not sync the box |
 
-## soloz release sync
+## kakt release sync
 
 Syncs the box to a version already promoted, and verifies every Application reached it.
 
 ```bash
-KUBECONFIG=<hub kubeconfig> soloz release sync --version 0.1.17-rc.1
+KUBECONFIG=<hub kubeconfig> kakt release sync --version 0.1.17-rc.1
 ```
 
 Use it when a release reported that the box did not converge. Fix the Applications it named, then run this again. Never publish the version again.
 
-## soloz release docs
+## kakt release docs
 
 Adds published versions to the [release pages](/versions/lines/0-1), and renders every release page.
 
 ```bash
-soloz release docs 0.1.17-rc.1
-soloz release docs
+kakt release docs 0.1.17-rc.1
+kakt release docs
 ```
 
 For each version named, it records each component's repository link, the newest upstream release on the version's release date, whether the version shipped it, and the catalog's reason when it did not. A version behind with no reason fails, and nothing is written for it. It then renders the release and line pages from every version the docs hold. With no version, it only renders.
 
 | Flag | Meaning |
 | :- | :- |
-| `--docs-dir` | The docs checkout to write into. Defaults to `../kamarkat` |
+| `--docs-dir` | The docs checkout to write into. Defaults to `../kamarkat-docs` |
 
 ## Flags every release command takes
 

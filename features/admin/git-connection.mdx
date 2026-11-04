@@ -1,7 +1,7 @@
 ---
 title: "Git connection"
 description: "Your git organization holds your GitOps repository and your application repositories, runs Day-0, and hosts your charts and images."
-keywords: ["git", "GITOPS_TOKEN", "soloz tenant set-gitops-token", "renovate", "ghcr"]
+keywords: ["git", "GITOPS_TOKEN", "kakt tenant set-gitops-token", "renovate", "ghcr"]
 ---
 
 > Your git organization is where your box's desired state lives, and where everything that changes it starts.
@@ -12,7 +12,7 @@ Kamarkat uses your git organization for four things:
 
 | Use | What it needs |
 | :- | :- |
-| **GitOps repository** | `<tenant>-gitops`, created once by `soloz tenant scaffold` |
+| **GitOps repository** | `<tenant>-gitops`, created once by `kakt tenant scaffold` |
 | **Day-0** | The **Bootstrap cluster** workflow, running in your git organization's CI |
 | **Application builds** | Write access to your GitOps repository, to pin each new version |
 | **Charts and images** | Your git organization's package registry, at `oci://ghcr.io/<org>/charts` |
@@ -25,7 +25,7 @@ Create a token with write access to your git organization's repositories and tha
 
 ### 2. Store it on your GitOps repository
 
-`soloz tenant scaffold` stores it as `GITOPS_TOKEN`. To set it yourself:
+`kakt tenant scaffold` stores it as `GITOPS_TOKEN`. To set it yourself:
 
 ```bash
 gh secret set GITOPS_TOKEN --repo acme-inc/acme-gitops
@@ -34,7 +34,7 @@ gh secret set GITOPS_TOKEN --repo acme-inc/acme-gitops
 ### 3. Publish it to your application builds
 
 ```bash
-soloz tenant set-gitops-token --org acme-inc
+kakt tenant set-gitops-token --org acme-inc
 ```
 
 The token is read from stdin, so it stays out of your shell history. Every repository in that git organization inherits it, including ones you create later.
@@ -50,8 +50,8 @@ Store `GHCR_USERNAME` and `GHCR_TOKEN` on your GitOps repository. The platform's
 On GitHub's free plan, a private repository's workflow receives an empty organization secret and fails with *"Invalid username or token"*. Publish per repository instead:
 
 ```bash
-soloz tenant set-gitops-token --repo acme-inc/shop
-soloz tenant set-gitops-token --discover --gitops-repo acme-inc/acme-gitops
+kakt tenant set-gitops-token --repo acme-inc/shop
+kakt tenant set-gitops-token --discover --gitops-repo acme-inc/acme-gitops
 ```
 
 `--discover` finds the repositories whose workflows write to your GitOps repository.

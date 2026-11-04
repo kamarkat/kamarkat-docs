@@ -1,7 +1,7 @@
 # Product brief: Kamarkat
 
 Sources: zero-ops ADR-062, ADR-063, ADR-064, ADR-065 (addendum 1), ADR-066, ADR-068, ADR-071, and the
-`soloz` CLI. Lines marked **Assumption** are not stated there and need confirming.
+`kakt` CLI. Lines marked **Assumption** are not stated there and need confirming.
 
 ## Description
 
@@ -23,7 +23,7 @@ terminal and a cloud console, not a Kubernetes specialist.
 ## Jobs to be done
 
 1. Build a box in their own accounts: escrow, scaffold the GitOps repository, run Day-0 (ADR-062,
-   ADR-040; `soloz tenant scaffold`, `soloz verify`).
+   ADR-040; `kakt tenant scaffold`, `kakt verify`).
 2. Run their applications on it: declare an app, supply its secrets, publish and pin its chart
    (ADR-073, ADR-088).
 3. Take new platform versions: review and merge the proposal their own Renovate opens; roll back by

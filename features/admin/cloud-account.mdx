@@ -27,7 +27,7 @@ Your box creates DNS records and proves domain ownership for its certificates th
 
 ### 3. Store the token on your GitOps repository
 
-`soloz tenant scaffold` stores it for you, prompting with echo disabled if you did not export it. To set it yourself:
+`kakt tenant scaffold` stores it for you, prompting with echo disabled if you did not export it. To set it yourself:
 
 ```bash
 gh secret set HCLOUD_TOKEN --repo acme-inc/acme-gitops

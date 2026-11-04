@@ -1,7 +1,7 @@
 ---
 title: "Bootstrap your box"
 description: "Day-0 runs in your repository's own CI. It builds the management cluster, waits for it to converge, and brings up your managed cluster."
-keywords: ["day-0", "bootstrap", "management cluster", "soloz verify"]
+keywords: ["day-0", "bootstrap", "management cluster", "kakt verify"]
 ---
 
 Day-0 runs as the **Bootstrap cluster** workflow in your GitOps repository, on your git organization's runners, under the secrets you stored there. It is pinned to the platform version your repository was scaffolded on, so a later change to the platform cannot change how your repository bootstraps.
@@ -33,7 +33,7 @@ The run takes a few hours. It works through these stages, and each must succeed 
 
 <Steps>
   <Step title="Fetch the platform CLI">
-    Downloads the `soloz` release for your version and checks that it reports that version.
+    Downloads the `kakt` release for your version and checks that it reports that version.
   </Step>
   <Step title="Check the declaration">
     Validates your repository before anything is created.
@@ -59,10 +59,10 @@ Day-0 commits the facts it discovers, such as the control-plane address, back to
 If the run ends before the management cluster converges, it prints the command to wait for it:
 
 ```bash
-soloz verify --cluster acme-hub --timeout 15m
+kakt verify --cluster acme-hub --timeout 15m
 ```
 
-`soloz verify` reports what is still outstanding if the budget runs out.
+`kakt verify` reports what is still outstanding if the budget runs out.
 
 <Tip>
 If a run fails part-way, fix the cause and start the workflow again. Phases that completed are not repeated, and a phase that is not safe to repeat refuses to resume rather than running twice.
@@ -70,10 +70,10 @@ If a run fails part-way, fix the cause and start the workflow again. Phases that
 
 ## Adding more managed clusters later
 
-A further managed cluster is a declaration, not another Day-0. `soloz tenant add-cluster` renders the cluster template your GitOps repository carries. From the repository root:
+A further managed cluster is a declaration, not another Day-0. `kakt tenant add-cluster` renders the cluster template your GitOps repository carries. From the repository root:
 
 ```bash
-soloz tenant add-cluster \
+kakt tenant add-cluster \
   --mgmt-cluster acme-hub \
   --name acme-02 \
   --tenant acme \

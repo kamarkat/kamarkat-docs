@@ -1,17 +1,17 @@
 ---
 title: "Scaffold your repository"
 description: "Create your GitOps repository from the platform template, store your credentials on it, and start Day-0."
-keywords: ["soloz tenant scaffold", "gitops repository", "scaffold", "repository secrets"]
+keywords: ["kakt tenant scaffold", "gitops repository", "scaffold", "repository secrets"]
 ---
 
-`soloz tenant scaffold` creates `<org>/<tenant>-gitops` in your git organization and renders it from the platform template. It writes only the facts unique to you: your tenant, that git organization, your domain, region and cluster names. Scaffolding happens once; every change after it is a commit or a pull request.
+`kakt tenant scaffold` creates `<org>/<tenant>-gitops` in your git organization and renders it from the platform template. It writes only the facts unique to you: your tenant, that git organization, your domain, region and cluster names. Scaffolding happens once; every change after it is a commit or a pull request.
 
 ## Step 1: Preview what you will receive
 
 A dry run renders the repository locally and creates nothing:
 
 ```bash
-soloz tenant scaffold \
+kakt tenant scaffold \
   --tenant acme \
   --org acme-inc \
   --domain acme.example \
@@ -38,7 +38,7 @@ soloz tenant scaffold \
 Run the same command without `--dry-run`, from a shell where you exported your [credentials](/quickstart/prerequisites#step-3-gather-your-credentials):
 
 ```bash
-soloz tenant scaffold \
+kakt tenant scaffold \
   --tenant acme \
   --org acme-inc \
   --domain acme.example \

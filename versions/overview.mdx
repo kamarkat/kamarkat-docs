@@ -13,8 +13,8 @@ A release publishes one semantic version, such as `0.1.15`. The same string name
 | Part of a release | Where it is published |
 | :- | :- |
 | **Bundle chart** | `oci://ghcr.io/soloz-io/charts/environment-manager` |
-| **`soloz` CLI** | Release assets `soloz-darwin-amd64`, `soloz-darwin-arm64`, `soloz-linux-amd64` and `soloz-linux-arm64` |
-| **Release notes** | The release page for tag `v<version>` on `soloz-io/zero-ops` |
+| **`kakt` CLI** | Release assets `kakt-darwin-amd64`, `kakt-darwin-arm64`, `kakt-linux-amd64` and `kakt-linux-arm64` |
+| **Release notes** | The release page for tag `v<version>` on `kamarkat/kamarkat` |
 | **Third-party inputs** | Release asset `third-party-charts-<version>.tar.gz`: the upstream charts the bundle was built from |
 | **Component inventory** | `components.json` inside the bundle chart, also attached to the release |
 
@@ -45,10 +45,10 @@ sources:
 
 ### Where the first version comes from
 
-The `soloz` CLI carries its version. `soloz tenant scaffold` pins your management cluster to it unless you pass `--bundle-version`. Check what a binary carries with:
+The `kakt` CLI carries its version. `kakt tenant scaffold` pins your management cluster to it unless you pass `--bundle-version`. Check what a binary carries with:
 
 ```bash
-soloz bundle-version
+kakt bundle-version
 ```
 
 A binary that prints `development` was built without a release version.

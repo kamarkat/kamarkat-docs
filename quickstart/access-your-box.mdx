@@ -1,7 +1,7 @@
 ---
 title: "Access your box"
 description: "Sign in to your box as yourself, through its identity provider. Keep the admin kubeconfig for emergencies only."
-keywords: ["access", "kubeconfig", "sign-in", "soloz kubeconfig"]
+keywords: ["access", "kubeconfig", "sign-in", "kakt kubeconfig"]
 ---
 
 You reach your box as a person, through its identity provider. Each person signs in as themselves, and what they can do follows the roles they hold. The cluster admin credential exists, but only as a break-glass artefact in your escrow.
@@ -20,7 +20,7 @@ export INFISICAL_ESCROW_PROJECT_ID=<project-id>
 export INFISICAL_ESCROW_CLIENT_ID=<machine-identity-client-id>
 export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
 
-soloz kubeconfig --cluster acme-hub --out acme-hub.kubeconfig
+kakt kubeconfig --cluster acme-hub --out acme-hub.kubeconfig
 kubectl --kubeconfig acme-hub.kubeconfig get nodes
 ```
 

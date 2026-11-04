@@ -1,0 +1,67 @@
+---
+title: "Create a management cluster"
+description: "A box has one management cluster, built once by Day-0 from your own CI. Every cluster after it is a commit."
+keywords: ["management cluster", "day-0", "scaffold", "bootstrap", "kakt tenant scaffold"]
+---
+
+> One management cluster per box, built once by Day-0. Everything after it is a commit.
+
+The management cluster runs the platform's services: the GitOps engine, cluster lifecycle, secrets, identity, login and observability. It is the only cluster that needs Day-0. It then creates every managed cluster your repository declares, starting with the one your scaffold declared.
+
+You create it once per box. A second box is a second GitOps repository, with its own management cluster.
+
+## Before you start
+
+- **Your accounts and credentials** are ready: see [Prerequisites](/quickstart/prerequisites).
+- **Your escrow** exists: see [Prepare the escrow](/quickstart/prepare-escrow). Scaffolding refuses without it, because an escrow cannot be added afterwards.
+- **The provider suits the environment.** `hybrid` is supported for `dev` only.
+
+<Note>
+Day-0 creates cloud servers, billed to your account, and runs for a few hours. It runs only when you start it, never because a file changed.
+</Note>
+
+## Step 1: Scaffold your GitOps repository
+
+```bash
+kakt tenant scaffold \
+  --tenant acme \
+  --org acme-inc \
+  --domain acme.example \
+  --region hel1 \
+  --environment dev
+```
+
+Add `--dry-run` first to see the repository without creating anything. The management cluster is named `<tenant>-hub` unless you pass `--cluster`, and it starts on the platform version the CLI carries unless you pass `--bundle-version`. Every flag, and the escrow and credential flags a real run needs, are in [Scaffold your repository](/quickstart/scaffold-your-repository).
+
+The scaffold creates the repository, stores your credentials on it as secrets, and starts Day-0.
+
+## Step 2: Let Day-0 run
+
+Day-0 is the **Bootstrap cluster** workflow in your repository, running on your own CI:
+
+```bash
+gh run watch --repo acme-inc/acme-gitops
+```
+
+It creates the management cluster, builds its foundation, waits for its platform services to become healthy, then brings up the managed cluster your repository declares. If a run fails part-way, fix the cause and start it again: completed phases are not repeated. See [Bootstrap your box](/quickstart/bootstrap-your-box) for each stage.
+
+## Step 3: Verify
+
+```bash
+kakt verify --cluster acme-hub --timeout 15m
+```
+
+It waits for the management cluster to converge and reports anything outstanding.
+
+## After this
+
+You never run Day-0 again for this box. Every further cluster, environment, app and platform upgrade is a commit to your repository, which the management cluster applies.
+
+<CardGroup cols={2}>
+  <Card title="Access your box" icon="right-to-bracket" href="/quickstart/access-your-box">
+    Sign in, and know where break-glass access is.
+  </Card>
+  <Card title="Add a managed cluster" icon="server" href="/guides/add-a-managed-cluster">
+    A further cluster, from a commit.
+  </Card>
+</CardGroup>

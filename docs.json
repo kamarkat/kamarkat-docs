@@ -58,6 +58,7 @@
           {
             "group": "Operate your box",
             "pages": [
+              "guides/create-a-management-cluster",
               "guides/add-a-managed-cluster",
               "guides/add-an-environment",
               "guides/promote-a-release",

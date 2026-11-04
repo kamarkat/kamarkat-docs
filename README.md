@@ -1,6 +1,6 @@
 # Kamarkat Documentation
 
-Official documentation for zero-ops — an open-source platform a startup runs its business on, delivered into a box in its own cloud account.
+Official documentation for Kamarkat — an open-source platform a startup runs its business on, delivered into a box in its own cloud account.
 
 Built with [Mintlify](https://mintlify.com).
 

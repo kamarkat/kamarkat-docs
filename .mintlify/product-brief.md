@@ -1,6 +1,6 @@
 # Product brief: Kamarkat
 
-Sources: zero-ops ADR-062, ADR-063, ADR-064, ADR-065 (addendum 1), ADR-066, ADR-068, ADR-071, and the
+Sources: Kamarkat ADR-062, ADR-063, ADR-064, ADR-065 (addendum 1), ADR-066, ADR-068, ADR-071, and the
 `kakt` CLI. Lines marked **Assumption** are not stated there and need confirming.
 
 ## Description

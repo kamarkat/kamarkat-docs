@@ -28,7 +28,7 @@ kakt tenant scaffold \
 | `--subdomain` | Optional. A DNS label every hostname sits under; empty publishes on the apex. |
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines. `hybrid` is supported for `dev` only. |
 | `--region` | The cloud region your clusters run in. |
-| `--environment` | The environment slug: `dev` (default), `stg` or `prod`. |
+| `--environment` | The stage your management cluster serves: `dev` (default), `stg` or `prod`. It is not where your applications go — each one names its own cluster. |
 | `--workers` | Cloud worker nodes the box starts with. Defaults to 2. |
 | `--cluster` | The management cluster's name. Defaults to `<tenant>-hub`. |
 | `--bundle-version` | The platform version the box starts on. Defaults to the version the CLI carries. |

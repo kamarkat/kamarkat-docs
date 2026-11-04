@@ -39,7 +39,8 @@
               "quickstart/prepare-escrow",
               "quickstart/scaffold-your-repository",
               "quickstart/bootstrap-your-box",
-              "quickstart/access-your-box"
+              "quickstart/access-your-box",
+              "quickstart/add-your-managed-cluster"
             ]
           },
           {
@@ -62,6 +63,7 @@
               "guides/add-a-managed-cluster",
               "guides/add-an-environment",
               "guides/promote-a-release",
+              "guides/replace-a-managed-cluster",
               "guides/retire-an-environment"
             ]
           }

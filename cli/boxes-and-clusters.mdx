@@ -31,7 +31,7 @@ Scaffolding happens once. Every change after it is a commit or a pull request. S
 | `--subdomain` | A DNS label every hostname sits under; empty publishes on the apex |
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines |
 | `--region` | The cloud region your clusters run in. Defaults to `hel1` |
-| `--environment` | `dev` (default), `stg` or `prod` |
+| `--environment` | The stage this cluster serves: `dev` (default), `stg` or `prod`. Not a destination — applications name the cluster they run on |
 | `--cluster` | The management cluster's name. Defaults to `<tenant>-hub` |
 | `--box-id` | The logical box, **pinned forever**. Defaults to the cluster name |
 | `--workers` | Cloud worker nodes the box starts with. Defaults to 2. Pass `0` to run on nodes on your own premises alone, which then have to be there |
@@ -66,11 +66,12 @@ kakt tenant add-cluster \
 | Flag | Meaning |
 | :- | :- |
 | `--mgmt-cluster` | The management cluster that creates this one. Required |
-| `--name` | The managed cluster, and this cell's id. Required |
+| `--name` | The managed cluster's name, and what applications name to run on it. Required |
 | `--tenant` | The tenant that owns it. Required |
 | `--bundle-version` | The platform version this cluster starts on. Required |
 | `--gitops-repo-url` | Your GitOps repository's URL. Required |
-| `--provider`, `--region`, `--environment` | Where and what it is, if it differs from the defaults |
+| `--provider`, `--region` | Where and what it is, if it differs from the defaults |
+| `--environment` | The stage this cluster serves. Several clusters may serve one stage, which is how a replacement runs beside the cluster it replaces |
 | `--workers` | Cloud worker nodes it starts with. Defaults to 2 on `hetzner` |
 | `--public-tls-issuer` | The ACME issuer for public certificates. Defaults to `letsencrypt-prod` |
 | `--gitops-dir` | Your GitOps repository. Defaults to the current directory |
@@ -80,7 +81,7 @@ kakt tenant add-cluster \
 </Note>
 
 <Warning>
-`--name` becomes the cell id for the cluster's whole life. Applications name the cell they run on, so renaming it later is not an edit — it is a new cluster.
+`--name` is the cluster's name for its whole life. Applications name the cluster they run on, and its secret path and backup prefix are named for it, so renaming it later is not an edit — it is a new cluster.
 </Warning>
 
 ### kakt tenant set-gitops-token

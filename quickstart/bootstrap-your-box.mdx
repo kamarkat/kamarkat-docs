@@ -1,6 +1,6 @@
 ---
 title: "Bootstrap your box"
-description: "Day-0 runs in your repository's own CI. It builds the management cluster, waits for it to converge, and brings up your managed cluster."
+description: "Day-0 runs in your repository's own CI. It builds the management cluster and waits for it to converge."
 keywords: ["day-0", "bootstrap", "management cluster", "kakt verify"]
 ---
 
@@ -44,8 +44,8 @@ The run takes a few hours. It works through these stages, and each must succeed 
   <Step title="Verify the management cluster converges">
     Waits for every platform boundary to become healthy, within a fixed budget.
   </Step>
-  <Step title="Bring up the managed cluster">
-    The management cluster provisions the managed cluster your repository declares.
+  <Step title="Bring up declared managed clusters">
+    The management cluster provisions any managed cluster your repository already declares. Scaffolding declares none, so on a new box this finds nothing and moves on: you add your first in [Add your managed cluster](/quickstart/add-your-managed-cluster).
   </Step>
   <Step title="Validate the platform">
     Runs the platform's validation and publishes the record as a run artefact.
@@ -68,21 +68,9 @@ kakt verify --cluster acme-hub --timeout 15m
 If a run fails part-way, fix the cause and start the workflow again. Phases that completed are not repeated, and a phase that is not safe to repeat refuses to resume rather than running twice.
 </Tip>
 
-## Adding more managed clusters later
+## Managed clusters are not Day-0
 
-A further managed cluster is a declaration, not another Day-0. `kakt tenant add-cluster` renders the cluster template your GitOps repository carries. From the repository root:
-
-```bash
-kakt tenant add-cluster \
-  --mgmt-cluster acme-hub \
-  --name acme-02 \
-  --tenant acme \
-  --bundle-version <version> \
-  --gitops-repo-url https://github.com/acme-inc/acme-gitops
-git add registry && git commit -m "Declare acme-02" && git push
-```
-
-The name you choose becomes the cluster's cell id for its whole life. The management cluster provisions it from the commit.
+Day-0 builds only the management cluster. Every managed cluster, including your first, is a declaration you commit; the management cluster provisions it. You never run Day-0 again for this box.
 
 ## Next
 

@@ -1,10 +1,10 @@
 ---
 title: "Retire an environment"
-description: "Remove an environment's apps first, then its cluster. Its secrets stay in your box until you delete them, and its cell id is never reused."
-keywords: ["retire environment", "remove environment", "delete cluster", "cell id", "teardown"]
+description: "Remove an environment's apps first, then its cluster. Its secrets stay in your box until you delete them, and its cluster name is never reused."
+keywords: ["retire environment", "remove environment", "delete cluster", "cluster name", "teardown"]
 ---
 
-> Apps first, then the cluster. A retired cell id is never used again.
+> Apps first, then the cluster. A retired cluster name is never used again.
 
 Retiring an environment removes its apps, then the managed cluster they ran on. The order matters: an app is removed from its cluster by the box, which needs the cluster to still be there.
 
@@ -17,9 +17,9 @@ git rm -r environments/stg
 git commit -m "Retire stg" && git push
 ```
 
-The platform removes each app it no longer finds a declaration for, and everything the app ran on its cell with it. Wait until the apps are gone from the cluster before the next step.
+The platform removes each app it no longer finds a declaration for, and everything the app ran on its cluster with it. Wait until the apps are gone from the cluster before the next step.
 
-If the cell also runs apps from another environment, stop here: the cluster is still in use.
+If the cluster also runs apps from another environment, stop here: it is still in use.
 
 ## Step 2: Remove the cluster
 
@@ -45,9 +45,9 @@ Deleting the `-infrastructure` Application destroys the cluster and everything o
 
 ## What stays behind
 
-- **Secrets.** An app's secrets are stored in your box's secret store under its cell and app, and removing the app does not delete them. Delete them in the secret store once you no longer need them.
-- **Backups.** The cluster's database backups stay in your object storage, under a prefix named for the cell.
+- **Secrets.** An app's secrets are stored in your box's secret store under its cluster and app, and removing the app does not delete them. Delete them in the secret store once you no longer need them.
+- **Backups.** The cluster's database backups stay in your object storage, under a prefix named for the cluster.
 
-## The cell id cannot be reused
+## The cluster name cannot be reused
 
-A cell id names more than the cluster: its secrets and its backup prefix are named for it too. A new cluster under a retired name would read the old cluster's secrets, and its databases would find the old backups where theirs must go and refuse to back up at all. Give a replacement cluster a new name.
+A cluster's name names more than the cluster: its secret path and its backup prefix are named for it too. A new cluster under a retired name would read the old cluster's secrets, and its databases would find the old backups where theirs must go and refuse to back up at all. Give a replacement cluster a new name — it can serve the same environment as the one it replaces, and both can run while you verify it. See [Replace a managed cluster](/guides/replace-a-managed-cluster).

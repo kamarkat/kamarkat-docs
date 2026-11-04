@@ -266,8 +266,11 @@ A management cluster running the platform's services, plus the managed clusters 
 **Tenant and application**
 The tenant owns the box (`tenantId`), and is bound to one organization in the identity provider. An application is a product running on it (`appId`), and the unit of isolation: its own namespace `tenant-<tenantId>-<appId>`, database, identity project, secret path and network policy. Being in the same tenant never grants access; only a declaration does.
 
+**Managed cluster**
+A cluster the box provisions and runs applications on. Its name (`clusterName`) is chosen by the customer, written once and fixed for life: applications name the cluster they run on, and the cluster's secret path and backup prefix are named for it. Several managed clusters may serve one environment.
+
 **Cell**
-A managed cluster's name, chosen by the customer and fixed for life. Applications name the cell they run on. Policy attaches to cells.
+A policy group (`cells`), not a cluster. It holds no compute, pins no version and owns nothing; a cluster may belong to several and receives the union of their policy. A residency policy on a cell is checked against the region of every cluster in it. Never use "cell" for a cluster's name — that is `clusterName`, and the three facts a cluster declares (its name, the environment it serves, the cells it belongs to) are independent.
 
 **GitOps repository**
 `<tenant>-gitops` in the customer's git organization. For each cluster it holds the bundle version and the customer's values; for each application, its declaration and the chart version of each workload.

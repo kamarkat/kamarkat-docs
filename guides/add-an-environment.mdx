@@ -1,22 +1,22 @@
 ---
 title: "Add an environment"
-description: "Add a stage such as stg to a running box: declare its cell, declare each app in it, supply its secrets, commit."
-keywords: ["add environment", "staging", "stg", "cell", "environments"]
+description: "Add a stage such as stg to a running box: declare a cluster for it, declare each app in it, supply its secrets, commit."
+keywords: ["add environment", "staging", "stg", "clusterName", "environments"]
 ---
 
-> An environment is a directory per app, on a cell that already exists. Declare the cell first.
+> An environment is a directory per app, on a managed cluster that already exists. Declare the cluster first.
 
-This guide adds `stg` to a box that runs `shop` in `dev`. The order matters: an app names the cell it runs on, and an app that names a cell that does not exist generates nothing.
+This guide adds `stg` to a box that runs `shop` in `dev`. The order matters: an app names the cluster it runs on, and an app naming a cluster that does not exist generates nothing.
 
 ## Before you start
 
 **Choose the provider.** `hybrid` is supported for `dev` only. If your `dev` runs on `hybrid`, your `stg` and `prod` run on `hetzner`, so your environments are not all the same provider: the new one has cloud nodes and their cost, and no tailnet. See [Environments](/features/workloads/environments#providers-per-environment).
 
-## Step 1: Declare the cell
+## Step 1: Declare the cluster
 
 Add a managed cluster for the environment, if it does not have one yet, and wait for it to converge. See [Add a managed cluster](/guides/add-a-managed-cluster).
 
-Several apps in one environment can share a cell, so a second app in `stg` needs no second cluster.
+Several apps in one environment can share a cluster, so a second app in `stg` needs no second one. Give the cluster `--environment stg`: that is the stage it serves, and the CLI refuses an app whose directory and whose cluster disagree about it.
 
 ## Step 2: Declare each app
 
@@ -33,7 +33,7 @@ In `environments/stg/shop/values.yaml`, set what differs from `dev`:
 ```yaml environments/stg/shop/values.yaml
 tenantId: acme
 appId: shop
-cellId: acme-stg-01      # the cell you declared in step 1
+clusterName: acme-stg-01 # the cluster you declared in step 1
 
 public:
   hosts:
@@ -63,7 +63,7 @@ Or one at a time with `kakt fleet secrets set stg shop <KEY>`. Delete the `.env`
 git add environments/stg && git commit -m "Add shop to stg" && git push
 ```
 
-The platform generates the app on its cell on the next pass. Every declared secret is checked before its workloads start, and a missing key is reported by name.
+The platform generates the app on its cluster on the next pass. Every declared secret is checked before its workloads start, and a missing key is reported by name.
 
 ## Next
 

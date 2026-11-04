@@ -1,0 +1,97 @@
+---
+title: "Replace a managed cluster"
+description: "Build the replacement beside the cluster it replaces, verify it, then move each app by changing one line. Both clusters serve the same environment while you check."
+keywords: ["replace cluster", "cluster replacement", "cutover", "kubernetes upgrade", "clusterName", "migration"]
+---
+
+> A managed cluster is replaced, not upgraded. The replacement runs beside it until you move each app across.
+
+A managed cluster's Kubernetes version, its node types and its machine templates are fixed for its life: changing them is a new cluster, not an edit. So a cluster is replaced by building its successor, verifying it, and moving each app over one commit at a time.
+
+Both clusters serve the same environment while you do this. Several clusters may declare the same `--environment`, and the environment a cluster serves places nothing on it — each app names the cluster it runs on. That is what makes the overlap possible.
+
+## Before you start
+
+- **The replacement needs a new name.** A cluster's name also names its secret path and its database backup prefix, so a name is never reused. See [Retire an environment](/guides/retire-an-environment#the-cluster-name-cannot-be-reused).
+- **An app's data does not follow it.** Each app's database lives on the cluster it runs on. An app moved to a replacement gets a new, empty database there. Decide how its data gets across — a restore from the predecessor's backups, or an export and load the app performs itself — before you move anything that holds data you need.
+- **Its secrets do not follow it either.** They are stored under the cluster's own path, so they are supplied again against the replacement. Step 3 covers this.
+- **You pay for both.** The replacement is a new set of nodes in your cloud account, running alongside the cluster it replaces for as long as the overlap lasts.
+
+## Step 1: Build the replacement
+
+Declare it exactly as you would any managed cluster, with a new name and the **same** `--environment` as the one it replaces:
+
+```bash
+kakt tenant add-cluster \
+  --mgmt-cluster acme-hub \
+  --name acme-stg-02 \
+  --environment stg \
+  --tenant acme \
+  --bundle-version <version> \
+  --gitops-repo-url https://github.com/acme-inc/acme-gitops
+```
+
+Commit it and wait for it to converge, as in [Add a managed cluster](/guides/add-a-managed-cluster). Nothing moves yet: no app names `acme-stg-02`, so nothing is generated onto it.
+
+Use this moment to take the newer platform version if that is why you are replacing the cluster. `--bundle-version` is per cluster, so the replacement can run a version the predecessor never will.
+
+## Step 2: Verify it before anything depends on it
+
+The replacement is empty, which is the only time you can check it without an app's traffic on it:
+
+```bash
+kakt verify --cluster acme-stg-02
+```
+
+It waits for the cluster to converge and reports anything outstanding.
+
+If you are replacing the cluster to prove a recovery path, restore into it now, while the predecessor is still serving and still holds the data you are comparing against.
+
+## Step 3: Move one app
+
+Pick the app with the least to lose first. Change one line in its declaration:
+
+```yaml environments/stg/shop/values.yaml
+clusterName: acme-stg-02   # was acme-stg-01
+```
+
+Then regenerate the public hostname aggregate, because it is written per cluster and the app's listener has to move from one to the other:
+
+```bash
+kakt fleet hosts aggregate
+```
+
+Supply the app's secrets against the replacement. They are stored under the cluster's path, so the new cluster has none of them; the command reads the cluster from the declaration you just changed, so run it after that edit:
+
+```bash
+kakt fleet secrets status stg shop
+kakt fleet secrets set stg shop <KEY>
+```
+
+`status` lists what the app declares and what is present. Every declared secret is checked before the app's workloads start, so a key you miss is reported by name rather than becoming a crash loop.
+
+Commit the lot:
+
+```bash
+git add environments registry && git commit -m "Move shop to acme-stg-02" && git push
+```
+
+The platform removes the app from `acme-stg-01` and generates it on `acme-stg-02`. Its public hostnames follow it: the aggregate on the old cluster no longer lists them, the new one does, and DNS is republished to the replacement's address.
+
+<Warning>
+The app is removed from the predecessor as part of the same commit. Its database there goes with it, so anything you still need from that database must be out before you push.
+</Warning>
+
+## Step 4: Move the rest, then retire the predecessor
+
+Repeat step 3 for each app. Between apps the environment is split across two clusters, which is supported and visible: each app's declaration says where it is.
+
+When no app names the predecessor, retire it with [Retire an environment](/guides/retire-an-environment#step-2-remove-the-cluster) — the cluster half only, since the environment itself is staying.
+
+<Note>
+Removing the predecessor's files does not destroy it. The management cluster never deletes a cluster because its declaration disappeared, so the cluster is removed by hand with its kubeconfig. Its backups stay in your object storage under its own prefix after it is gone.
+</Note>
+
+## What this does not change
+
+The environment keeps its name and its directory. `environments/stg/` is the stage your apps are promoted through; replacing the cluster underneath it is not a promotion, and no version moves. The apps that ran on the predecessor run the same chart versions on the replacement, because those are pinned per app and per environment, not per cluster.

@@ -21,7 +21,7 @@ Kamarkat names two things separately:
 
 For example, a tenant `acme` running two products, `web` and `agents`, gets the namespaces `tenant-acme-web` and `tenant-acme-agents`. Both are attributed to `acme`, and costs split by product.
 
-A tenant may hold several clusters. Each cluster has a **cell id**, its own name, which never stands in for the tenant.
+A tenant may hold several clusters. Each has its own name (`clusterName`), which never stands in for the tenant.
 
 <Note>
 **Organization** means one thing only: the identity provider's own container for users, projects and clients. Your tenant is bound to one. Everywhere else — the box, its clusters, its applications, its costs — the platform's word is **tenant**.

@@ -1,0 +1,53 @@
+---
+title: "Add your managed cluster"
+description: "Your apps run on a managed cluster. Declare one with a commit; the management cluster provisions it."
+keywords: ["managed cluster", "kakt tenant add-cluster", "clusterName", "first cluster"]
+---
+
+Your management cluster runs the platform's services, not your apps. Apps run on a managed cluster, and scaffolding declares none, so declare your first one now. It is a commit, not another Day-0: the management cluster provisions it.
+
+## Step 1: Declare the cluster
+
+From the root of your GitOps repository:
+
+```bash
+kakt tenant add-cluster \
+  --mgmt-cluster acme-hub \
+  --name acme-01 \
+  --environment dev \
+  --tenant acme \
+  --bundle-version <version> \
+  --gitops-repo-url https://github.com/acme-inc/acme-gitops
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--name` | The cluster's name for its whole life. Your apps name it to run on it. |
+| `--environment` | The stage it serves. An app in `environments/dev/` must run on a cluster that serves `dev`. |
+| `--bundle-version` | The platform version it starts on: the one your management cluster runs. |
+
+<Note>
+A managed cluster is a new set of nodes in your cloud account. On `hetzner` it starts with 2 worker nodes unless you pass `--workers`.
+</Note>
+
+## Step 2: Commit
+
+```bash
+git add registry && git commit -m "Declare acme-01" && git push
+```
+
+The management cluster provisions the cluster from this commit, then installs the platform on it.
+
+## Step 3: Verify
+
+```bash
+kakt verify --cluster acme-01
+```
+
+It waits for the cluster to converge and reports anything outstanding. For a further cluster later, see [Add a managed cluster](/guides/add-a-managed-cluster).
+
+## Next
+
+<Card title="Declare your app" icon="cube" href="/quickstart/declare-your-app">
+  Run your first application on `acme-01`.
+</Card>

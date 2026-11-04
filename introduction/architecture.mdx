@@ -123,7 +123,7 @@ Stopping using Kamarkat stops nothing running: your box holds everything it need
 
 ## Delivery and upgrades
 
-**Day-0** runs once, from your CI, under your credentials. It creates the management cluster and your first managed cluster, and commits the facts it discovers to your GitOps repository. After that, **the repository is the only authority** for the box.
+**Day-0** runs once, from your CI, under your credentials. It creates the management cluster, brings up any managed cluster your repository already declares, and commits the facts it discovers to your GitOps repository. After that, **the repository is the only authority** for the box.
 
 **Platform upgrades** arrive as pull requests from your own upgrade automation, each changing one version field. A pre-flight check runs inside your box against the target cluster and reports its verdict. Nothing changes until you merge.
 

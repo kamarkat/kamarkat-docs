@@ -8,7 +8,7 @@ An application is declared in your GitOps repository, one directory per applicat
 
 ```text
 environments/<env>/<app>/
-├── values.yaml           what the app is: tenant, app, cell, hosts, capabilities
+├── values.yaml           what the app is: tenant, app, cluster, hosts, capabilities
 ├── frontend/Chart.yaml   one directory per workload, naming its chart version
 └── bff/Chart.yaml
 ```
@@ -27,7 +27,7 @@ cp templates/fleet/values.yaml environments/dev/shop/values.yaml
 ```yaml environments/dev/shop/values.yaml
 tenantId: acme          # the tenant that owns the box, the same in every app
 appId: shop             # this product; it gets namespace tenant-acme-shop
-cellId: acme-01         # the managed cluster it runs on
+clusterName: acme-01    # the managed cluster it runs on
 
 public:
   hosts:
@@ -52,7 +52,7 @@ secrets: []             # secrets you supply; see "Supply your secrets"
 | :- | :- |
 | `tenantId` | Your tenant. The same value in every app's file. |
 | `appId` | The product, and its isolation unit. It never defaults to `tenantId`. |
-| `cellId` | Must match the managed cluster's name, or nothing is generated for the app. |
+| `clusterName` | The managed cluster this app runs on. It must name a cluster your box declares, serving this directory's environment, or nothing is generated for the app. |
 | `public.hosts` | Public hostnames. An empty list publishes nothing. |
 | `database.enabled` | Provisions the app's own database and role. |
 

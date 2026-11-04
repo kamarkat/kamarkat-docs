@@ -1,7 +1,7 @@
 ---
 title: "Add a managed cluster"
 description: "A managed cluster is a commit. The management cluster provisions it from your repository; no Day-0 run is involved."
-keywords: ["add-cluster", "managed cluster", "cell", "kakt tenant add-cluster", "workers"]
+keywords: ["add-cluster", "managed cluster", "clusterName", "kakt tenant add-cluster", "workers"]
 ---
 
 > Day-0 builds a management cluster. A managed cluster is a commit.
@@ -10,7 +10,7 @@ Day-0 runs once, to build your box's management cluster. Every managed cluster a
 
 ## Before you start
 
-- **Choose the name.** It becomes the cluster's cell id for its whole life. Applications name the cell they run on, so a rename is not an edit: it is a new cluster. A retired name cannot be reused (see [Retire an environment](/guides/retire-an-environment)).
+- **Choose the name.** It is the cluster's name for its whole life. Applications name the cluster they run on, so a rename is not an edit: it is a new cluster — see [Replace a managed cluster](/guides/replace-a-managed-cluster) for how one is swapped out. A retired name cannot be reused (see [Retire an environment](/guides/retire-an-environment)).
 - **Choose the version.** `--bundle-version` must name a platform version that is already published, in the registry your `bundle.yaml` files pull from, and pullable without credentials. The new cluster cannot converge on a version its registry does not hold. Use the version your other clusters run unless you mean to differ.
 - **Check the provider supports the environment.** `hybrid` is supported for `dev` only. A `stg` or `prod` cluster runs on `hetzner`. See [Environments](/features/workloads/environments#providers-per-environment).
 

@@ -71,7 +71,7 @@ Every published version stays in your registry, so the previous one is always th
 
 - **Only the dependency's `version`.** The chart's own `version: 1.0.0` and the `repository` are the same in every environment. A diff between two environments' `Chart.yaml` that shows anything else is not a promotion.
 - **Never the chart's contents.** There are none in this repository to change: the chart, and the image digests inside it, come from your registry.
-- **Values that differ per environment** — hosts, cell, secrets — live in the app's `values.yaml`, never in `Chart.yaml`.
+- **Values that differ per environment** — hosts, cluster, secrets — live in the app's `values.yaml`, never in `Chart.yaml`.
 
 <Tip>
 Protect promotion with your repository's own review rules: require reviewers on `environments/prod`, and allow automatic merges only on lower environments.

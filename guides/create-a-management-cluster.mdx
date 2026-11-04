@@ -6,7 +6,7 @@ keywords: ["management cluster", "day-0", "scaffold", "bootstrap", "kakt tenant 
 
 > One management cluster per box, built once by Day-0. Everything after it is a commit.
 
-The management cluster runs the platform's services: the GitOps engine, cluster lifecycle, secrets, identity, login and observability. It is the only cluster that needs Day-0. It then creates every managed cluster your repository declares, starting with the one your scaffold declared.
+The management cluster runs the platform's services: the GitOps engine, cluster lifecycle, secrets, identity, login and observability. It is the only cluster that needs Day-0. It then creates every managed cluster your repository declares. Scaffolding declares none: your first managed cluster is a commit you make with `kakt tenant add-cluster`.
 
 You create it once per box. A second box is a second GitOps repository, with its own management cluster.
 
@@ -43,7 +43,7 @@ Day-0 is the **Bootstrap cluster** workflow in your repository, running on your 
 gh run watch --repo acme-inc/acme-gitops
 ```
 
-It creates the management cluster, builds its foundation, waits for its platform services to become healthy, then brings up the managed cluster your repository declares. If a run fails part-way, fix the cause and start it again: completed phases are not repeated. See [Bootstrap your box](/quickstart/bootstrap-your-box) for each stage.
+It creates the management cluster, builds its foundation, waits for its platform services to become healthy, then brings up any managed cluster your repository already declares. With none declared, it finishes after the management cluster. If a run fails part-way, fix the cause and start it again: completed phases are not repeated. See [Bootstrap your box](/quickstart/bootstrap-your-box) for each stage.
 
 ## Step 3: Verify
 
@@ -62,6 +62,6 @@ You never run Day-0 again for this box. Every further cluster, environment, app 
     Sign in, and know where break-glass access is.
   </Card>
   <Card title="Add a managed cluster" icon="server" href="/guides/add-a-managed-cluster">
-    A further cluster, from a commit.
+    Where your apps run, from a commit.
   </Card>
 </CardGroup>

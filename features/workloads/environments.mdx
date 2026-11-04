@@ -8,7 +8,9 @@ keywords: ["environments", "dev", "stg", "prod", "promotion", "rollback"]
 
 ## What it is
 
-An environment is a deployment stage for your applications. Kamarkat recognizes the slugs `dev`, `stg`, `prod` and `ephemeral`, and you choose one when you scaffold a box or declare a cluster.
+An environment is a deployment stage for your applications. Kamarkat recognizes the slugs `dev`, `stg` and `prod`.
+
+Each managed cluster declares the environment it serves (`environmentSlug`), and each application declares the cluster it runs on (`clusterName`). Those are two separate statements: the environment a cluster serves does not place anything on it, and several clusters may serve one environment — which is what lets a replacement cluster be built and verified beside the one it replaces.
 
 Each environment is a directory in your GitOps repository. Every application you run in it has its own directory there, holding its declaration and the chart version of each of its workloads.
 
@@ -16,7 +18,7 @@ Each environment is a directory in your GitOps repository. Every application you
 environments/
 ├── dev/
 │   └── shop/
-│       ├── values.yaml          the app in dev: cell, hosts, capabilities, secrets
+│       ├── values.yaml          the app in dev: cluster, hosts, capabilities, secrets
 │       └── frontend/Chart.yaml  the version running in dev
 └── prod/
     └── shop/
@@ -26,7 +28,7 @@ environments/
 
 | | What differs per environment |
 | :- | :- |
-| **Cell** | Each app declares the managed cluster it runs on in that environment. |
+| **Cluster** | Each app declares the managed cluster it runs on in that environment (`clusterName`). |
 | **Hostnames** | Each app declares its public hosts per environment. |
 | **Versions** | Each workload pins its own chart version per environment. |
 | **Secrets** | Secrets are supplied per environment: `kakt fleet secrets set <env> <app> <KEY>`. |
@@ -51,9 +53,9 @@ To roll back, commit the previous version. Every published version stays in your
 
 `hybrid` is supported for `dev` only; `stg` and `prod` run on `hetzner`. A box whose `dev` runs on `hybrid` therefore has environments on different providers: its higher environments have cloud nodes and their cost, and do not join your tailnet. Decide this before you [add an environment](/guides/add-an-environment).
 
-### An environment needs its cell first
+### An environment needs its cluster first
 
-An app names the managed cluster it runs on, so that cluster must exist before the app's directory is committed. An app that names a cell that does not exist generates nothing.
+An app names the managed cluster it runs on, so that cluster must exist before the app's directory is committed, and it must be a cluster that serves this environment. An app naming a cluster that does not exist generates nothing — and generating nothing is reported as healthy, so the CLI checks the name when it reads the declaration.
 
 ### Promotion is never a branch
 
@@ -77,9 +79,9 @@ Who may change `environments/prod` and `registry/clusters/<prod-cluster>` is set
 
 <AccordionGroup>
   <Accordion title="Can an environment span several managed clusters?">
-    Each app in an environment declares one cell. Different apps in the same environment can run on different managed clusters.
+    Yes. Each app in an environment declares one cluster, and different apps in the same environment can run on different managed clusters. Several clusters may also declare the same `environmentSlug`.
   </Accordion>
   <Accordion title="Can I add a staging environment later?">
-    Yes. See [Add an environment](/guides/add-an-environment): declare its cell first, then each app, then its secrets.
+    Yes. See [Add an environment](/guides/add-an-environment): declare its cluster first, then each app, then its secrets.
   </Accordion>
 </AccordionGroup>

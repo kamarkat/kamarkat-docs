@@ -2,6 +2,17 @@ export const line = {
   "line": "0.1",
   "releases": [
     {
+      "version": "0.1.16-rc.189",
+      "released": "4 Nov 2026",
+      "href": "/versions/releases/0-1-16-rc-189",
+      "latest": false,
+      "prerelease": true,
+      "components": 146,
+      "behind": 70,
+      "previous": "0.1.16-rc.188",
+      "changed": 113
+    },
+    {
       "version": "0.1.16-rc.188",
       "released": "2 Nov 2026",
       "href": "/versions/releases/0-1-16-rc-188",
@@ -10,7 +21,7 @@ export const line = {
       "components": 139,
       "behind": 121,
       "previous": "0.1.16-rc.187",
-      "changes": []
+      "changed": 0
     },
     {
       "version": "0.1.16-rc.187",
@@ -21,7 +32,7 @@ export const line = {
       "components": 139,
       "behind": 121,
       "previous": "0.1.16-rc.186",
-      "changes": []
+      "changed": 0
     }
   ]
 };

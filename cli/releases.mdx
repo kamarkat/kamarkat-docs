@@ -20,36 +20,37 @@ It runs every packaging step and release gate for the next version. It then list
 
 ## kakt release publish
 
-Publishes the next version, promotes the tenant to it, and verifies the box reached it.
+Publishes the next version. Given a tenant's GitOps checkout, it also promotes that tenant to the version and verifies its box reached it.
 
 ```bash
 kakt release publish --dry-run
 kakt release publish
+kakt release publish --gitops-dir ../nutgraf-gitops
 kakt release publish --version 0.1.17-rc.1
 ```
 
 The steps run in a fixed order:
 
-1. **Pull** the tenant's GitOps repository.
-2. **Decide the version** from the tenant's current one: the next release candidate, unless `--version` names one. A version already referenced is refused.
+1. **Decide the version** from the registry: the release candidate after the newest published, unless `--version` names one.
+2. **Pull** the tenant's GitOps repository, before anything is published. Uncommitted version files, clusters on different versions and a version the tenant already references are refused.
 3. **Publish** it: package, run every release gate, write the component inventory, push. If this fails, nothing is promoted.
-4. **Promote** every reference to the old version, check none survives, commit and push.
+4. **Promote** every reference to the tenant's old version, check none survives, commit and push.
 5. **Sync** the box and verify every Application reached the version.
 
-It ends with `Done. <version> is published, promoted and running.` A version is published once: if a step fails after publishing starts, the next attempt takes the next version.
+Steps 2, 4 and 5 run only with `--gitops-dir`. Without it the command ends after publishing; with it, it ends with `Done. <version> is published, promoted and running.` A version is published once: if a step fails after publishing starts, the next attempt takes the next version.
 
 | Flag | Meaning |
 | :- | :- |
 | `--dry-run` | Say what each step would do; change nothing |
-| `--no-promote` | Publish only |
-| `--no-sync` | Publish and promote; do not sync the box |
+| `--no-promote` | With `--gitops-dir`: publish only |
+| `--no-sync` | With `--gitops-dir`: publish and promote; do not sync the box |
 
 ## kakt release promote
 
 Promotes the tenant to a version already published, then syncs and verifies the box. This is for a stable version, which is published when a release is created on GitHub.
 
 ```bash
-kakt release promote --version 0.1.17
+kakt release promote --version 0.1.17 --gitops-dir ../nutgraf-gitops
 ```
 
 The version must be named and must already be in the registry: promoting first would write a reference to nothing.
@@ -88,6 +89,6 @@ For each version named, it records each component's repository link, the newest 
 
 | Flag | Meaning |
 | :- | :- |
-| `--version` | The version. Defaults to the tenant's current release candidate + 1 |
-| `--gitops-dir` | The tenant's GitOps checkout. Defaults to `.local-e2e/nutgraf-gitops` |
-| `--owner` | The GitHub organisation whose registry the bundle is published to. Defaults to `soloz-io` |
+| `--version` | The version. Defaults to the release candidate after the newest published |
+| `--gitops-dir` | A tenant's GitOps checkout to promote and sync. No default: without it nothing is promoted. `promote` requires it |
+| `--owner` | The GitHub organisation whose registry the bundle is published to. Defaults to `kamarkat` |

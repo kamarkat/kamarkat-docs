@@ -1,0 +1,5608 @@
+export const release = {
+  "version": "0.1.16-rc.189",
+  "groups": [
+    {
+      "id": "management",
+      "title": "Management cluster"
+    },
+    {
+      "id": "managed",
+      "title": "Managed clusters"
+    },
+    {
+      "id": "bootstrap",
+      "title": "Bootstrap tools"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "control-plane",
+      "title": "Control plane nodes"
+    },
+    {
+      "id": "worker",
+      "title": "Worker nodes"
+    }
+  ],
+  "provider": "hetzner",
+  "components": [
+    {
+      "name": "agentgateway",
+      "component": "agentgateway",
+      "description": "The gateway that serves application and platform routes.",
+      "license": "Apache-2.0",
+      "layer": "workload-infrastructure",
+      "type": "container",
+      "cluster": "management",
+      "source": "cr.agentgateway.dev/agentgateway",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "api-gateway",
+        "billing-engine",
+        "credit-authority"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v1.7.0",
+      "digests": [
+        "sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b"
+      ],
+      "url": "https://github.com/agentgateway/agentgateway",
+      "latest": "1.7.0",
+      "current": true
+    },
+    {
+      "name": "alertmanager",
+      "component": "Alertmanager",
+      "description": "Routes the alerts rule evaluation raises, run by the VictoriaMetrics operator.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/prom/alertmanager",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "victoriametrics"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [
+        "VictoriaMetrics operator v0.75.0"
+      ],
+      "version": "v0.34.1",
+      "digests": [],
+      "url": "https://github.com/prometheus/alertmanager",
+      "latest": "0.34.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A patch behind, delivered by the observability operator rather than pinned directly. Nobody has assessed the move."
+        }
+      ]
+    },
+    {
+      "name": "argocd",
+      "component": "Argo CD",
+      "description": "The GitOps engine. Reconciles every cluster to the GitOps repository and the pinned bundle.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "quay.io/argoproj/argocd",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-argocd"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [
+        "chart argo-cd 10.11.7"
+      ],
+      "version": "v3.5.7",
+      "digests": [],
+      "url": "https://github.com/argoproj/argo-cd",
+      "latest": "3.6.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Newest chart ships 3.5.7"
+        }
+      ]
+    },
+    {
+      "name": "dex",
+      "component": "Argo CD",
+      "description": "The GitOps engine. Reconciles every cluster to the GitOps repository and the pinned bundle.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/dexidp/dex",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-argocd"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [
+        "chart argo-cd 10.11.7"
+      ],
+      "version": "v2.46.1",
+      "digests": [],
+      "url": "https://github.com/dexidp/dex",
+      "latest": "2.46.1",
+      "current": true
+    },
+    {
+      "name": "busybox",
+      "component": "BusyBox",
+      "description": "Init steps that prepare a volume before its workload starts.",
+      "license": "GPL-2.0-only",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/library/busybox",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-storage"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [],
+      "version": "1.38.0",
+      "digests": [
+        "sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4"
+      ],
+      "url": "https://git.busybox.net/busybox",
+      "latest": "1.38.0",
+      "current": true
+    },
+    {
+      "name": "capi2argo-cluster-operator",
+      "component": "capi2argo",
+      "description": "Registers each cluster Cluster API creates with the GitOps engine.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/dntosas/capi2argo-cluster-operator",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-capi2argo"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v1.5.0",
+      "digests": [
+        "sha256:fb8c6457ef6e44d4c4d8a3468feb0d19e973867e0544d6cbc38f837411f3498c"
+      ],
+      "url": "https://github.com/dntosas/capi2argo-cluster-operator",
+      "latest": "1.5.0",
+      "current": true
+    },
+    {
+      "name": "cert-manager-controller",
+      "component": "cert-manager",
+      "description": "Issues and renews the TLS certificates for every gateway and webhook.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "quay.io/jetstack/cert-manager-controller",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-cert-manager"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v1.21.3",
+      "digests": [],
+      "url": "https://github.com/cert-manager/cert-manager",
+      "latest": "1.21.3",
+      "current": true
+    },
+    {
+      "name": "cert-manager-webhook",
+      "component": "cert-manager",
+      "description": "Issues and renews the TLS certificates for every gateway and webhook.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "quay.io/jetstack/cert-manager-webhook",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-cert-manager"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v1.21.3",
+      "digests": [],
+      "url": "https://github.com/cert-manager/cert-manager",
+      "latest": "1.21.3",
+      "current": true
+    },
+    {
+      "name": "cert-manager-webhook-hetzner",
+      "component": "cert-manager DNS-01 webhook",
+      "description": "Proves domain ownership for certificates through the provider's DNS.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/hetzner/cert-manager-webhook-hetzner",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "ingress-config"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v0.9.0",
+      "digests": [],
+      "url": "https://github.com/hetzner/cert-manager-webhook-hetzner",
+      "latest": "0.9.1",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A patch release behind, in a vendored render. Nobody has assessed the move."
+        }
+      ]
+    },
+    {
+      "name": "certgen",
+      "component": "Cilium",
+      "description": "Container networking, network policy and the Gateway API implementation.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "quay.io/cilium/certgen",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "installed by the kakt CLI"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v0.4.13",
+      "digests": [
+        "sha256:f0c16ea8abe251d448a7fd04bdd93fe0f85fb1c3a456a455e05f7bb107dc2ff1"
+      ],
+      "url": "https://github.com/cilium/certgen",
+      "latest": "0.4.13",
+      "current": true
+    },
+    {
+      "name": "cilium",
+      "component": "Cilium",
+      "description": "Container networking, network policy and the Gateway API implementation.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "quay.io/cilium/cilium",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "installed by the kakt CLI"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.20.4",
+      "digests": [
+        "sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e"
+      ],
+      "url": "https://github.com/cilium/cilium",
+      "latest": "1.20.4",
+      "current": true
+    },
+    {
+      "name": "operator-generic",
+      "component": "Cilium",
+      "description": "Container networking, network policy and the Gateway API implementation.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "quay.io/cilium/operator-generic",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "installed by the kakt CLI"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.20.4",
+      "digests": [
+        "sha256:7a7a3489dc66ad67e420d285c8a8d2e169b0957ad15e120f593d27081bf38d82"
+      ],
+      "url": "https://github.com/cilium/cilium",
+      "latest": "1.20.4",
+      "current": true
+    },
+    {
+      "name": "cluster-api-controller",
+      "component": "Cluster API",
+      "description": "Declarative cluster lifecycle. Creates, scales and replaces the management cluster and managed clusters.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/cluster-api/cluster-api-controller",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "Cluster API"
+      ],
+      "boundaries": [],
+      "via": [
+        "core provider v1.13.7"
+      ],
+      "version": "v1.13.7",
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/cluster-api",
+      "latest": "1.14.4",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Infrastructure provider is tested to 1.13 only",
+          "blocked_by": "Cluster API provider for Hetzner",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "cluster-api-operator",
+      "component": "Cluster API",
+      "description": "Declarative cluster lifecycle. Creates, scales and replaces the management cluster and managed clusters.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/capi-operator/cluster-api-operator",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "installed by the kakt CLI"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v0.29.0",
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/cluster-api-operator",
+      "latest": "0.30.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The newer operator moves to CAPI 1.14",
+          "blocked_by": "Cluster API",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kubeadm-bootstrap-controller",
+      "component": "Cluster API",
+      "description": "Declarative cluster lifecycle. Creates, scales and replaces the management cluster and managed clusters.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/cluster-api/kubeadm-bootstrap-controller",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "Cluster API"
+      ],
+      "boundaries": [],
+      "via": [
+        "bootstrap provider v1.13.7"
+      ],
+      "version": "v1.13.7",
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/cluster-api",
+      "latest": "1.14.4",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Infrastructure provider is tested to 1.13 only",
+          "blocked_by": "Cluster API provider for Hetzner",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kubeadm-control-plane-controller",
+      "component": "Cluster API",
+      "description": "Declarative cluster lifecycle. Creates, scales and replaces the management cluster and managed clusters.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/cluster-api/kubeadm-control-plane-controller",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "Cluster API"
+      ],
+      "boundaries": [],
+      "via": [
+        "control-plane provider v1.13.7"
+      ],
+      "version": "v1.13.7",
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/cluster-api",
+      "latest": "1.14.4",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Infrastructure provider is tested to 1.13 only",
+          "blocked_by": "Cluster API provider for Hetzner",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "caph",
+      "component": "Cluster API provider for Hetzner",
+      "description": "Creates cluster machines, networks and load balancers in the cloud account.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/syself/caph",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "Cluster API"
+      ],
+      "boundaries": [],
+      "via": [
+        "infrastructure provider v1.1.10"
+      ],
+      "version": "v1.1.10",
+      "digests": [],
+      "url": "https://github.com/syself/cluster-api-provider-hetzner",
+      "latest": "1.1.10",
+      "current": true
+    },
+    {
+      "name": "cluster-autoscaler",
+      "component": "Cluster Autoscaler",
+      "description": "Adds and removes worker nodes as workloads need them.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/autoscaling/cluster-autoscaler",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "cluster-autoscaler"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v1.35.2",
+      "digests": [],
+      "url": "https://github.com/kubernetes/autoscaler",
+      "latest": "1.36.1",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Its minor follows Kubernetes",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "spoke-identity-operator",
+      "component": "Cluster identity operator",
+      "description": "Gives each managed cluster its identity with the management cluster.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/kamarkat/kamarkat/spoke-identity-operator",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "spoke-identity-operator"
+      ],
+      "boundaries": [
+        "04"
+      ],
+      "via": [],
+      "version": "digest-pinned",
+      "digests": [
+        "sha256:8a1f7b584737775cf8c55ce9ec0aa7e697299c9241eba7b0548752287741845a"
+      ],
+      "url": "https://github.com/kamarkat/kamarkat",
+      "latest": "ea2e5d37",
+      "current": true
+    },
+    {
+      "name": "cluster-proportional-autoscaler",
+      "component": "Cluster proportional autoscaler",
+      "description": "Scales cluster DNS with the size of the cluster.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/cpa/cluster-proportional-autoscaler",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-dns"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v1.10.3",
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/cluster-proportional-autoscaler",
+      "latest": "1.10.3",
+      "current": true
+    },
+    {
+      "name": "containerd",
+      "component": "containerd",
+      "description": "The container runtime on every node.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "management",
+      "source": "pkg:containerd",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "2.4.2",
+      "digests": [],
+      "url": "https://github.com/containerd/containerd",
+      "latest": "2.4.2",
+      "current": true
+    },
+    {
+      "name": "mcp-server",
+      "component": "Control-plane API",
+      "description": "The control plane's API.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/kamarkat/kamarkat/mcp-server",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "mcp-server"
+      ],
+      "boundaries": [
+        "04"
+      ],
+      "via": [],
+      "version": "digest-pinned",
+      "digests": [
+        "sha256:990bfec09d9e6e89ac6e375f8137d014ce870ad19cec61b40bbfb464838928e0"
+      ],
+      "url": "https://github.com/kamarkat/kamarkat",
+      "latest": "migrated",
+      "current": true
+    },
+    {
+      "name": "coredns",
+      "component": "CoreDNS",
+      "description": "Cluster DNS.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/coredns/coredns",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "v1.13.1",
+      "digests": [],
+      "url": "https://github.com/coredns/coredns",
+      "latest": "1.15.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Chosen by kubeadm, not pinned here",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "crossplane",
+      "component": "Crossplane",
+      "description": "Composition. Turns one declaration into the set of resources behind it.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "management",
+      "source": "xpkg.crossplane.io/crossplane/crossplane",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-crossplane"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [
+        "chart crossplane 2.4.3"
+      ],
+      "version": "v2.4.3",
+      "digests": [],
+      "url": "https://github.com/crossplane/crossplane",
+      "latest": "2.4.3",
+      "current": true
+    },
+    {
+      "name": "provider-kubernetes",
+      "component": "Crossplane Kubernetes provider",
+      "description": "Lets a composition create objects in any cluster the platform manages.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "management",
+      "source": "xpkg.upbound.io/crossplane-contrib/provider-kubernetes",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-crossplane-providers"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [],
+      "version": "v1.4.1",
+      "digests": [],
+      "url": "https://github.com/crossplane-contrib/provider-kubernetes",
+      "latest": "1.4.1",
+      "current": true
+    },
+    {
+      "name": "csi-attacher",
+      "component": "CSI sidecars",
+      "description": "The standard Kubernetes storage sidecars the CSI driver runs with.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/sig-storage/csi-attacher",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "infrastructure-provider",
+        "installed by the kakt CLI"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v4.13.0, v4.8.1",
+      "digests": [],
+      "url": "https://github.com/kubernetes-csi/external-attacher",
+      "latest": "4.13.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Five sidecars on five independent release series, pinned beside the storage driver's manifest. Each has its own newest release; none has been assessed.",
+          "blocked_by": "Hetzner CSI driver"
+        }
+      ]
+    },
+    {
+      "name": "csi-node-driver-registrar",
+      "component": "CSI sidecars",
+      "description": "The standard Kubernetes storage sidecars the CSI driver runs with.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/sig-storage/csi-node-driver-registrar",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "infrastructure-provider",
+        "installed by the kakt CLI"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v2.13.0, v2.18.0",
+      "digests": [],
+      "url": "https://github.com/kubernetes-csi/node-driver-registrar",
+      "latest": "2.18.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Five sidecars on five independent release series, pinned beside the storage driver's manifest. Each has its own newest release; none has been assessed.",
+          "blocked_by": "Hetzner CSI driver"
+        }
+      ]
+    },
+    {
+      "name": "csi-provisioner",
+      "component": "CSI sidecars",
+      "description": "The standard Kubernetes storage sidecars the CSI driver runs with.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/sig-storage/csi-provisioner",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "infrastructure-provider",
+        "installed by the kakt CLI"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v5.2.0, v6.4.0",
+      "digests": [],
+      "url": "https://github.com/kubernetes-csi/external-provisioner",
+      "latest": "6.4.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Five sidecars on five independent release series, pinned beside the storage driver's manifest. Each has its own newest release; none has been assessed.",
+          "blocked_by": "Hetzner CSI driver"
+        }
+      ]
+    },
+    {
+      "name": "csi-resizer",
+      "component": "CSI sidecars",
+      "description": "The standard Kubernetes storage sidecars the CSI driver runs with.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/sig-storage/csi-resizer",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "infrastructure-provider",
+        "installed by the kakt CLI"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v1.13.2, v2.3.0",
+      "digests": [],
+      "url": "https://github.com/kubernetes-csi/external-resizer",
+      "latest": "2.3.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Five sidecars on five independent release series, pinned beside the storage driver's manifest. Each has its own newest release; none has been assessed.",
+          "blocked_by": "Hetzner CSI driver"
+        }
+      ]
+    },
+    {
+      "name": "livenessprobe",
+      "component": "CSI sidecars",
+      "description": "The standard Kubernetes storage sidecars the CSI driver runs with.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/sig-storage/livenessprobe",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "infrastructure-provider",
+        "installed by the kakt CLI"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v2.15.0, v2.20.0",
+      "digests": [],
+      "url": "https://github.com/kubernetes-csi/livenessprobe",
+      "latest": "2.20.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Five sidecars on five independent release series, pinned beside the storage driver's manifest. Each has its own newest release; none has been assessed.",
+          "blocked_by": "Hetzner CSI driver"
+        }
+      ]
+    },
+    {
+      "name": "curl",
+      "component": "curl",
+      "description": "An HTTP client image for one-time setup jobs and network probes.",
+      "license": "curl",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/curlimages/curl",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "credit-authority"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "8.23.0",
+      "digests": [
+        "sha256:3fb7e13e5d179a845c97d78204f3f1064d1907037f26a3ebf91710571151fd93"
+      ],
+      "url": "https://github.com/curl/curl",
+      "latest": "8.23.0",
+      "current": true
+    },
+    {
+      "name": "etcd",
+      "component": "etcd",
+      "description": "The control plane's key-value store.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/etcd",
+      "nodes": [
+        "control-plane"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "3.6.6-0",
+      "digests": [],
+      "url": "https://github.com/etcd-io/etcd",
+      "latest": "3.7.3",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Chosen by kubeadm, not pinned here",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "external-secrets",
+      "component": "External Secrets",
+      "description": "Secret delivery. Copies each workload's secrets from the secret store into its namespace.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/external-secrets/external-secrets",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-external-secrets"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [
+        "chart external-secrets 2.14.0"
+      ],
+      "version": "v2.14.0",
+      "digests": [],
+      "url": "https://github.com/external-secrets/external-secrets",
+      "latest": "2.14.0",
+      "current": true
+    },
+    {
+      "name": "external-dns",
+      "component": "ExternalDNS",
+      "description": "Publishes DNS records for every public hostname.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/external-dns/external-dns",
+      "nodes": [
+        "control-plane"
+      ],
+      "where": [
+        "platform-external-dns"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v0.24.0",
+      "digests": [
+        "sha256:a80a146d2540fa138565e404f0625157271071a06093021f27ae19d8316d10f9"
+      ],
+      "url": "https://github.com/kubernetes-sigs/external-dns",
+      "latest": "0.24.0",
+      "current": true
+    },
+    {
+      "name": "external-dns-hetzner-webhook",
+      "component": "ExternalDNS provider webhook",
+      "description": "Connects ExternalDNS to the provider's DNS service.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/hetzner/external-dns-hetzner-webhook",
+      "nodes": [
+        "control-plane"
+      ],
+      "where": [
+        "platform-external-dns"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v0.5.1",
+      "digests": [
+        "sha256:643d5752e2864493ef29e314ba413f8ee58a99eb97c1e0387f76f5a43ea8e787"
+      ],
+      "url": "https://github.com/hetzner/external-dns-hetzner-webhook",
+      "latest": "0.5.1",
+      "current": true
+    },
+    {
+      "name": "ledger",
+      "component": "Formance Ledger",
+      "description": "The ledger Credit Authority records every credit grant and spend in.",
+      "license": "MIT",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/formancehq/ledger",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "credit-authority"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v2.4.17",
+      "digests": [
+        "sha256:269cc7079a4375eaaad21dd3565563a0372437216cdda14c200619c647c07ea3"
+      ],
+      "url": "https://github.com/formancehq/ledger",
+      "latest": "2.4.17",
+      "current": true
+    },
+    {
+      "name": "grafana",
+      "component": "Grafana",
+      "description": "Dashboards for metrics and logs.",
+      "license": "AGPL-3.0-only",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/grafana/grafana",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "grafana"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [
+        "Grafana operator v5.24.0"
+      ],
+      "version": "13.3.0",
+      "digests": [],
+      "url": "https://github.com/grafana/grafana",
+      "latest": "13.3.0",
+      "current": true
+    },
+    {
+      "name": "alloy",
+      "component": "Grafana Alloy",
+      "description": "Collects metrics and logs on every node and cluster.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/grafana/alloy",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "grafana-alloy"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v1.21.3",
+      "digests": [
+        "sha256:8ab871206bd2d8f89277f53abffee5f452a293980788d52f85fa183a87a505a4"
+      ],
+      "url": "https://github.com/grafana/alloy",
+      "latest": "1.21.3",
+      "current": true
+    },
+    {
+      "name": "grafana-operator",
+      "component": "Grafana operator",
+      "description": "Manages dashboards and data sources as declarations.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/grafana/grafana-operator",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-dashboards"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v5.24.0",
+      "digests": [
+        "sha256:e72d11ac579a000fe0ddcc0c3341a5103a1c93a28fbc394dc7c7009ed071d1a7"
+      ],
+      "url": "https://github.com/grafana/grafana-operator",
+      "latest": "5.25.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A minor behind. Nobody has assessed the move; it also sets the instance version today, which is the defect recorded against the instance."
+        }
+      ]
+    },
+    {
+      "name": "headlamp",
+      "component": "Headlamp",
+      "description": "The cluster console.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/headlamp-k8s/headlamp",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-headlamp"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v0.45.0",
+      "digests": [],
+      "url": "https://github.com/headlamp-k8s/headlamp",
+      "latest": "0.46.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A minor behind. Nobody has assessed the move."
+        }
+      ]
+    },
+    {
+      "name": "hetzner-cloud-controller-manager",
+      "component": "Hetzner cloud controller manager",
+      "description": "Node lifecycle and load balancers in the cloud account.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/syself/hetzner-cloud-controller-manager",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "infrastructure-provider",
+        "installed by the kakt CLI"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v2.0.7",
+      "digests": [],
+      "url": "https://github.com/syself/hetzner-cloud-controller-manager",
+      "latest": "2.0.7",
+      "current": true
+    },
+    {
+      "name": "hcloud-csi-driver",
+      "component": "Hetzner CSI driver",
+      "description": "Block-storage volumes for persistent data.",
+      "license": "MIT",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/hetznercloud/hcloud-csi-driver",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "infrastructure-provider",
+        "installed by the kakt CLI"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v2.13.0, v2.24.1",
+      "digests": [],
+      "url": "https://github.com/hetznercloud/csi-driver",
+      "latest": "2.24.1",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors. Nobody has assessed the move; the driver is delivered as a hand-assembled manifest, so its sidecars are pinned here rather than by a chart."
+        }
+      ]
+    },
+    {
+      "name": "infisical",
+      "component": "Infisical",
+      "description": "The secret store. Holds every platform and application secret.",
+      "license": "MIT (enterprise directory unused)",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/infisical/infisical",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-infisical"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v0.160.11",
+      "digests": [],
+      "url": "https://github.com/Infisical/infisical",
+      "latest": "0.167.6",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several patch releases, in a vendored chart. Nobody has assessed the move, and it runs database migrations on start, so it needs its own validation."
+        }
+      ]
+    },
+    {
+      "name": "pki-issuer",
+      "component": "Infisical PKI issuer",
+      "description": "Issues internal certificates from the secret store's certificate authority.",
+      "license": "MIT",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/infisical/pki-issuer",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-security-infra"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [],
+      "version": "v1.0.1",
+      "digests": [],
+      "url": "https://github.com/Infisical/infisical-issuer",
+      "latest": "1.0.1",
+      "current": true
+    },
+    {
+      "name": "kube-state-metrics",
+      "component": "kube-state-metrics",
+      "description": "Exposes the state of Kubernetes objects as metrics.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/kube-state-metrics/kube-state-metrics",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "kube-state-metrics"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [
+        "chart kube-state-metrics 8.3.1"
+      ],
+      "version": "v2.19.1",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kube-state-metrics",
+      "latest": "2.20.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Newer builds target Kubernetes 1.36",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kubectl",
+      "component": "kubectl",
+      "description": "Runs one-off jobs against the cluster API.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/kubectl",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "installed by the kakt CLI"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.35.10",
+      "digests": [
+        "sha256:4e1d541a3d62f74637974e4c71f3cea91b9a36ffd059ab45e355648898783837"
+      ],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Held within one minor of the API server",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kube-apiserver",
+      "component": "Kubernetes",
+      "description": "The control plane kubeadm runs at the pinned Kubernetes version.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/kube-apiserver",
+      "nodes": [
+        "control-plane"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "v1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Policy engine supports 1.33-1.35 only",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kube-controller-manager",
+      "component": "Kubernetes",
+      "description": "The control plane kubeadm runs at the pinned Kubernetes version.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/kube-controller-manager",
+      "nodes": [
+        "control-plane"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "v1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Policy engine supports 1.33-1.35 only",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kube-proxy",
+      "component": "Kubernetes",
+      "description": "The control plane kubeadm runs at the pinned Kubernetes version.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/kube-proxy",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "v1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Policy engine supports 1.33-1.35 only",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kube-scheduler",
+      "component": "Kubernetes",
+      "description": "The control plane kubeadm runs at the pinned Kubernetes version.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/kube-scheduler",
+      "nodes": [
+        "control-plane"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "v1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Policy engine supports 1.33-1.35 only",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "pause",
+      "component": "Kubernetes",
+      "description": "The control plane kubeadm runs at the pinned Kubernetes version.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/pause",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "3.10.1",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes/tree/master/build/pause",
+      "latest": "3.10.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Pause image chosen by kubeadm, not pinned here",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kubeadm",
+      "component": "Kubernetes node tools",
+      "description": "kubelet runs the node's pods; kubeadm joins it to the cluster; kubectl is the command-line client.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "management",
+      "source": "pkg:kubeadm",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Follows the node's Kubernetes version",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kubectl",
+      "component": "Kubernetes node tools",
+      "description": "kubelet runs the node's pods; kubeadm joins it to the cluster; kubectl is the command-line client.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "management",
+      "source": "pkg:kubectl",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Follows the node's Kubernetes version",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kubelet",
+      "component": "Kubernetes node tools",
+      "description": "kubelet runs the node's pods; kubeadm joins it to the cluster; kubectl is the command-line client.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "management",
+      "source": "pkg:kubelet",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Follows the node's Kubernetes version",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "k8s",
+      "component": "Kubernetes toolbox image",
+      "description": "A container image with kubectl and other Kubernetes tools; runs the node labeler.",
+      "license": "MIT",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/alpine/k8s",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "zitadel"
+      ],
+      "boundaries": [
+        "04"
+      ],
+      "via": [
+        "chart zitadel 10.4.0"
+      ],
+      "version": "1.35.10",
+      "digests": [],
+      "url": "https://github.com/alpine-docker/k8s",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Tracks the cluster's Kubernetes minor",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "background-controller",
+      "component": "Kyverno",
+      "description": "Admission policy. Enforces the platform's rules on everything a cluster admits.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "reg.kyverno.io/kyverno/background-controller",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-kyverno"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [
+        "chart kyverno 3.9.2"
+      ],
+      "version": "v1.19.2",
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": true
+    },
+    {
+      "name": "cleanup-controller",
+      "component": "Kyverno",
+      "description": "Admission policy. Enforces the platform's rules on everything a cluster admits.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "reg.kyverno.io/kyverno/cleanup-controller",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-kyverno"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [
+        "chart kyverno 3.9.2"
+      ],
+      "version": "v1.19.2",
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": true
+    },
+    {
+      "name": "kyverno",
+      "component": "Kyverno",
+      "description": "Admission policy. Enforces the platform's rules on everything a cluster admits.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "reg.kyverno.io/kyverno/kyverno",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-kyverno"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [
+        "chart kyverno 3.9.2"
+      ],
+      "version": "v1.19.2",
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": true
+    },
+    {
+      "name": "kyverno-cli",
+      "component": "Kyverno",
+      "description": "Admission policy. Enforces the platform's rules on everything a cluster admits.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "reg.kyverno.io/kyverno/kyverno-cli",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-kyverno"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [
+        "chart kyverno 3.9.2"
+      ],
+      "version": "v1.19.2",
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": true
+    },
+    {
+      "name": "kyvernopre",
+      "component": "Kyverno",
+      "description": "Admission policy. Enforces the platform's rules on everything a cluster admits.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "reg.kyverno.io/kyverno/kyvernopre",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-kyverno"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [
+        "chart kyverno 3.9.2"
+      ],
+      "version": "v1.19.2",
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": true
+    },
+    {
+      "name": "readiness-checker",
+      "component": "Kyverno",
+      "description": "Admission policy. Enforces the platform's rules on everything a cluster admits.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/kyverno/readiness-checker",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-kyverno"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [
+        "chart kyverno 3.9.2"
+      ],
+      "version": "v1.19.2",
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": true
+    },
+    {
+      "name": "reports-controller",
+      "component": "Kyverno",
+      "description": "Admission policy. Enforces the platform's rules on everything a cluster admits.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "reg.kyverno.io/kyverno/reports-controller",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-kyverno"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [
+        "chart kyverno 3.9.2"
+      ],
+      "version": "v1.19.2",
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": true
+    },
+    {
+      "name": "api",
+      "component": "Lago",
+      "description": "The billing engine. Rates usage into invoices, run unmodified.",
+      "license": "AGPL-3.0-only",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/getlago/api",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "billing-engine"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v1.55.0",
+      "digests": [
+        "sha256:8dd75237d977b757134b062b88943b0c8c76ae135997a49c0cd2572245b9695e"
+      ],
+      "url": "https://github.com/getlago/lago",
+      "latest": "1.56.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "One minor behind; not assessed"
+        }
+      ]
+    },
+    {
+      "name": "lago-gotenberg",
+      "component": "Lago document renderer",
+      "description": "Renders the billing engine's invoices as PDF.",
+      "license": "MIT",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/getlago/lago-gotenberg",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "billing-engine"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "7.8.2",
+      "digests": [
+        "sha256:e8eef6fb4a92a3440c70d06598b385e7eb2ec7fb2d9b908ca4aa028741a0b270"
+      ],
+      "url": "https://github.com/getlago/lago-gotenberg",
+      "latest": "8.39.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The renderer the engine's release pins",
+          "blocked_by": "Lago"
+        }
+      ]
+    },
+    {
+      "name": "local-path-provisioner",
+      "component": "Local path provisioner",
+      "description": "Node-local volumes on clusters without cloud block storage.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/rancher/local-path-provisioner",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-storage"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [],
+      "version": "v0.0.37",
+      "digests": [],
+      "url": "https://github.com/rancher/local-path-provisioner",
+      "latest": "0.0.37",
+      "current": true
+    },
+    {
+      "name": "auth-proxy",
+      "component": "Login gateway",
+      "description": "Signs people in before a request reaches a protected route.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/kamarkat/kamarkat/auth-proxy",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "auth-proxy"
+      ],
+      "boundaries": [
+        "04"
+      ],
+      "via": [],
+      "version": "digest-pinned",
+      "digests": [
+        "sha256:a65ccec4e96b74b5176bb0e4ef26e5dafb6a1f1ef64f70f5025ca3aef0857e70"
+      ],
+      "url": "https://github.com/kamarkat/kamarkat",
+      "latest": "75bad784",
+      "current": true
+    },
+    {
+      "name": "loki",
+      "component": "Loki",
+      "description": "Log storage and search.",
+      "license": "AGPL-3.0-only",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/grafana/loki",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "loki"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "3.7.9",
+      "digests": [
+        "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
+      ],
+      "url": "https://github.com/grafana/loki",
+      "latest": "3.7.9",
+      "current": true
+    },
+    {
+      "name": "metrics-server",
+      "component": "metrics-server",
+      "description": "Resource metrics for autoscaling and `kubectl top`.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/metrics-server/metrics-server",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "metrics-server"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [
+        "chart metrics-server 3.14.0"
+      ],
+      "version": "v0.9.0",
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/metrics-server",
+      "latest": "0.9.1",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Newest release has no chart yet"
+        }
+      ]
+    },
+    {
+      "name": "k8s-dns-node-cache",
+      "component": "NodeLocal DNSCache",
+      "description": "A DNS cache on every node.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "registry.k8s.io/dns/k8s-dns-node-cache",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-dns"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "1.26.0",
+      "digests": [],
+      "url": "https://github.com/kubernetes/dns",
+      "latest": "1.26.0",
+      "current": true
+    },
+    {
+      "name": "kube-sbt",
+      "component": "Organization provisioning",
+      "description": "Provisions each organization and application declared in the GitOps repository.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/kamarkat/kamarkat/kube-sbt",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "kube-sbt"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "digest-pinned",
+      "digests": [
+        "sha256:b8f1e299a0a7ead3f3c48931397c662f9f0e0683aad25278b680f20303a17229"
+      ],
+      "url": "https://github.com/kamarkat/kamarkat",
+      "latest": "904daae3",
+      "current": true
+    },
+    {
+      "name": "function-patch-and-transform",
+      "component": "Patch and transform function",
+      "description": "The composition function the platform's compositions are written in.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "management",
+      "source": "xpkg.upbound.io/crossplane-contrib/function-patch-and-transform",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-crossplane-providers"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [],
+      "version": "v0.11.2",
+      "digests": [],
+      "url": "https://github.com/crossplane-contrib/function-patch-and-transform",
+      "latest": "0.11.2",
+      "current": true
+    },
+    {
+      "name": "hub-operator",
+      "component": "Platform operator",
+      "description": "Reconciles the management cluster's own platform state.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/kamarkat/kamarkat/hub-operator",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "hub-operator"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "digest-pinned",
+      "digests": [
+        "sha256:96deb61065f0c5bfe58d5367b08f5d49ca98be2a49616d3ee3dc7c7b269ecd46"
+      ],
+      "url": "https://github.com/kamarkat/kamarkat",
+      "latest": "ea2e5d37",
+      "current": true
+    },
+    {
+      "name": "postgres",
+      "component": "PostgreSQL",
+      "description": "The platform database and each application's database.",
+      "license": "PostgreSQL",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/library/postgres",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-infisical"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "16-alpine",
+      "digests": [],
+      "url": "https://github.com/postgres/postgres",
+      "latest": "18.6",
+      "current": false,
+      "behind": [
+        {
+          "status": "declined",
+          "reason": "Each application selects the newest major it supports, so these differ on purpose. The newest major is declined where a consumer does not support it: the identity store documents support but has an unresolved fresh-install failure on it, and the secret store documents only a floor.",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "postgresql",
+      "component": "PostgreSQL",
+      "description": "The platform database and each application's database.",
+      "license": "PostgreSQL",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/cloudnative-pg/postgresql",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-credits-db",
+        "platform-grafana-db",
+        "platform-infisical-db",
+        "platform-zitadel-db"
+      ],
+      "boundaries": [
+        "02"
+      ],
+      "via": [],
+      "version": "17.11-standard-bookworm, 18.6",
+      "digests": [],
+      "url": "https://github.com/postgres/postgres",
+      "latest": "18.6",
+      "current": false,
+      "behind": [
+        {
+          "status": "declined",
+          "reason": "Chosen per application; its consumers do not support 18",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "postgres-partman",
+      "component": "PostgreSQL with pg_partman",
+      "description": "The billing engine's database image. PostgreSQL with the partitioning extension the engine requires, built by the platform.",
+      "license": "PostgreSQL",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/kamarkat/kamarkat/postgres-partman",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-billing-db"
+      ],
+      "boundaries": [
+        "02"
+      ],
+      "via": [],
+      "version": "digest-pinned",
+      "digests": [
+        "sha256:d1b20ec2ea6856260d763af493c7abd8c8fc9e1ce7be501d8ac9ad14c00ca66a"
+      ],
+      "url": "https://github.com/pgpartman/pg_partman",
+      "latest": "d339aeec",
+      "current": true
+    },
+    {
+      "name": "redis",
+      "component": "Redis",
+      "description": "The platform cache.",
+      "license": "BSD-3-Clause (7.x); AGPL-3.0-only (8.x)",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/library/redis",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "billing-engine",
+        "platform-argocd",
+        "platform-redis",
+        "platform-tenant-platform"
+      ],
+      "boundaries": [
+        "01",
+        "02",
+        "03"
+      ],
+      "via": [
+        "chart argo-cd 10.11.7"
+      ],
+      "version": "8.10.3-alpine, 8.6.4-alpine",
+      "digests": [
+        "sha256:21090af93f8324db2f0f0f4f38a7c60369d47d917e000c3423d89d2ae2883537"
+      ],
+      "url": "https://github.com/redis/redis",
+      "latest": "8.10.3",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The GitOps chart's own cache; it moves when that chart does",
+          "blocked_by": "Argo CD"
+        }
+      ]
+    },
+    {
+      "name": "reloader",
+      "component": "Reloader",
+      "description": "Restarts a workload when a secret or config map it reads changes.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/stakater/reloader",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "stakater-reloader"
+      ],
+      "boundaries": [
+        "01"
+      ],
+      "via": [
+        "chart reloader 2.2.19"
+      ],
+      "version": "v1.4.23",
+      "digests": [],
+      "url": "https://github.com/stakater/Reloader",
+      "latest": "1.4.23",
+      "current": true
+    },
+    {
+      "name": "runc",
+      "component": "runc",
+      "description": "The low-level runtime containerd starts containers with.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "management",
+      "source": "pkg:runc",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.5.2",
+      "digests": [],
+      "url": "https://github.com/opencontainers/runc",
+      "latest": "1.5.2",
+      "current": true
+    },
+    {
+      "name": "support-agent",
+      "component": "Support agent",
+      "description": "Reports allowlisted control-plane facts when an organization enrols. Does nothing until then.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/kamarkat/kamarkat/support-agent",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "support-agent"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "digest-pinned",
+      "digests": [
+        "sha256:94b18661d576e5a25dd55fc6b216dd1e02464aa0290f8f87bd8f097749fb0592"
+      ],
+      "url": "https://github.com/kamarkat/kamarkat",
+      "latest": "ea2e5d37",
+      "current": true
+    },
+    {
+      "name": "tailscale",
+      "component": "Tailscale",
+      "description": "Joins the node to the tailnet when a tailnet hostname is configured for it.",
+      "license": "BSD-3-Clause",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "management",
+      "source": "pkg:tailscale",
+      "nodes": [
+        "control-plane"
+      ],
+      "where": [
+        "control plane"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.104.4",
+      "digests": [],
+      "url": "https://github.com/tailscale/tailscale",
+      "latest": "1.104.5",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "One patch behind; installed by the node bootstrap"
+        }
+      ]
+    },
+    {
+      "name": "ubuntu",
+      "component": "Ubuntu",
+      "description": "The node operating system, the provider's stock image.",
+      "license": "Per package; see /usr/share/doc/<package>/copyright on the node",
+      "layer": "machinery",
+      "type": "os",
+      "cluster": "management",
+      "source": "os:ubuntu",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "24.04",
+      "digests": [],
+      "url": "https://launchpad.net/ubuntu",
+      "latest": "26.04",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The node image is the provider's own published system image, named by the exact string the provider uses. Whether the newest release is published in the cloud catalogue, and under what name, is not readable without provider credentials and has not been confirmed. The newest image may also be built for a narrower processor baseline than the machine types in use, which is a separate question from availability.",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "victoria-metrics",
+      "component": "VictoriaMetrics",
+      "description": "The metrics store, rule evaluation and the authenticating proxy in front of them, run by the VictoriaMetrics operator.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/victoriametrics/victoria-metrics",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "victoriametrics"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [
+        "VictoriaMetrics operator v0.75.0"
+      ],
+      "version": "v1.152.0",
+      "digests": [],
+      "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+      "latest": "1.155.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by three patch releases, in a vendored render whose values are recorded in prose rather than a values file, so re-rendering has to be reconstructed before it can be trusted."
+        }
+      ]
+    },
+    {
+      "name": "vmalert",
+      "component": "VictoriaMetrics",
+      "description": "The metrics store, rule evaluation and the authenticating proxy in front of them, run by the VictoriaMetrics operator.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/victoriametrics/vmalert",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "victoriametrics"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [
+        "VictoriaMetrics operator v0.75.0"
+      ],
+      "version": "v1.152.0",
+      "digests": [],
+      "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+      "latest": "1.155.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by three patch releases, in a vendored render whose values are recorded in prose rather than a values file, so re-rendering has to be reconstructed before it can be trusted."
+        }
+      ]
+    },
+    {
+      "name": "vmauth",
+      "component": "VictoriaMetrics",
+      "description": "The metrics store, rule evaluation and the authenticating proxy in front of them, run by the VictoriaMetrics operator.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/victoriametrics/vmauth",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "victoriametrics"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [
+        "VictoriaMetrics operator v0.75.0"
+      ],
+      "version": "v1.152.0",
+      "digests": [],
+      "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+      "latest": "1.155.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by three patch releases, in a vendored render whose values are recorded in prose rather than a values file, so re-rendering has to be reconstructed before it can be trusted."
+        }
+      ]
+    },
+    {
+      "name": "operator",
+      "component": "VictoriaMetrics operator",
+      "description": "Runs the metrics stores.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/victoriametrics/operator",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "victoriametrics",
+        "victoriametrics-operator"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [
+        "VictoriaMetrics operator v0.75.0"
+      ],
+      "version": "config-reloader-v0.75.0, v0.75.0",
+      "digests": [
+        "sha256:78da26b41a819093707be2ab6a65a5dc19f43d58ec52f30b49a545c2c6b7bd55"
+      ],
+      "url": "https://github.com/VictoriaMetrics/operator",
+      "latest": "0.75.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Two patch releases behind, in the same vendored render as the stores. The operator and its config reloader move together because one render produces both."
+        }
+      ]
+    },
+    {
+      "name": "wait4x",
+      "component": "wait4x",
+      "description": "Waits until a dependency, such as a database, accepts connections before its workload starts.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "docker.io/wait4x/wait4x",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "zitadel"
+      ],
+      "boundaries": [
+        "04"
+      ],
+      "via": [
+        "chart zitadel 10.4.0"
+      ],
+      "version": "3.6",
+      "digests": [],
+      "url": "https://github.com/wait4x/wait4x",
+      "latest": "3.7.3",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by patch releases. A helper image used by init containers to wait on dependencies."
+        }
+      ]
+    },
+    {
+      "name": "zitadel",
+      "component": "ZITADEL",
+      "description": "The identity provider. Sign-in for people and identities for applications.",
+      "license": "AGPL-3.0-only",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/zitadel/zitadel",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "zitadel"
+      ],
+      "boundaries": [
+        "04"
+      ],
+      "via": [
+        "chart zitadel 10.4.0"
+      ],
+      "version": "v4.19.2",
+      "digests": [],
+      "url": "https://github.com/zitadel/zitadel",
+      "latest": "4.20.1",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Newest chart ships 4.19.2"
+        }
+      ]
+    },
+    {
+      "name": "zitadel-login",
+      "component": "ZITADEL",
+      "description": "The identity provider. Sign-in for people and identities for applications.",
+      "license": "AGPL-3.0-only",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "management",
+      "source": "ghcr.io/zitadel/zitadel-login",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "zitadel"
+      ],
+      "boundaries": [
+        "04"
+      ],
+      "via": [
+        "chart zitadel 10.4.0"
+      ],
+      "version": "v4.19.2",
+      "digests": [],
+      "url": "https://github.com/zitadel/zitadel",
+      "latest": "4.20.1",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Newest chart ships 4.19.2"
+        }
+      ]
+    },
+    {
+      "name": "agent-sandbox-controller",
+      "component": "Agent sandbox controller",
+      "description": "Runs isolated, short-lived sandboxes for application jobs.",
+      "license": "Apache-2.0",
+      "layer": "workload-infrastructure",
+      "type": "container",
+      "cluster": "managed",
+      "source": "registry.k8s.io/agent-sandbox/agent-sandbox-controller",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v0.5.0",
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/agent-sandbox",
+      "latest": "1.0.9",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "The newest release is a major, crossing 1.0. Nobody has assessed what it changes for the sandbox resources the platform declares."
+        }
+      ]
+    },
+    {
+      "name": "agentgateway",
+      "component": "agentgateway",
+      "description": "The gateway that serves application and platform routes.",
+      "license": "Apache-2.0",
+      "layer": "workload-infrastructure",
+      "type": "container",
+      "cluster": "managed",
+      "source": "cr.agentgateway.dev/agentgateway",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "universal-tenant"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.7.0",
+      "digests": [
+        "sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b"
+      ],
+      "url": "https://github.com/agentgateway/agentgateway",
+      "latest": "1.7.0",
+      "current": true
+    },
+    {
+      "name": "alertmanager",
+      "component": "Alertmanager",
+      "description": "Routes the alerts rule evaluation raises, run by the VictoriaMetrics operator.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/prom/alertmanager",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [
+        "VictoriaMetrics operator v0.75.0"
+      ],
+      "version": "v0.34.1",
+      "digests": [],
+      "url": "https://github.com/prometheus/alertmanager",
+      "latest": "0.34.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A patch behind, delivered by the observability operator rather than pinned directly. Nobody has assessed the move."
+        }
+      ]
+    },
+    {
+      "name": "argocd",
+      "component": "Argo CD",
+      "description": "The GitOps engine. Reconciles every cluster to the GitOps repository and the pinned bundle.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "quay.io/argoproj/argocd",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-bootstrap-templates"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v3.5.7",
+      "digests": [],
+      "url": "https://github.com/argoproj/argo-cd",
+      "latest": "3.6.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Newest chart ships 3.5.7"
+        }
+      ]
+    },
+    {
+      "name": "argocd-agent",
+      "component": "Argo CD agent",
+      "description": "Connects each managed cluster's GitOps engine to the management cluster over an outbound channel.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "quay.io/argoprojlabs/argocd-agent",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-bootstrap-templates"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v0.10.0",
+      "digests": [
+        "sha256:ec9baba6e81555bfa5ce1fa6252f06c6100b56ae7f85273ba2f7e2309303800d"
+      ],
+      "url": "https://github.com/argoproj-labs/argocd-agent",
+      "latest": "0.10.0",
+      "current": true
+    },
+    {
+      "name": "argo-rollouts",
+      "component": "Argo Rollouts",
+      "description": "Progressive delivery for application workloads.",
+      "license": "Apache-2.0",
+      "layer": "workload-infrastructure",
+      "type": "container",
+      "cluster": "managed",
+      "source": "quay.io/argoproj/argo-rollouts",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.9.1",
+      "digests": [],
+      "url": "https://github.com/argoproj/argo-rollouts",
+      "latest": "1.10.1",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A minor behind. Nobody has assessed the move."
+        }
+      ]
+    },
+    {
+      "name": "busybox",
+      "component": "BusyBox",
+      "description": "Init steps that prepare a volume before its workload starts.",
+      "license": "GPL-2.0-only",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/library/busybox",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.38.0",
+      "digests": [],
+      "url": "https://git.busybox.net/busybox",
+      "latest": "1.38.0",
+      "current": true
+    },
+    {
+      "name": "cert-manager-cainjector",
+      "component": "cert-manager",
+      "description": "Issues and renews the TLS certificates for every gateway and webhook.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "quay.io/jetstack/cert-manager-cainjector",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.21.3",
+      "digests": [],
+      "url": "https://github.com/cert-manager/cert-manager",
+      "latest": "1.21.3",
+      "current": true
+    },
+    {
+      "name": "cert-manager-controller",
+      "component": "cert-manager",
+      "description": "Issues and renews the TLS certificates for every gateway and webhook.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "quay.io/jetstack/cert-manager-controller",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.21.3",
+      "digests": [],
+      "url": "https://github.com/cert-manager/cert-manager",
+      "latest": "1.21.3",
+      "current": true
+    },
+    {
+      "name": "cert-manager-startupapicheck",
+      "component": "cert-manager",
+      "description": "Issues and renews the TLS certificates for every gateway and webhook.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "quay.io/jetstack/cert-manager-startupapicheck",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.21.3",
+      "digests": [],
+      "url": "https://github.com/cert-manager/cert-manager",
+      "latest": "1.21.3",
+      "current": true
+    },
+    {
+      "name": "cert-manager-webhook",
+      "component": "cert-manager",
+      "description": "Issues and renews the TLS certificates for every gateway and webhook.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "quay.io/jetstack/cert-manager-webhook",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.21.3",
+      "digests": [],
+      "url": "https://github.com/cert-manager/cert-manager",
+      "latest": "1.21.3",
+      "current": true
+    },
+    {
+      "name": "cert-manager-webhook-hetzner",
+      "component": "cert-manager DNS-01 webhook",
+      "description": "Proves domain ownership for certificates through the provider's DNS.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/hetzner/cert-manager-webhook-hetzner",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v0.9.0",
+      "digests": [],
+      "url": "https://github.com/hetzner/cert-manager-webhook-hetzner",
+      "latest": "0.9.1",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "A patch release behind, in a vendored render. Nobody has assessed the move."
+        }
+      ]
+    },
+    {
+      "name": "certgen",
+      "component": "Cilium",
+      "description": "Container networking, network policy and the Gateway API implementation.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "quay.io/cilium/certgen",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-bootstrap-templates"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v0.4.13",
+      "digests": [
+        "sha256:f0c16ea8abe251d448a7fd04bdd93fe0f85fb1c3a456a455e05f7bb107dc2ff1"
+      ],
+      "url": "https://github.com/cilium/certgen",
+      "latest": "0.4.13",
+      "current": true
+    },
+    {
+      "name": "cilium",
+      "component": "Cilium",
+      "description": "Container networking, network policy and the Gateway API implementation.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "quay.io/cilium/cilium",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-bootstrap-templates"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v1.20.4",
+      "digests": [
+        "sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e"
+      ],
+      "url": "https://github.com/cilium/cilium",
+      "latest": "1.20.4",
+      "current": true
+    },
+    {
+      "name": "operator-generic",
+      "component": "Cilium",
+      "description": "Container networking, network policy and the Gateway API implementation.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "quay.io/cilium/operator-generic",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-bootstrap-templates"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v1.20.4",
+      "digests": [
+        "sha256:7a7a3489dc66ad67e420d285c8a8d2e169b0957ad15e120f593d27081bf38d82"
+      ],
+      "url": "https://github.com/cilium/cilium",
+      "latest": "1.20.4",
+      "current": true
+    },
+    {
+      "name": "cloudnative-pg",
+      "component": "CloudNativePG",
+      "description": "The database operator. Runs PostgreSQL clusters with backups and failover.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "managed",
+      "source": "ghcr.io/cloudnative-pg/cloudnative-pg",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.29.0",
+      "digests": [],
+      "url": "https://github.com/cloudnative-pg/cloudnative-pg",
+      "latest": "1.30.1",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The newest release supports Kubernetes 1.34 to 1.36, above what the nodes run, so the operator waits on the Kubernetes move. 1.29.x is already out of upstream support.",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "containerd",
+      "component": "containerd",
+      "description": "The container runtime on every node.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "managed",
+      "source": "pkg:containerd",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "burst-worker",
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "2.4.2",
+      "digests": [],
+      "url": "https://github.com/containerd/containerd",
+      "latest": "2.4.2",
+      "current": true
+    },
+    {
+      "name": "coredns",
+      "component": "CoreDNS",
+      "description": "Cluster DNS.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "registry.k8s.io/coredns/coredns",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "v1.13.1",
+      "digests": [],
+      "url": "https://github.com/coredns/coredns",
+      "latest": "1.15.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Chosen by kubeadm, not pinned here",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "crossplane",
+      "component": "Crossplane",
+      "description": "Composition. Turns one declaration into the set of resources behind it.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "managed",
+      "source": "xpkg.crossplane.io/crossplane/crossplane",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v2.4.3",
+      "digests": [],
+      "url": "https://github.com/crossplane/crossplane",
+      "latest": "2.4.3",
+      "current": true
+    },
+    {
+      "name": "provider-kubernetes",
+      "component": "Crossplane Kubernetes provider",
+      "description": "Lets a composition create objects in any cluster the platform manages.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "managed",
+      "source": "xpkg.upbound.io/crossplane-contrib/provider-kubernetes",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.4.1",
+      "digests": [],
+      "url": "https://github.com/crossplane-contrib/provider-kubernetes",
+      "latest": "1.4.1",
+      "current": true
+    },
+    {
+      "name": "provider-sql",
+      "component": "Crossplane SQL provider",
+      "description": "Creates application databases and roles inside the platform database.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "package",
+      "cluster": "managed",
+      "source": "xpkg.upbound.io/crossplane-contrib/provider-sql",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v0.16.2",
+      "digests": [],
+      "url": "https://github.com/crossplane-contrib/provider-sql",
+      "latest": "0.16.2",
+      "current": true
+    },
+    {
+      "name": "ephemeral-job-operator",
+      "component": "Ephemeral job operator",
+      "description": "Runs short-lived jobs on managed clusters.",
+      "license": "Apache-2.0",
+      "layer": "workload-infrastructure",
+      "type": "container",
+      "cluster": "managed",
+      "source": "ghcr.io/kamarkat/kamarkat/ephemeral-job-operator",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "digest-pinned",
+      "digests": [
+        "sha256:aaf089b1a60232ac5db757cf95b573bfb311b2b97544c0e1ef6f57a570383083"
+      ],
+      "url": "https://github.com/kamarkat/kamarkat",
+      "latest": "ea2e5d37",
+      "current": true
+    },
+    {
+      "name": "etcd",
+      "component": "etcd",
+      "description": "The control plane's key-value store.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "registry.k8s.io/etcd",
+      "nodes": [
+        "control-plane"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "3.6.6-0",
+      "digests": [],
+      "url": "https://github.com/etcd-io/etcd",
+      "latest": "3.7.3",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Chosen by kubeadm, not pinned here",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "external-secrets",
+      "component": "External Secrets",
+      "description": "Secret delivery. Copies each workload's secrets from the secret store into its namespace.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "ghcr.io/external-secrets/external-secrets",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v2.14.0",
+      "digests": [],
+      "url": "https://github.com/external-secrets/external-secrets",
+      "latest": "2.14.0",
+      "current": true
+    },
+    {
+      "name": "external-dns",
+      "component": "ExternalDNS",
+      "description": "Publishes DNS records for every public hostname.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "registry.k8s.io/external-dns/external-dns",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v0.24.0",
+      "digests": [
+        "sha256:a80a146d2540fa138565e404f0625157271071a06093021f27ae19d8316d10f9"
+      ],
+      "url": "https://github.com/kubernetes-sigs/external-dns",
+      "latest": "0.24.0",
+      "current": true
+    },
+    {
+      "name": "external-dns-hetzner-webhook",
+      "component": "ExternalDNS provider webhook",
+      "description": "Connects ExternalDNS to the provider's DNS service.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/hetzner/external-dns-hetzner-webhook",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v0.5.1",
+      "digests": [
+        "sha256:643d5752e2864493ef29e314ba413f8ee58a99eb97c1e0387f76f5a43ea8e787"
+      ],
+      "url": "https://github.com/hetzner/external-dns-hetzner-webhook",
+      "latest": "0.5.1",
+      "current": true
+    },
+    {
+      "name": "alloy",
+      "component": "Grafana Alloy",
+      "description": "Collects metrics and logs on every node and cluster.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/grafana/alloy",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.21.3",
+      "digests": [
+        "sha256:8ab871206bd2d8f89277f53abffee5f452a293980788d52f85fa183a87a505a4"
+      ],
+      "url": "https://github.com/grafana/alloy",
+      "latest": "1.21.3",
+      "current": true
+    },
+    {
+      "name": "pki-issuer",
+      "component": "Infisical PKI issuer",
+      "description": "Issues internal certificates from the secret store's certificate authority.",
+      "license": "MIT",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/infisical/pki-issuer",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.0.1",
+      "digests": [],
+      "url": "https://github.com/Infisical/infisical-issuer",
+      "latest": "1.0.1",
+      "current": true
+    },
+    {
+      "name": "kube-state-metrics",
+      "component": "kube-state-metrics",
+      "description": "Exposes the state of Kubernetes objects as metrics.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "managed",
+      "source": "registry.k8s.io/kube-state-metrics/kube-state-metrics",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v2.19.1",
+      "digests": [
+        "sha256:85108987d044b18a098126732f98602df408888c0f7d456241f5abefb9744bc1"
+      ],
+      "url": "https://github.com/kubernetes/kube-state-metrics",
+      "latest": "2.20.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Newer builds target Kubernetes 1.36",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kubectl",
+      "component": "kubectl",
+      "description": "Runs one-off jobs against the cluster API.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "registry.k8s.io/kubectl",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-bootstrap-templates"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "v1.35.10",
+      "digests": [
+        "sha256:4e1d541a3d62f74637974e4c71f3cea91b9a36ffd059ab45e355648898783837"
+      ],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Held within one minor of the API server",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kube-apiserver",
+      "component": "Kubernetes",
+      "description": "The control plane kubeadm runs at the pinned Kubernetes version.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "registry.k8s.io/kube-apiserver",
+      "nodes": [
+        "control-plane"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "v1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Policy engine supports 1.33-1.35 only",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kube-controller-manager",
+      "component": "Kubernetes",
+      "description": "The control plane kubeadm runs at the pinned Kubernetes version.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "registry.k8s.io/kube-controller-manager",
+      "nodes": [
+        "control-plane"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "v1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Policy engine supports 1.33-1.35 only",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kube-scheduler",
+      "component": "Kubernetes",
+      "description": "The control plane kubeadm runs at the pinned Kubernetes version.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "registry.k8s.io/kube-scheduler",
+      "nodes": [
+        "control-plane"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "v1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Policy engine supports 1.33-1.35 only",
+          "blocked_by": "Kyverno",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "pause",
+      "component": "Kubernetes",
+      "description": "The control plane kubeadm runs at the pinned Kubernetes version.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "registry.k8s.io/pause",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "kubeadm"
+      ],
+      "boundaries": [],
+      "via": [
+        "kubeadm v1.35.10"
+      ],
+      "version": "3.10.1",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes/tree/master/build/pause",
+      "latest": "3.10.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Pause image chosen by kubeadm, not pinned here",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kubeadm",
+      "component": "Kubernetes node tools",
+      "description": "kubelet runs the node's pods; kubeadm joins it to the cluster; kubectl is the command-line client.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "managed",
+      "source": "pkg:kubeadm",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "burst-worker",
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Follows the node's Kubernetes version",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kubectl",
+      "component": "Kubernetes node tools",
+      "description": "kubelet runs the node's pods; kubeadm joins it to the cluster; kubectl is the command-line client.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "managed",
+      "source": "pkg:kubectl",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "burst-worker",
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Follows the node's Kubernetes version",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "kubelet",
+      "component": "Kubernetes node tools",
+      "description": "kubelet runs the node's pods; kubeadm joins it to the cluster; kubectl is the command-line client.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "managed",
+      "source": "pkg:kubelet",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "burst-worker",
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.35.10",
+      "digests": [],
+      "url": "https://github.com/kubernetes/kubernetes",
+      "latest": "1.37.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Follows the node's Kubernetes version",
+          "blocked_by": "Kubernetes",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "background-controller",
+      "component": "Kyverno",
+      "description": "Admission policy. Enforces the platform's rules on everything a cluster admits.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "reg.kyverno.io/kyverno/background-controller",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.19.2",
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": true
+    },
+    {
+      "name": "cleanup-controller",
+      "component": "Kyverno",
+      "description": "Admission policy. Enforces the platform's rules on everything a cluster admits.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "reg.kyverno.io/kyverno/cleanup-controller",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.19.2",
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": true
+    },
+    {
+      "name": "kyverno",
+      "component": "Kyverno",
+      "description": "Admission policy. Enforces the platform's rules on everything a cluster admits.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "reg.kyverno.io/kyverno/kyverno",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.19.2",
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": true
+    },
+    {
+      "name": "kyvernopre",
+      "component": "Kyverno",
+      "description": "Admission policy. Enforces the platform's rules on everything a cluster admits.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "reg.kyverno.io/kyverno/kyvernopre",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.19.2",
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": true
+    },
+    {
+      "name": "reports-controller",
+      "component": "Kyverno",
+      "description": "Admission policy. Enforces the platform's rules on everything a cluster admits.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "reg.kyverno.io/kyverno/reports-controller",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.19.2",
+      "digests": [],
+      "url": "https://github.com/kyverno/kyverno",
+      "latest": "1.19.2",
+      "current": true
+    },
+    {
+      "name": "loki",
+      "component": "Loki",
+      "description": "Log storage and search.",
+      "license": "AGPL-3.0-only",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/grafana/loki",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "3.7.9",
+      "digests": [
+        "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
+      ],
+      "url": "https://github.com/grafana/loki",
+      "latest": "3.7.9",
+      "current": true
+    },
+    {
+      "name": "nginx-unprivileged",
+      "component": "NGINX",
+      "description": "Serves static pages and public assets.",
+      "license": "BSD-2-Clause",
+      "layer": "workload-infrastructure",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/nginxinc/nginx-unprivileged",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "universal-tenant"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.27-alpine",
+      "digests": [
+        "sha256:65e3e85dbaed8ba248841d9d58a899b6197106c23cb0ff1a132b7bfe0547e4c0"
+      ],
+      "url": "https://github.com/nginx/nginx",
+      "latest": "1.31.8",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by several minors, in a vendored chart's values. Nobody has assessed the move."
+        }
+      ]
+    },
+    {
+      "name": "k8s-dns-node-cache",
+      "component": "NodeLocal DNSCache",
+      "description": "A DNS cache on every node.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "registry.k8s.io/dns/k8s-dns-node-cache",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.26.0",
+      "digests": [],
+      "url": "https://github.com/kubernetes/dns",
+      "latest": "1.26.0",
+      "current": true
+    },
+    {
+      "name": "function-patch-and-transform",
+      "component": "Patch and transform function",
+      "description": "The composition function the platform's compositions are written in.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "managed",
+      "source": "xpkg.upbound.io/crossplane-contrib/function-patch-and-transform",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v0.11.2",
+      "digests": [],
+      "url": "https://github.com/crossplane-contrib/function-patch-and-transform",
+      "latest": "0.11.2",
+      "current": true
+    },
+    {
+      "name": "postgresql",
+      "component": "PostgreSQL",
+      "description": "The platform database and each application's database.",
+      "license": "PostgreSQL",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "managed",
+      "source": "ghcr.io/cloudnative-pg/postgresql",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "18.6",
+      "digests": [],
+      "url": "https://github.com/postgres/postgres",
+      "latest": "18.6",
+      "current": true
+    },
+    {
+      "name": "redis",
+      "component": "Redis",
+      "description": "The platform cache.",
+      "license": "BSD-3-Clause (7.x); AGPL-3.0-only (8.x)",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/library/redis",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-bootstrap-templates"
+      ],
+      "boundaries": [
+        "03"
+      ],
+      "via": [],
+      "version": "8.10.3-alpine",
+      "digests": [],
+      "url": "https://github.com/redis/redis",
+      "latest": "8.10.3",
+      "current": true
+    },
+    {
+      "name": "reloader",
+      "component": "Reloader",
+      "description": "Restarts a workload when a secret or config map it reads changes.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "ghcr.io/stakater/reloader",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.4.23",
+      "digests": [
+        "sha256:82c80a15fdba22f738642553159f9fb37baf9e4d1edfeb798e8c48d87767f410"
+      ],
+      "url": "https://github.com/stakater/Reloader",
+      "latest": "1.4.23",
+      "current": true
+    },
+    {
+      "name": "runc",
+      "component": "runc",
+      "description": "The low-level runtime containerd starts containers with.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "managed",
+      "source": "pkg:runc",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "burst-worker",
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.5.2",
+      "digests": [],
+      "url": "https://github.com/opencontainers/runc",
+      "latest": "1.5.2",
+      "current": true
+    },
+    {
+      "name": "support-agent",
+      "component": "Support agent",
+      "description": "Reports allowlisted control-plane facts when an organization enrols. Does nothing until then.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "container",
+      "cluster": "managed",
+      "source": "ghcr.io/kamarkat/kamarkat/support-agent",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "digest-pinned",
+      "digests": [
+        "sha256:94b18661d576e5a25dd55fc6b216dd1e02464aa0290f8f87bd8f097749fb0592"
+      ],
+      "url": "https://github.com/kamarkat/kamarkat",
+      "latest": "ea2e5d37",
+      "current": true
+    },
+    {
+      "name": "tailscale",
+      "component": "Tailscale",
+      "description": "Joins the node to the tailnet when a tailnet hostname is configured for it.",
+      "license": "BSD-3-Clause",
+      "layer": "machinery",
+      "type": "package",
+      "cluster": "managed",
+      "source": "pkg:tailscale",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "burst-worker",
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "1.104.4",
+      "digests": [],
+      "url": "https://github.com/tailscale/tailscale",
+      "latest": "1.104.5",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "One patch behind; installed by the node bootstrap"
+        }
+      ]
+    },
+    {
+      "name": "ubuntu",
+      "component": "Ubuntu",
+      "description": "The node operating system, the provider's stock image.",
+      "license": "Per package; see /usr/share/doc/<package>/copyright on the node",
+      "layer": "machinery",
+      "type": "os",
+      "cluster": "managed",
+      "source": "os:ubuntu",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "burst-worker",
+        "control plane",
+        "default-worker"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "24.04",
+      "digests": [],
+      "url": "https://launchpad.net/ubuntu",
+      "latest": "26.04",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "The node image is the provider's own published system image, named by the exact string the provider uses. Whether the newest release is published in the cloud catalogue, and under what name, is not readable without provider credentials and has not been confirmed. The newest image may also be built for a narrower processor baseline than the machine types in use, which is a separate question from availability.",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    },
+    {
+      "name": "victoria-metrics",
+      "component": "VictoriaMetrics",
+      "description": "The metrics store, rule evaluation and the authenticating proxy in front of them, run by the VictoriaMetrics operator.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/victoriametrics/victoria-metrics",
+      "nodes": [
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [
+        "VictoriaMetrics operator v0.75.0"
+      ],
+      "version": "v1.152.0",
+      "digests": [],
+      "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+      "latest": "1.155.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by three patch releases, in a vendored render whose values are recorded in prose rather than a values file, so re-rendering has to be reconstructed before it can be trusted."
+        }
+      ]
+    },
+    {
+      "name": "vmalert",
+      "component": "VictoriaMetrics",
+      "description": "The metrics store, rule evaluation and the authenticating proxy in front of them, run by the VictoriaMetrics operator.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/victoriametrics/vmalert",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [
+        "VictoriaMetrics operator v0.75.0"
+      ],
+      "version": "v1.152.0",
+      "digests": [],
+      "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+      "latest": "1.155.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by three patch releases, in a vendored render whose values are recorded in prose rather than a values file, so re-rendering has to be reconstructed before it can be trusted."
+        }
+      ]
+    },
+    {
+      "name": "vmauth",
+      "component": "VictoriaMetrics",
+      "description": "The metrics store, rule evaluation and the authenticating proxy in front of them, run by the VictoriaMetrics operator.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/victoriametrics/vmauth",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [
+        "VictoriaMetrics operator v0.75.0"
+      ],
+      "version": "v1.152.0",
+      "digests": [],
+      "url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+      "latest": "1.155.0",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Behind by three patch releases, in a vendored render whose values are recorded in prose rather than a values file, so re-rendering has to be reconstructed before it can be trusted."
+        }
+      ]
+    },
+    {
+      "name": "operator",
+      "component": "VictoriaMetrics operator",
+      "description": "Runs the metrics stores.",
+      "license": "Apache-2.0",
+      "layer": "capability",
+      "type": "container",
+      "cluster": "managed",
+      "source": "docker.io/victoriametrics/operator",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "where": [
+        "platform-spoke-catalog"
+      ],
+      "boundaries": [],
+      "via": [
+        "VictoriaMetrics operator v0.75.0"
+      ],
+      "version": "config-reloader-v0.75.0, v0.75.0",
+      "digests": [
+        "sha256:78da26b41a819093707be2ab6a65a5dc19f43d58ec52f30b49a545c2c6b7bd55"
+      ],
+      "url": "https://github.com/VictoriaMetrics/operator",
+      "latest": "0.75.2",
+      "current": false,
+      "behind": [
+        {
+          "status": "not assessed",
+          "reason": "Two patch releases behind, in the same vendored render as the stores. The operator and its config reloader move together because one render produces both."
+        }
+      ]
+    },
+    {
+      "name": "clusterctl",
+      "component": "Cluster API",
+      "description": "Declarative cluster lifecycle. Creates, scales and replaces the management cluster and managed clusters.",
+      "license": "Apache-2.0",
+      "layer": "machinery",
+      "type": "binary",
+      "cluster": "bootstrap",
+      "source": "tool:clusterctl",
+      "nodes": [],
+      "where": [
+        "kakt CLI"
+      ],
+      "boundaries": [],
+      "via": [],
+      "version": "v1.13.7",
+      "digests": [],
+      "url": "https://github.com/kubernetes-sigs/cluster-api",
+      "latest": "1.14.4",
+      "current": false,
+      "behind": [
+        {
+          "status": "held",
+          "reason": "Infrastructure provider is tested to 1.13 only",
+          "blocked_by": "Cluster API provider for Hetzner",
+          "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
+        }
+      ]
+    }
+  ],
+  "previous": "0.1.16-rc.188",
+  "changes": [
+    {
+      "name": "agentgateway",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "digest-pinned, v1.4.1",
+      "to": "v1.7.0"
+    },
+    {
+      "name": "argocd",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v2.14.11",
+      "to": "v3.5.7"
+    },
+    {
+      "name": "dex",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v2.42.1",
+      "to": "v2.46.1"
+    },
+    {
+      "name": "busybox",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "1.37.0",
+      "to": "1.38.0"
+    },
+    {
+      "name": "cert-manager-controller",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.20.2",
+      "to": "v1.21.3"
+    },
+    {
+      "name": "cert-manager-webhook",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.20.2",
+      "to": "v1.21.3"
+    },
+    {
+      "name": "certgen",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "added",
+      "from": "",
+      "to": "v0.4.13"
+    },
+    {
+      "name": "cilium",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.17.18",
+      "to": "v1.20.4"
+    },
+    {
+      "name": "operator-generic",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.17.18",
+      "to": "v1.20.4"
+    },
+    {
+      "name": "cluster-api-controller",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.10.0",
+      "to": "v1.13.7"
+    },
+    {
+      "name": "cluster-api-operator",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v0.13.0",
+      "to": "v0.29.0"
+    },
+    {
+      "name": "kubeadm-bootstrap-controller",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.8.5",
+      "to": "v1.13.7"
+    },
+    {
+      "name": "kubeadm-control-plane-controller",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.8.5",
+      "to": "v1.13.7"
+    },
+    {
+      "name": "caph",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.0.7",
+      "to": "v1.1.10"
+    },
+    {
+      "name": "cluster-autoscaler",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "added",
+      "from": "",
+      "to": "v1.35.2"
+    },
+    {
+      "name": "spoke-identity-operator",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "c265343a0d85",
+      "to": "8a1f7b584737"
+    },
+    {
+      "name": "cluster-proportional-autoscaler",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.9.0",
+      "to": "v1.10.3"
+    },
+    {
+      "name": "coredns",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.11.3",
+      "to": "v1.13.1"
+    },
+    {
+      "name": "crossplane",
+      "cluster": "management",
+      "type": "package",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.20.5",
+      "to": "v2.4.3"
+    },
+    {
+      "name": "provider-kubernetes",
+      "cluster": "management",
+      "type": "package",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.3.1",
+      "to": "v1.4.1"
+    },
+    {
+      "name": "csi-attacher",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v4.8.1",
+      "to": "v4.13.0, v4.8.1"
+    },
+    {
+      "name": "csi-node-driver-registrar",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v2.13.0",
+      "to": "v2.13.0, v2.18.0"
+    },
+    {
+      "name": "csi-provisioner",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v5.2.0",
+      "to": "v5.2.0, v6.4.0"
+    },
+    {
+      "name": "csi-resizer",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.13.2",
+      "to": "v1.13.2, v2.3.0"
+    },
+    {
+      "name": "livenessprobe",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v2.15.0",
+      "to": "v2.15.0, v2.20.0"
+    },
+    {
+      "name": "curl",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "digest-pinned",
+      "to": "8.23.0"
+    },
+    {
+      "name": "etcd",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane"
+      ],
+      "kind": "changed",
+      "from": "3.5.15-0",
+      "to": "3.6.6-0"
+    },
+    {
+      "name": "external-secrets",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v2.2.0",
+      "to": "v2.14.0"
+    },
+    {
+      "name": "external-dns",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane"
+      ],
+      "kind": "changed",
+      "from": "v0.15.0",
+      "to": "v0.24.0"
+    },
+    {
+      "name": "external-dns-hetzner-webhook",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane"
+      ],
+      "kind": "changed",
+      "from": "v0.3.4",
+      "to": "v0.5.1"
+    },
+    {
+      "name": "ledger",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "digest-pinned",
+      "to": "v2.4.17"
+    },
+    {
+      "name": "grafana",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "13.0.1",
+      "to": "13.3.0"
+    },
+    {
+      "name": "alloy",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.20.1",
+      "to": "v1.21.3"
+    },
+    {
+      "name": "hcloud-csi-driver",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v2.13.0",
+      "to": "v2.13.0, v2.24.1"
+    },
+    {
+      "name": "pki-issuer",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v0.2.0",
+      "to": "v1.0.1"
+    },
+    {
+      "name": "kube-state-metrics",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v2.14.0",
+      "to": "v2.19.1"
+    },
+    {
+      "name": "kubectl",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.31.6",
+      "to": "v1.35.10"
+    },
+    {
+      "name": "kube-apiserver",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane"
+      ],
+      "kind": "changed",
+      "from": "v1.31.6",
+      "to": "v1.35.10"
+    },
+    {
+      "name": "kube-controller-manager",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane"
+      ],
+      "kind": "changed",
+      "from": "v1.31.6",
+      "to": "v1.35.10"
+    },
+    {
+      "name": "kube-proxy",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.31.6",
+      "to": "v1.35.10"
+    },
+    {
+      "name": "kube-scheduler",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane"
+      ],
+      "kind": "changed",
+      "from": "v1.31.6",
+      "to": "v1.35.10"
+    },
+    {
+      "name": "pause",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "3.10",
+      "to": "3.10.1"
+    },
+    {
+      "name": "kubeadm",
+      "cluster": "management",
+      "type": "package",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "1.31.6",
+      "to": "1.35.10"
+    },
+    {
+      "name": "kubectl",
+      "cluster": "management",
+      "type": "package",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "1.31.6",
+      "to": "1.35.10"
+    },
+    {
+      "name": "kubelet",
+      "cluster": "management",
+      "type": "package",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "1.31.6",
+      "to": "1.35.10"
+    },
+    {
+      "name": "k8s",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "1.31.6",
+      "to": "1.35.10"
+    },
+    {
+      "name": "background-controller",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.19.1",
+      "to": "v1.19.2"
+    },
+    {
+      "name": "cleanup-controller",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.19.1",
+      "to": "v1.19.2"
+    },
+    {
+      "name": "kyverno",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.19.1",
+      "to": "v1.19.2"
+    },
+    {
+      "name": "kyverno-cli",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.19.1",
+      "to": "v1.19.2"
+    },
+    {
+      "name": "kyvernopre",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.19.1",
+      "to": "v1.19.2"
+    },
+    {
+      "name": "readiness-checker",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "latest, v1.19.1",
+      "to": "v1.19.2"
+    },
+    {
+      "name": "reports-controller",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.19.1",
+      "to": "v1.19.2"
+    },
+    {
+      "name": "api",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "added",
+      "from": "",
+      "to": "v1.55.0"
+    },
+    {
+      "name": "lago-gotenberg",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "added",
+      "from": "",
+      "to": "7.8.2"
+    },
+    {
+      "name": "local-path-provisioner",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v0.0.30",
+      "to": "v0.0.37"
+    },
+    {
+      "name": "auth-proxy",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "ff22acc36665",
+      "to": "a65ccec4e96b"
+    },
+    {
+      "name": "metrics-server",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v0.7.2",
+      "to": "v0.9.0"
+    },
+    {
+      "name": "k8s-dns-node-cache",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "1.23.1",
+      "to": "1.26.0"
+    },
+    {
+      "name": "kube-sbt",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "f705cd09a4d8",
+      "to": "b8f1e299a0a7"
+    },
+    {
+      "name": "function-patch-and-transform",
+      "cluster": "management",
+      "type": "package",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v0.8.0",
+      "to": "v0.11.2"
+    },
+    {
+      "name": "hub-operator",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "ff309121b7b5",
+      "to": "96deb61065f0"
+    },
+    {
+      "name": "postgres",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "15-alpine, 16-alpine",
+      "to": "16-alpine"
+    },
+    {
+      "name": "postgresql",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "added",
+      "from": "",
+      "to": "17.11-standard-bookworm, 18.6"
+    },
+    {
+      "name": "postgres-partman",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "added",
+      "from": "",
+      "to": "digest-pinned"
+    },
+    {
+      "name": "redis",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "7.2.8-alpine, 8.6-alpine, digest-pinned",
+      "to": "8.10.3-alpine, 8.6.4-alpine"
+    },
+    {
+      "name": "reloader",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.2.1",
+      "to": "v1.4.23"
+    },
+    {
+      "name": "support-agent",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "b0522975b830",
+      "to": "94b18661d576"
+    },
+    {
+      "name": "zitadel",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v4.15.3",
+      "to": "v4.19.2"
+    },
+    {
+      "name": "zitadel-login",
+      "cluster": "management",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v4.15.3",
+      "to": "v4.19.2"
+    },
+    {
+      "name": "agentgateway",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.6.0",
+      "to": "v1.7.0"
+    },
+    {
+      "name": "argocd",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v2.11.2",
+      "to": "v3.5.7"
+    },
+    {
+      "name": "argocd-agent",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v0.9.0",
+      "to": "v0.10.0"
+    },
+    {
+      "name": "busybox",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "1.37.0",
+      "to": "1.38.0"
+    },
+    {
+      "name": "cert-manager-cainjector",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.21.1",
+      "to": "v1.21.3"
+    },
+    {
+      "name": "cert-manager-controller",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.21.1",
+      "to": "v1.21.3"
+    },
+    {
+      "name": "cert-manager-startupapicheck",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.21.1",
+      "to": "v1.21.3"
+    },
+    {
+      "name": "cert-manager-webhook",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.21.1",
+      "to": "v1.21.3"
+    },
+    {
+      "name": "certgen",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "added",
+      "from": "",
+      "to": "v0.4.13"
+    },
+    {
+      "name": "cilium",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.17.18",
+      "to": "v1.20.4"
+    },
+    {
+      "name": "operator-generic",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.17.18",
+      "to": "v1.20.4"
+    },
+    {
+      "name": "coredns",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.11.3",
+      "to": "v1.13.1"
+    },
+    {
+      "name": "crossplane",
+      "cluster": "managed",
+      "type": "package",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.20.5",
+      "to": "v2.4.3"
+    },
+    {
+      "name": "provider-kubernetes",
+      "cluster": "managed",
+      "type": "package",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.3.1",
+      "to": "v1.4.1"
+    },
+    {
+      "name": "provider-sql",
+      "cluster": "managed",
+      "type": "package",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v0.14.0",
+      "to": "v0.16.2"
+    },
+    {
+      "name": "ephemeral-job-operator",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "55970a56f8ab",
+      "to": "aaf089b1a602"
+    },
+    {
+      "name": "etcd",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane"
+      ],
+      "kind": "changed",
+      "from": "3.5.15-0",
+      "to": "3.6.6-0"
+    },
+    {
+      "name": "external-secrets",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v2.2.0",
+      "to": "v2.14.0"
+    },
+    {
+      "name": "external-dns",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v0.15.0",
+      "to": "v0.24.0"
+    },
+    {
+      "name": "external-dns-hetzner-webhook",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v0.3.4",
+      "to": "v0.5.1"
+    },
+    {
+      "name": "alloy",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.20.1",
+      "to": "v1.21.3"
+    },
+    {
+      "name": "pki-issuer",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v0.2.0",
+      "to": "v1.0.1"
+    },
+    {
+      "name": "kube-state-metrics",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v2.14.0",
+      "to": "v2.19.1"
+    },
+    {
+      "name": "kubectl",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.31.6",
+      "to": "v1.35.10"
+    },
+    {
+      "name": "kube-apiserver",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane"
+      ],
+      "kind": "changed",
+      "from": "v1.31.6",
+      "to": "v1.35.10"
+    },
+    {
+      "name": "kube-controller-manager",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane"
+      ],
+      "kind": "changed",
+      "from": "v1.31.6",
+      "to": "v1.35.10"
+    },
+    {
+      "name": "kube-scheduler",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane"
+      ],
+      "kind": "changed",
+      "from": "v1.31.6",
+      "to": "v1.35.10"
+    },
+    {
+      "name": "pause",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "3.10",
+      "to": "3.10.1"
+    },
+    {
+      "name": "kubeadm",
+      "cluster": "managed",
+      "type": "package",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "1.31.6",
+      "to": "1.35.10"
+    },
+    {
+      "name": "kubectl",
+      "cluster": "managed",
+      "type": "package",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "1.31.6",
+      "to": "1.35.10"
+    },
+    {
+      "name": "kubelet",
+      "cluster": "managed",
+      "type": "package",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "1.31.6",
+      "to": "1.35.10"
+    },
+    {
+      "name": "background-controller",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.19.1",
+      "to": "v1.19.2"
+    },
+    {
+      "name": "cleanup-controller",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.19.1",
+      "to": "v1.19.2"
+    },
+    {
+      "name": "kyverno",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.19.1",
+      "to": "v1.19.2"
+    },
+    {
+      "name": "kyvernopre",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.19.1",
+      "to": "v1.19.2"
+    },
+    {
+      "name": "reports-controller",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.19.1",
+      "to": "v1.19.2"
+    },
+    {
+      "name": "k8s-dns-node-cache",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "1.23.1",
+      "to": "1.26.0"
+    },
+    {
+      "name": "function-patch-and-transform",
+      "cluster": "managed",
+      "type": "package",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v0.8.0",
+      "to": "v0.11.2"
+    },
+    {
+      "name": "postgresql",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "16.2",
+      "to": "18.6"
+    },
+    {
+      "name": "redis",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "7.2-alpine",
+      "to": "8.10.3-alpine"
+    },
+    {
+      "name": "reloader",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "v1.2.1",
+      "to": "v1.4.23"
+    },
+    {
+      "name": "support-agent",
+      "cluster": "managed",
+      "type": "container",
+      "nodes": [
+        "control-plane",
+        "worker"
+      ],
+      "kind": "changed",
+      "from": "b0522975b830",
+      "to": "94b18661d576"
+    },
+    {
+      "name": "clusterctl",
+      "cluster": "bootstrap",
+      "type": "binary",
+      "nodes": [],
+      "kind": "changed",
+      "from": "v1.10.0",
+      "to": "v1.13.7"
+    }
+  ],
+  "released": "2026-11-04T13:24:36Z"
+};

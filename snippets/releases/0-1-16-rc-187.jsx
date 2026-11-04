@@ -58,12 +58,12 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: a third copy carries a digest with no tag, so its version is unreportable. A tag is restored alongside the digest in the next release.",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         },
         {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: the gateway ships at two versions in one release, one on the management cluster and one in the managed-cluster catalogue. They converge in the next release.",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         }
       ]
     },
@@ -161,9 +161,9 @@ export const release = {
       "current": false,
       "behind": [
         {
-          "status": "scheduled",
-          "reason": "DEFECT, not a hold: this row is the identity broker image shipped with the chart, recorded under the wrong component, so it is compared against the wrong upstream project. The catalog entry is corrected in the next release.",
-          "target": "next release"
+          "status": "held",
+          "reason": "The identity broker the GitOps chart bundles. It is tracked against its own upstream project, and the chart pins which release ships, so it moves when the chart does rather than on its own. The newest broker release becomes reachable when the chart carrying it is adopted.",
+          "blocked_by": "Argo CD"
         }
       ]
     },
@@ -488,7 +488,7 @@ export const release = {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: the kubeadm bootstrap and control-plane providers were left behind the core provider, so one release ships a mismatched Cluster API set. They move to the core provider's version in the next release.",
           "blocked_by": "Cluster API",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -523,7 +523,7 @@ export const release = {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: the kubeadm bootstrap and control-plane providers were left behind the core provider, so one release ships a mismatched Cluster API set. They move to the core provider's version in the next release.",
           "blocked_by": "Cluster API",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -973,7 +973,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: pinned by digest with no tag, so its version is unreportable. A tag is restored alongside the digest in the next release.",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         }
       ]
     },
@@ -1140,7 +1140,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: pinned by digest with no tag, so the release cannot report which ledger version it runs. A tag is restored alongside the digest in the next release.",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         }
       ]
     },
@@ -1175,7 +1175,7 @@ export const release = {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: the instance carries no image at all, so its version is whatever the operator release defaults to and an operator bump moves it silently. An explicit image is pinned in the next release.",
           "blocked_by": "Grafana operator",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         }
       ]
     },
@@ -1791,7 +1791,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -1826,7 +1826,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -1861,7 +1861,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -1896,7 +1896,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -1931,7 +1931,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -1966,12 +1966,12 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: the readiness-checker image is pinned to a moving tag, so what it runs is whatever the registry served last. It is pinned by digest in the next release.",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         },
         {
           "status": "scheduled",
           "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -2006,7 +2006,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -2320,12 +2320,12 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: three different versions of the same cache ship in one release, from separate manifests that were never reconciled. They converge on one version in the next release.",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         },
         {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: one copy is pinned by digest with no tag, so the release cannot report what it runs and nobody can tell whether it is current. A tag is restored alongside the digest in the next release.",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         }
       ]
     },
@@ -2417,7 +2417,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: this release ships the 2026-09-13 build. A later build exists, but the commit that pins it back into the deployment never landed, so the newer image was published and never shipped. The pin-back lands in the next release.",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         }
       ]
     },
@@ -2768,7 +2768,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: the gateway ships at two versions in one release, one on the management cluster and one in the managed-cluster catalogue. They converge in the next release.",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         }
       ]
     },
@@ -2833,7 +2833,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: the managed clusters run a hand-assembled minimal install that was never moved with the management cluster's, so one release ships two Argo CD versions three minors apart. The newest upstream equivalent configures through far more environment values than the local copy carries, so it is re-derived from upstream rather than bumped.",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         }
       ]
     },
@@ -3875,7 +3875,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -3907,7 +3907,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -3939,7 +3939,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -3971,7 +3971,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -4003,7 +4003,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "A patch release behind. The version is load-bearing for the Kubernetes destination, so it moves deliberately rather than with routine bumps; 1.19.2 is the newest of the line that supports the target Kubernetes.",
-          "target": "next release",
+          "target": "0.1.16-rc.189",
           "ref": "docs/plans/k8s-cnpg-upgrade-and-restore-drill.md"
         }
       ]
@@ -4183,7 +4183,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: three different versions of the same cache ship in one release, from separate manifests that were never reconciled. They converge on one version in the next release.",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         }
       ]
     },
@@ -4274,7 +4274,7 @@ export const release = {
         {
           "status": "scheduled",
           "reason": "DEFECT, not a hold: this release ships the 2026-09-13 build. A later build exists, but the commit that pins it back into the deployment never landed, so the newer image was published and never shipped. The pin-back lands in the next release.",
-          "target": "next release"
+          "target": "0.1.16-rc.189"
         }
       ]
     },

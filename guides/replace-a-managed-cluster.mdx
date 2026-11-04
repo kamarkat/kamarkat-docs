@@ -58,14 +58,14 @@ clusterName: acme-stg-02   # was acme-stg-01
 Then regenerate the public hostname aggregate, because it is written per cluster and the app's listener has to move from one to the other:
 
 ```bash
-kakt fleet hosts aggregate
+kakt app hosts aggregate
 ```
 
 Supply the app's secrets against the replacement. They are stored under the cluster's path, so the new cluster has none of them; the command reads the cluster from the declaration you just changed, so run it after that edit:
 
 ```bash
-kakt fleet secrets status stg shop
-kakt fleet secrets set stg shop <KEY>
+kakt app secrets status stg shop
+kakt app secrets set stg shop <KEY>
 ```
 
 `status` lists what the app declares and what is present. Every declared secret is checked before the app's workloads start, so a key you miss is reported by name rather than becoming a crash loop.

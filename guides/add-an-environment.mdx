@@ -20,15 +20,18 @@ Several apps in one environment can share a cluster, so a second app in `stg` ne
 
 ## Step 2: Declare each app
 
-For each app, create its directory in the new environment from the templates, as in the quickstart:
+For each app, declare it in the new environment:
 
 ```bash
-mkdir -p environments/stg/shop/frontend
-cp templates/fleet/values.yaml environments/stg/shop/values.yaml
-cp templates/workload/Chart.yaml environments/stg/shop/frontend/Chart.yaml
+kakt tenant add-app \
+  --env stg \
+  --app shop \
+  --cluster acme-stg-01 \
+  --owner-email platform@acme.example \
+  --workload frontend
 ```
 
-In `environments/stg/shop/values.yaml`, set what differs from `dev`:
+The cluster is checked before anything is written — it must serve `stg`, which is what step 1 declared. Then set what differs from `dev` in `environments/stg/shop/values.yaml`:
 
 ```yaml environments/stg/shop/values.yaml
 tenantId: acme
@@ -49,13 +52,13 @@ In each workload's `Chart.yaml`, set the version to promote. See [Promote betwee
 Secrets are supplied per environment. Nothing is copied from `dev`.
 
 ```bash
-kakt fleet secrets template stg shop > shop-stg.env   # the declared keys, with no values
+kakt app secrets template stg shop > shop-stg.env   # the declared keys, with no values
 # fill in shop-stg.env
-kakt fleet secrets import stg shop --from-env shop-stg.env --confirm
-kakt fleet secrets status stg shop
+kakt app secrets import stg shop --from-env shop-stg.env --confirm
+kakt app secrets status stg shop
 ```
 
-Or one at a time with `kakt fleet secrets set stg shop <KEY>`. Delete the `.env` file once the values are in your box.
+Or one at a time with `kakt app secrets set stg shop <KEY>`. Delete the `.env` file once the values are in your box.
 
 ## Step 4: Commit
 

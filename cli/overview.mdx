@@ -72,7 +72,7 @@ These delete infrastructure in your cloud account and are not reversible. Both r
 
 `kakt teardown` takes the whole box: it reads the managed clusters from the management cluster and removes them with it. `kakt spoke teardown` is for taking managed clusters down on their own, and for the case where the management cluster is already gone and its clusters would otherwise be left running.
 
-Removing an **application** is not a command. Delete its directory under `environments/<env>/<app>/`, regenerate the hostname aggregate with `kakt fleet hosts aggregate`, and commit — your management cluster removes what the declaration no longer asks for.
+Removing an **application** is not a command. Delete its directory under `environments/<env>/<app>/`, regenerate the hostname aggregate with `kakt app hosts aggregate`, and commit — your management cluster removes what the declaration no longer asks for.
 
 [Boxes and clusters →](/cli/boxes-and-clusters#destroy)
 
@@ -80,11 +80,12 @@ Removing an **application** is not a command. Delete its directory under `enviro
 
 | Command | What it does |
 | :- | :- |
-| `kakt fleet hosts aggregate` | Regenerate the public hostname aggregate your gateway serves |
-| `kakt fleet secrets set` | Supply one declared secret |
-| `kakt fleet secrets status` | Report which declared secrets are present, by name |
-| `kakt fleet secrets template` | Print a `.env` skeleton holding exactly the declared keys |
-| `kakt fleet secrets import` | Write every declared key from a `KEY=VALUE` file, once |
+| `kakt tenant add-app` | Declare an application in an environment, and its workloads |
+| `kakt app hosts aggregate` | Regenerate the public hostname aggregate your gateway serves |
+| `kakt app secrets set` | Supply one declared secret |
+| `kakt app secrets status` | Report which declared secrets are present, by name |
+| `kakt app secrets template` | Print a `.env` skeleton holding exactly the declared keys |
+| `kakt app secrets import` | Write every declared key from a `KEY=VALUE` file, once |
 
 [Applications →](/cli/applications)
 

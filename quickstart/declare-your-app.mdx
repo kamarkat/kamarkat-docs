@@ -17,12 +17,21 @@ The platform reconciles every `environments/*/*/values.yaml`, so the file existi
 
 ## Step 1: Create the app's values file
 
-Copy the template and fill it in:
+Declare it, then fill it in:
 
 ```bash
-mkdir -p environments/dev/shop
-cp templates/fleet/values.yaml environments/dev/shop/values.yaml
+kakt tenant add-app \
+  --env dev \
+  --app shop \
+  --cluster acme-01 \
+  --owner-email platform@acme.example
 ```
+
+This writes the file below from the template your repository keeps, with the
+tenant, app, environment and cluster already filled in. It refuses a cluster your
+box has not declared, or one that does not serve `dev`, before writing anything —
+so a name that would have generated nothing is caught here rather than at your
+first secret.
 
 ```yaml environments/dev/shop/values.yaml
 tenantId: acme          # the tenant that owns the box, the same in every app
@@ -58,11 +67,13 @@ secrets: []             # secrets you supply; see "Supply your secrets"
 
 ## Step 2: Add a directory per workload
 
-Each workload directory holds one chart dependency. Copy the template once per workload:
+Each workload directory holds one chart dependency. Pass `--workload` once per
+workload when you declare the app, or add one later:
 
 ```bash
-mkdir -p environments/dev/shop/frontend
-cp templates/workload/Chart.yaml environments/dev/shop/frontend/Chart.yaml
+kakt tenant add-app --env dev --app shop --cluster acme-01 \
+  --owner-email platform@acme.example \
+  --workload frontend --workload bff
 ```
 
 ```yaml environments/dev/shop/frontend/Chart.yaml
@@ -83,7 +94,7 @@ The placeholder version cannot resolve, on purpose. An empty dependency list wou
 Your managed cluster has one shared gateway whose listeners come from every app's `public.hosts`. Regenerate it, then commit:
 
 ```bash
-kakt fleet hosts aggregate
+kakt app hosts aggregate
 git add environments registry
 git commit -m "Declare shop"
 git push

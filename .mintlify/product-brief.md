@@ -6,9 +6,9 @@ Sources: Kamarkat ADR-062, ADR-063, ADR-064, ADR-065 (addendum 1), ADR-066, ADR-
 ## Description
 
 Kamarkat delivers a complete platform into a box in the customer's own cloud account and git
-organization: a management cluster running the customer's own control plane, and the managed
+organization: a management cluster running the platform's services, and the managed
 clusters it provisions. The platform is published as one versioned bundle; the customer's GitOps
-repository is the only source of desired state, and the customer's control plane applies it
+repository is the only source of desired state, and the customer's management cluster applies it
 (ADR-063, ADR-065). Kamarkat operates no customer infrastructure and holds no access to any
 customer repository (ADR-065 addendum 1).
 

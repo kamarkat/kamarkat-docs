@@ -47,6 +47,14 @@ To roll back, commit the previous version. Every published version stays in your
 
 ## What you need to know
 
+### Providers per environment
+
+`hybrid` is supported for `dev` only; `stg` and `prod` run on `hetzner`. A box whose `dev` runs on `hybrid` therefore has environments on different providers: its higher environments have cloud nodes and their cost, and do not join your tailnet. Decide this before you [add an environment](/guides/add-an-environment).
+
+### An environment needs its cell first
+
+An app names the managed cluster it runs on, so that cluster must exist before the app's directory is committed. An app that names a cell that does not exist generates nothing.
+
 ### Promotion is never a branch
 
 All environments live on the main branch. There is no environment branch to merge or keep in step, so the repository always shows what runs everywhere.
@@ -72,6 +80,6 @@ Who may change `environments/prod` and `registry/clusters/<prod-cluster>` is set
     Each app in an environment declares one cell. Different apps in the same environment can run on different managed clusters.
   </Accordion>
   <Accordion title="Can I add a staging environment later?">
-    Yes. Create `environments/stg/<app>/` from the templates in your GitOps repository, declare its cell and hosts, supply its secrets, and commit.
+    Yes. See [Add an environment](/guides/add-an-environment): declare its cell first, then each app, then its secrets.
   </Accordion>
 </AccordionGroup>

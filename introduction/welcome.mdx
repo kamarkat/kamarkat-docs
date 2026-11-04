@@ -1,7 +1,7 @@
 ---
 title: "Welcome"
 description: "Kamarkat is an open-source platform a startup runs its business on. It ships a complete platform into a box you own, on infrastructure you pay for directly."
-keywords: ["kamarkat", "box", "control plane", "gitops", "byoc", "capabilities"]
+keywords: ["kamarkat", "box", "management cluster", "gitops", "byoc", "capabilities"]
 ---
 
 > Kamarkat gives you the platform a platform team would build, without the platform team. You own the box and everything in it.
@@ -10,7 +10,7 @@ keywords: ["kamarkat", "box", "control plane", "gitops", "byoc", "capabilities"]
 
 Kamarkat is a complete platform stack for startups that want a golden path and cannot yet staff a platform engineering team. It runs on affordable infrastructure in your own cloud account rather than on a hyperscaler's managed services, and it covers everything your applications need to run: cluster lifecycle, GitOps delivery, secrets, certificates, DNS, a gateway with login, a database, an identity provider and observability.
 
-The foundational unit is the **box**: your management cluster and the managed clusters it manages, all running in your cloud account under credentials only you hold. The **control plane** (the GitOps engine, cluster lifecycle and the operators that reconcile everything else) runs inside your management cluster. There is no separate control-plane tier above it and nothing hosted for you, so your box keeps running whether or not Kamarkat is reachable.
+The foundational unit is the **box**: your management cluster and the managed clusters it manages, all running in your cloud account under credentials only you hold. The **platform services** (the GitOps engine, cluster lifecycle and the operators that reconcile everything else) run on your management cluster. There is no separate management tier above it and nothing hosted for you, so your box keeps running whether or not Kamarkat is reachable.
 
 Kamarkat is free and open source. The stack is tested as one set, published as one version, and proposed to your repository as an upgrade you accept.
 

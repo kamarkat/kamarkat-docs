@@ -8,12 +8,12 @@ keywords: ["cloud account", "HCLOUD_TOKEN", "hetzner", "hybrid", "dns zone"]
 
 ## What it is
 
-The cloud account is where your management cluster and managed clusters run, and what your cloud provider bills you for. Its API token is stored as the `HCLOUD_TOKEN` secret on your GitOps repository, where Day-0 reads it, and then held by your control plane, which creates every later cluster with it.
+The cloud account is where your management cluster and managed clusters run, and what your cloud provider bills you for. Its API token is stored as the `HCLOUD_TOKEN` secret on your GitOps repository, where Day-0 reads it, and then held by your management cluster, which creates every later cluster with it.
 
 | Provider | What it runs |
 | :- | :- |
 | `hetzner` | Clusters on cloud servers. The default. |
-| `hybrid` | A cloud control plane, with worker nodes on your own machines joining over your tailnet. Supported for `dev` only. |
+| `hybrid` | Control plane nodes in the cloud, with worker nodes on your own machines joining over your tailnet. Supported for `dev` only. |
 
 ## Getting started
 
@@ -54,6 +54,6 @@ A box's clusters all run in one cloud account, and no component in one box holds
     Yes. Create a new token in your cloud console, set it on your GitOps repository, then revoke the old one.
   </Accordion>
   <Accordion title="Does Kamarkat ever see my bill or my token?">
-    No. The token lives only in your repository's secrets and your control plane, and the bill is between you and your provider.
+    No. The token lives only in your repository's secrets and your management cluster, and the bill is between you and your provider.
   </Accordion>
 </AccordionGroup>

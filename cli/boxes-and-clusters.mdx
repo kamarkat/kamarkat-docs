@@ -52,7 +52,7 @@ Scaffolding happens once. Every change after it is a commit or a pull request. S
 
 ### kakt tenant add-cluster
 
-Declares an additional managed cluster. It renders the cluster template your GitOps repository carries; the management cluster provisions the cluster from your commit.
+Declares an additional managed cluster. It renders the cluster template your GitOps repository carries; the management cluster provisions the cluster from your commit. No Day-0 run is involved. For the whole task, see [Add a managed cluster](/guides/add-a-managed-cluster).
 
 ```bash
 kakt tenant add-cluster \
@@ -74,6 +74,10 @@ kakt tenant add-cluster \
 | `--workers` | Cloud worker nodes it starts with. Defaults to 2 on `hetzner` |
 | `--public-tls-issuer` | The ACME issuer for public certificates. Defaults to `letsencrypt-prod` |
 | `--gitops-dir` | Your GitOps repository. Defaults to the current directory |
+
+<Note>
+`--bundle-version` must already be published, in the registry your `bundle.yaml` files pull from, and pullable without credentials. The cluster cannot converge on a version its registry does not hold.
+</Note>
 
 <Warning>
 `--name` becomes the cell id for the cluster's whole life. Applications name the cell they run on, so renaming it later is not an edit — it is a new cluster.

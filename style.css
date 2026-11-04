@@ -38,58 +38,6 @@
   background-size: 16px 16px;
 }
 
-.arch-split {
-  display: grid;
-  grid-template-columns: minmax(0, 1.7fr) 120px minmax(0, 1fr);
-  align-items: center;
-}
-
-/* Zones */
-
-.arch-zone {
-  position: relative;
-  border: 1px solid var(--arch-border);
-  border-radius: 10px;
-  background: var(--arch-surface);
-}
-
-.arch-zone-key {
-  border: 1.5px solid var(--arch-accent);
-}
-
-.arch-zone-tab {
-  position: absolute;
-  top: -11px;
-  left: 12px;
-  padding: 2px 8px;
-  border: 1px solid var(--arch-border);
-  border-radius: 9999px;
-  background: var(--arch-surface);
-  color: var(--arch-text-2);
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.arch-zone-key .arch-zone-tab {
-  border-color: var(--arch-accent);
-  background: var(--arch-accent);
-  color: var(--arch-accent-fg);
-}
-
-.arch-zone-body {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 20px 12px 12px;
-}
-
-.arch-zone-key .arch-zone-body {
-  border-radius: 9px;
-  background: var(--arch-subtle);
-}
-
-.arch-zone-body > .arch-label:not(:first-child),
 .arch-group > .arch-label:not(:first-child) {
   margin-top: 4px;
 }
@@ -250,24 +198,6 @@
   padding-left: 24px;
 }
 
-.arch-links {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: 0 4px;
-}
-
-.arch-link {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.arch-link .arch-wire-label {
-  font-size: 10.5px;
-  text-align: center;
-}
-
 .arch-wire-h {
   width: auto;
   height: 2px;
@@ -297,51 +227,14 @@
   border-right-color: var(--arch-accent);
 }
 
-.arch-lock {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  color: var(--arch-text-3);
-  font-size: 10.5px;
-  line-height: 1.3;
-  text-align: center;
-}
-
-.arch-lock svg {
-  width: 14px;
-  height: 14px;
-  background-color: currentColor !important;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .arch-wire { animation: none; }
 }
 
-/* Narrow screens: zones stack and the middle wires turn vertical. */
+/* Narrow screens: the middle wires turn vertical. */
 
 @media (max-width: 768px) {
-  .arch-split { grid-template-columns: 1fr; }
   .arch-row { grid-template-columns: 1fr; }
-
-  .arch-links {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px 16px;
-    padding: 8px 0 18px;
-  }
-
-  .arch-link {
-    flex-direction: row-reverse;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .arch-link .arch-wire-label {
-    max-width: 110px;
-    text-align: left;
-  }
 
   .arch-wire-h {
     width: 2px;
@@ -913,4 +806,134 @@ a.rel-name:hover { text-decoration-color: currentColor; }
   height: 22px;
   font-size: 11px;
   flex-shrink: 0;
+}
+
+/* Clusters and nodes (architecture) */
+
+.arch-cl {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The git organization and escrow sit over and under the management cluster:
+   the width of the row's first column. */
+.arch-cl-git,
+.arch-cl-escrow {
+  width: calc((100% - 150px) / 2);
+}
+
+.arch-cl-git > .arch-group {
+  background: var(--arch-surface);
+}
+
+.arch-cl-escrow {
+  margin-top: 10px;
+}
+
+.arch-cl-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+  align-items: center;
+}
+
+/* Top-aligned, so the management cluster sits right under the wire into it
+   rather than centred against the taller managed column. */
+.arch-cl-row > .arch-cl-cluster {
+  align-self: start;
+}
+
+.arch-cl-cluster {
+  align-self: start;
+}
+
+.arch-cl-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--arch-border);
+  border-radius: 10px;
+  background: var(--arch-surface);
+}
+
+.arch-cl-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--arch-text);
+  text-decoration: none;
+}
+
+a.arch-cl-title:hover,
+a.arch-wire-label:hover {
+  color: var(--arch-accent);
+}
+
+a.arch-wire-label {
+  text-decoration: none;
+}
+
+a.arch-cl-node {
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+
+a.arch-cl-node:hover {
+  border-color: var(--arch-accent);
+  border-style: solid;
+}
+
+.arch-cl-sub {
+  margin-bottom: 4px;
+  font-size: 12.5px;
+  color: var(--arch-text-2);
+}
+
+.arch-cl-node {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border: 1px dashed var(--arch-border);
+  border-radius: 8px;
+}
+
+.arch-cl-node-main {
+  border-color: var(--arch-accent);
+  background: var(--arch-subtle);
+}
+
+.arch-cl-node-opt {
+  border-style: dotted;
+}
+
+.arch-cl-what {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--arch-text);
+}
+
+.arch-cl-detail {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--arch-text-2);
+}
+
+.arch-cl-flows {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.arch-cl-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .arch-cl-row { grid-template-columns: 1fr; }
+  .arch-cl-git, .arch-cl-escrow { width: auto; }
+  .arch-cl-flows { gap: 10px; padding: 14px 0; }
 }

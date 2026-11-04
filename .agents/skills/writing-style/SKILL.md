@@ -10,7 +10,7 @@ These pages document Kamarkat. The goal is prose that is direct and informative 
 ## Tone and voice
 
 - Second person throughout: "you", "your box", "your team".
-- Active voice. Avoid passive constructions ("the cluster is provisioned" → "your control plane provisions the cluster").
+- Active voice. Avoid passive constructions ("the cluster is provisioned" → "your management cluster provisions the cluster").
 - Present tense. State what things do, not what they "will" do.
 - Confident but not promotional. State facts about the platform; let the capability speak for itself.
 - No filler phrases: "easily", "seamlessly", "powerful", "robust", "cutting-edge", "leverage".
@@ -23,6 +23,7 @@ These are hard constraints — never deviate.
 | :- | :- |
 | hub | management cluster |
 | spoke | managed cluster |
+| control plane, for what the management cluster runs | management cluster (the actor) or platform services (what it runs). "Control plane" means only a cluster's Kubernetes control plane nodes, which every cluster has |
 | fleet | application (or app) |
 | organization, for anything the platform owns | **tenant** — see the rule below |
 | tenant repository | GitOps repository |
@@ -30,7 +31,7 @@ These are hard constraints — never deviate.
 | platform tools (alone) | capabilities, introduced as "the platform tools your apps need" |
 | catalog, register an app | none: every capability ships in the bundle, and an app exists because its declaration is committed |
 | catalogue, catalog (of components) | capability, bundle |
-| Kamarkat deploys / applies / pushes to your cluster | Kamarkat publishes a version; your control plane applies it |
+| Kamarkat deploys / applies / pushes to your cluster | Kamarkat publishes a version; your management cluster applies it |
 | Kamarkat manages / operates your box | Kamarkat delivers the platform into your box |
 | upgrade (as something Kamarkat does) | upgrade proposal you accept |
 | SaaS, hosted platform | delivered into your box |
@@ -218,7 +219,7 @@ Do not pad to fill space. Do not truncate to save space.
 
 - One idea per sentence.
 - Short sentences for key facts. Slightly longer sentences to explain relationships or sequence.
-- Start sentences with the subject, not a clause: "Your control plane reconciles..." not "Once the proposal is merged, your control plane reconciles..."
+- Start sentences with the subject, not a clause: "Your management cluster reconciles..." not "Once the proposal is merged, your management cluster reconciles..."
 - When describing a sequence of events, prefer numbered lists or `<Steps>` over long compound sentences.
 
 ## What to avoid
@@ -247,20 +248,20 @@ Kamarkat is an open-source platform a startup runs its business on. It delivers 
 **The correct mental model:**
 - The **box** is the constant — a management cluster and its managed clusters, in the customer's account
 - The **GitOps repository** is the only source of desired state for the box
-- Kamarkat **publishes versions**; the customer's own automation proposes them and the customer's control plane applies them
+- Kamarkat **publishes versions**; the customer's own automation proposes them and the customer's management cluster applies them
 - Kamarkat **provides the capability**; the customer **owns its use**
 
 **Core vocabulary:**
 - Use **"box"** for what a customer owns, **"tenant"** for whoever owns it, **"application"** for a product running on it
 - Use **"capability"** — not "feature", not "service", not "module" — for what the platform provides
-- Use **"propose"** for upgrades, **"reconcile"** for what the control plane does
+- Use **"propose"** for upgrades, **"reconcile"** for what the management cluster does
 
 ---
 
 ## Concepts to use accurately
 
 **Box**
-A management cluster running the customer's control plane, plus the managed clusters it provisions. It runs in the customer's cloud account under credentials only the customer holds, belongs to one tenant, and keeps running whether or not Kamarkat is reachable.
+A management cluster running the platform's services, plus the managed clusters it provisions. It runs in the customer's cloud account under credentials only the customer holds, belongs to one tenant, and keeps running whether or not Kamarkat is reachable.
 
 **Tenant and application**
 The tenant owns the box (`tenantId`), and is bound to one organization in the identity provider. An application is a product running on it (`appId`), and the unit of isolation: its own namespace `tenant-<tenantId>-<appId>`, database, identity project, secret path and network policy. Being in the same tenant never grants access; only a declaration does.

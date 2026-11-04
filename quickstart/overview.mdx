@@ -9,7 +9,7 @@ This quickstart takes you from empty accounts to an application served on your o
 ## What you will build
 
 - A **GitOps repository**, `<tenant>-gitops`, in your git organization. It is the only source of desired state for your box.
-- A **management cluster** that runs your control plane.
+- A **management cluster** that runs the platform's services.
 - A **managed cluster** that runs your applications.
 - One **application**, deployed from its own repository and served on a hostname under your domain.
 
@@ -20,7 +20,7 @@ You choose where your nodes run when you scaffold, with `--provider`.
 | Path | Nodes | Choose it when |
 | :- | :- | :- |
 | **Cloud** (`hetzner`, default) | Cloud servers in your account | You want the shortest path to a running box |
-| **Hybrid** (`hybrid`) | A cloud control plane, with worker nodes on your own machines joining over your tailnet | You are building a development box on hardware you already have. Supported for `dev` only. |
+| **Hybrid** (`hybrid`) | Control plane nodes in the cloud, with worker nodes on your own machines joining over your tailnet | You are building a development box on hardware you already have. Supported for `dev` only. |
 
 This quickstart follows the cloud path. The hybrid path adds a `TS_AUTHKEY` secret and the nodes you list for each managed cluster.
 

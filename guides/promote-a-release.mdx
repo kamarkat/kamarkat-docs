@@ -1,0 +1,78 @@
+---
+title: "Promote between environments"
+description: "Promotion copies a version from one environment's Chart.yaml to the next. Rollback is the same edit backwards."
+keywords: ["promote", "promotion", "rollback", "Chart.yaml", "version"]
+---
+
+> Copy the version, never the chart.
+
+A workload's version in an environment is one line in its `Chart.yaml`. Promotion is committing that line, unchanged, to the next environment. What ships to `stg` is exactly what ran in `dev`, because the version names a chart that cannot change.
+
+## Before
+
+`dev` runs a new build of `frontend`; `stg` runs the previous one.
+
+<CodeGroup>
+```yaml environments/dev/shop/frontend/Chart.yaml
+apiVersion: v2
+name: frontend
+type: application
+version: 1.0.0
+dependencies:
+  - name: frontend
+    repository: oci://ghcr.io/acme-inc/charts
+    version: 1.4.0
+```
+
+```yaml environments/stg/shop/frontend/Chart.yaml
+apiVersion: v2
+name: frontend
+type: application
+version: 1.0.0
+dependencies:
+  - name: frontend
+    repository: oci://ghcr.io/acme-inc/charts
+    version: 1.3.2
+```
+</CodeGroup>
+
+## Promote
+
+Change one line in `stg`: the dependency's `version`, to the one `dev` runs.
+
+```diff environments/stg/shop/frontend/Chart.yaml
+ dependencies:
+   - name: frontend
+     repository: oci://ghcr.io/acme-inc/charts
+-    version: 1.3.2
++    version: 1.4.0
+```
+
+```bash
+git commit -am "Promote shop/frontend 1.4.0 to stg" && git push
+```
+
+Both files now name `1.4.0`, and the two environments run the same chart. The GitOps engine deploys it to `stg` on its next pass.
+
+Promote each workload of an app on its own. An app whose workloads must move together is promoted in one commit that changes each of their `Chart.yaml` files.
+
+## Roll back
+
+The same edit, backwards:
+
+```diff environments/stg/shop/frontend/Chart.yaml
+-    version: 1.4.0
++    version: 1.3.2
+```
+
+Every published version stays in your registry, so the previous one is always there to go back to.
+
+## What not to change
+
+- **Only the dependency's `version`.** The chart's own `version: 1.0.0` and the `repository` are the same in every environment. A diff between two environments' `Chart.yaml` that shows anything else is not a promotion.
+- **Never the chart's contents.** There are none in this repository to change: the chart, and the image digests inside it, come from your registry.
+- **Values that differ per environment** — hosts, cell, secrets — live in the app's `values.yaml`, never in `Chart.yaml`.
+
+<Tip>
+Protect promotion with your repository's own review rules: require reviewers on `environments/prod`, and allow automatic merges only on lower environments.
+</Tip>

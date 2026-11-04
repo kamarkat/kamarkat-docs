@@ -1,6 +1,6 @@
 ---
 title: "The box"
-description: "A box is your control plane and the clusters it manages, running in your own cloud account. Kamarkat delivers it to you and never operates it."
+description: "A box is your management cluster and the clusters it manages, running in your own cloud account. Kamarkat delivers it to you and never operates it."
 keywords: ["box", "management cluster", "managed cluster", "custody"]
 ---
 
@@ -8,20 +8,20 @@ keywords: ["box", "management cluster", "managed cluster", "custody"]
 
 ## What it is
 
-A box is everything Kamarkat gives you: a **management cluster** that runs your control plane, and the **managed clusters** it creates and reconciles. It runs in your cloud account, under credentials you hold, and it belongs to exactly one tenant.
+A box is everything Kamarkat gives you: a **management cluster** that runs the platform's services, and the **managed clusters** it creates and reconciles. It runs in your cloud account, under credentials you hold, and it belongs to exactly one tenant.
 
-The control plane is **delivered, not hosted**. It is the same control plane Kamarkat tests and publishes, not a reduced edition. Once it is running it reconciles your clusters from your own repository and depends on nothing Kamarkat operates.
+The platform is **delivered, not hosted**. It is the same platform Kamarkat tests and publishes, not a reduced edition. Once it is running it reconciles your clusters from your own repository and depends on nothing Kamarkat operates.
 
 ## What Kamarkat never holds
 
 | Credential | Where it lives |
 | :- | :- |
-| Cloud provider credentials | Your control plane |
+| Cloud provider credentials | Your management cluster |
 | Cluster admin credentials | Your box, with a break-glass copy escrowed in your own cloud account |
 | Secret material | Your box's secret store |
 | Write access to your repository | Your own automation |
 
-Because no Kamarkat component serves more than one tenant, a compromise of Kamarkat cannot reach your running infrastructure. Isolation between customers comes from the topology itself: there is no shared control plane to break into.
+Because no Kamarkat component serves more than one tenant, a compromise of Kamarkat cannot reach your running infrastructure. Isolation between customers comes from the topology itself: there is no shared management cluster to break into.
 
 ## How a change reaches your box
 
@@ -29,9 +29,9 @@ Because no Kamarkat component serves more than one tenant, a compromise of Kamar
 2. Your repository's own dependency-update automation **proposes** it as a pull request that changes one version field.
 3. A **pre-flight check** runs inside your box against the target cluster and attaches its verdict to the proposal.
 4. You **merge** it, or configure your repository to merge qualifying proposals automatically.
-5. Your control plane **reconciles** the new version.
+5. Your management cluster **reconciles** the new version.
 
-Kamarkat does step 1 and nothing else. Every change reaches running infrastructure through your repository and your control plane.
+Kamarkat does step 1 and nothing else. Every change reaches running infrastructure through your repository and your management cluster.
 
 ## Reaching your box
 
@@ -47,15 +47,15 @@ If Kamarkat is unreachable, your box keeps reconciling. Nothing is ever withdraw
 
 No Kamarkat component opens a connection into your box, holds a credential for it, or queries it.
 
-### Every box carries a full control plane
+### Every box carries its own management cluster
 
-There is no shared control plane between tenants. That is what makes the custody claim true, and it sets the floor on what a box costs.
+There is no shared management cluster between tenants. That is what makes the custody claim true, and it sets the floor on what a box costs.
 
 ## Frequently asked questions
 
 <AccordionGroup>
   <Accordion title="Can Kamarkat push a change to my clusters?">
-    No. Kamarkat holds no access to your repository or your clusters. A change takes effect only when your repository says so and your control plane applies it.
+    No. Kamarkat holds no access to your repository or your clusters. A change takes effect only when your repository says so and your management cluster applies it.
   </Accordion>
   <Accordion title="What if a published version is defective?">
     A published version is never changed in place. Kamarkat publishes a new version that supersedes it, and that version reaches you as a proposal like any other.

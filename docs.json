@@ -53,6 +53,20 @@
         ]
       },
       {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Operate your box",
+            "pages": [
+              "guides/add-a-managed-cluster",
+              "guides/add-an-environment",
+              "guides/promote-a-release",
+              "guides/retire-an-environment"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Features",
         "groups": [
           {

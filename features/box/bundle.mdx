@@ -23,7 +23,7 @@ None of the bundle's content is copied into your repository. Upgrades write the 
 
 ## How it works
 
-Your control plane pulls the bundle chart at the version in `bundle.yaml` and renders it with your `values.yaml`. Every platform-owned Application on the cluster comes from that one render, so a cluster cannot run two versions at once.
+Your management cluster pulls the bundle chart at the version in `bundle.yaml` and renders it with your `values.yaml`. Every platform-owned Application on the cluster comes from that one render, so a cluster cannot run two versions at once.
 
 How versions are published, proposed and taken is covered in [Versions](/versions/overview).
 

@@ -72,7 +72,7 @@ These delete infrastructure in your cloud account and are not reversible. Both r
 
 `kakt teardown` takes the whole box: it reads the managed clusters from the management cluster and removes them with it. `kakt spoke teardown` is for taking managed clusters down on their own, and for the case where the management cluster is already gone and its clusters would otherwise be left running.
 
-Removing an **application** is not a command. Delete its directory under `environments/<env>/<app>/`, regenerate the hostname aggregate with `kakt fleet hosts aggregate`, and commit — your control plane removes what the declaration no longer asks for.
+Removing an **application** is not a command. Delete its directory under `environments/<env>/<app>/`, regenerate the hostname aggregate with `kakt fleet hosts aggregate`, and commit — your management cluster removes what the declaration no longer asks for.
 
 [Boxes and clusters →](/cli/boxes-and-clusters#destroy)
 

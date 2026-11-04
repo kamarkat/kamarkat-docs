@@ -4,7 +4,7 @@ description: "An upgrade is a pull request against your GitOps repository that c
 keywords: ["upgrades", "renovate", "pull request", "rollback", "minimum version", "reversible"]
 ---
 
-> Kamarkat publishes a version. Your own Renovate proposes it as a pull request, and your control plane applies it once you merge.
+> Kamarkat publishes a version. Your own Renovate proposes it as a pull request, and your management cluster applies it once you merge.
 
 ## What it is
 
@@ -24,7 +24,7 @@ The pull request changes `targetRevision` and `bundleVersion` in `registry/clust
   <Step title="You merge">
     Nothing changes in a cluster before you merge.
   </Step>
-  <Step title="Your control plane reconciles">
+  <Step title="Your management cluster reconciles">
     The cluster pulls the bundle chart at the new version and reconciles from it.
   </Step>
 </Steps>
@@ -49,7 +49,7 @@ Reverting the version restores what the cluster asks for. It does not undo what 
 
 ### Kamarkat holds no access to your repository or clusters
 
-Kamarkat's part ends at publishing a version. The proposal comes from your Renovate, and a cluster changes only when you merge it and your own control plane reconciles the result.
+Kamarkat's part ends at publishing a version. The proposal comes from your Renovate, and a cluster changes only when you merge it and your own management cluster reconciles the result.
 
 ### Proposals depend on your Renovate
 

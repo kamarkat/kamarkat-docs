@@ -1,6 +1,6 @@
 ---
 title: "Cluster lifecycle"
-description: "Day-0 creates your management cluster once, under your control. After that, every cluster is a declaration in your repository, reconciled by your own control plane."
+description: "Day-0 creates your management cluster once, under your control. After that, every cluster is a declaration in your repository, reconciled by your own management cluster."
 keywords: ["cluster lifecycle", "day-0", "cluster template", "kakt tenant add-cluster"]
 ---
 
@@ -32,7 +32,7 @@ Day-0 commits the facts it discovers, such as the control-plane address, to your
 
 ### 4. Declare managed clusters
 
-To add a managed cluster, render the **cluster template** into a new directory in your repository and commit it. Your control plane provisions it, and keeps it in its desired state from then on.
+To add a managed cluster, render the **cluster template** into a new directory in your repository and commit it. Your management cluster provisions it, and keeps it in its desired state from then on.
 
 ## What you need to know
 

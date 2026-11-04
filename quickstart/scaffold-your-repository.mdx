@@ -79,7 +79,7 @@ acme-gitops/
 └── renovate.json                  proposes new platform versions as pull requests
 ```
 
-`bundle.yaml` changes only through upgrade proposals. `values.yaml` holds only what you change from the defaults.
+The platform version in `bundle.yaml` changes only through upgrade proposals. Its `repoURL` names the registry the platform's charts are pulled from, and changes if that registry moves. `values.yaml` holds only what you change from the defaults.
 
 ## Next
 

@@ -8,90 +8,95 @@ import { BoundaryStack } from "/snippets/boundary-stack.jsx";
 
 ## Architecture overview
 
-A Kamarkat deployment lives entirely in accounts you own: a git organization that holds the desired state, and a cloud account that runs the box. The box is a management cluster running your control plane, plus the managed clusters it provisions. Kamarkat delivers the platform into the box, but holds no credential to it and never connects into it.
+A Kamarkat deployment lives entirely in accounts you own: a git organization that holds the desired state, and a cloud account that runs the box. The box is a management cluster, which runs the platform's services, plus the managed clusters it creates, where your applications run. Kamarkat delivers the platform into the box, but holds no credential to it and never connects into it.
 
-Kamarkat's side is small: a release pipeline publishes bundle versions to a registry.
+Kamarkat's side is small: a release pipeline publishes bundle versions to a registry, and your box pulls them.
+
+A box is two kinds of cluster, and every cluster has two kinds of node.
 
 <div className="arch-sys not-prose">
-  <div className="arch-split">
-    <div className="arch-zone">
-      <span className="arch-zone-tab">Your git organization and cloud account</span>
-      <div className="arch-zone-body">
-        <div className="arch-group">
-          <span className="arch-label">Your git organization</span>
-          <div className="arch-caps">
-            <a className="arch-cap" href="/features/box/bundle"><span className="arch-icon arch-icon-neutral"><Icon icon="code-branch" /></span>GitOps repository</a>
-            <a className="arch-cap" href="/features/workloads/deploying-applications"><span className="arch-icon arch-icon-neutral"><Icon icon="folder-open" /></span>Application repositories</a>
-            <a className="arch-cap" href="/versions/upgrades"><span className="arch-icon arch-icon-neutral"><Icon icon="robot" /></span>Upgrade proposals (Renovate)</a>
-            <a className="arch-cap" href="/features/capabilities/cluster-lifecycle"><span className="arch-icon arch-icon-neutral"><Icon icon="terminal" /></span>Day-0 runner (your CI)</a>
-          </div>
-        </div>
-        <div className="arch-inline-wire">
-          <span className="arch-wire"></span>
-          <span className="arch-wire-label">Desired state</span>
-        </div>
-        <div className="arch-group arch-group-managed">
-          <span className="arch-label">Your box · Management cluster: your control plane</span>
-          <div className="arch-caps">
-            <a className="arch-cap" href="/features/capabilities/gitops-and-composition"><span className="arch-icon"><Icon icon="code-merge" /></span>GitOps and composition</a>
-            <a className="arch-cap" href="/features/capabilities/cluster-lifecycle"><span className="arch-icon"><Icon icon="server" /></span>Cluster lifecycle</a>
-            <a className="arch-cap" href="/features/capabilities/secret-management"><span className="arch-icon"><Icon icon="key" /></span>Secret management</a>
-            <a className="arch-cap" href="/features/capabilities/certificate-management"><span className="arch-icon"><Icon icon="certificate" /></span>Certificate management</a>
-            <a className="arch-cap" href="/features/capabilities/identity-management"><span className="arch-icon"><Icon icon="id-card" /></span>Identity management</a>
-            <a className="arch-cap" href="/features/capabilities/gateway-and-login"><span className="arch-icon"><Icon icon="shield-halved" /></span>Gateway and login</a>
-            <a className="arch-cap" href="/features/capabilities/networking-and-dns"><span className="arch-icon"><Icon icon="network-wired" /></span>Networking and DNS</a>
-            <a className="arch-cap" href="/features/capabilities/admission-policy"><span className="arch-icon"><Icon icon="scale-balanced" /></span>Admission policy</a>
-            <a className="arch-cap" href="/features/capabilities/observability"><span className="arch-icon"><Icon icon="chart-line" /></span>Observability</a>
-            <a className="arch-cap" href="/features/capabilities/databases"><span className="arch-icon"><Icon icon="database" /></span>Databases</a>
-            <a className="arch-cap" href="/features/capabilities/console-and-platform-services"><span className="arch-icon"><Icon icon="desktop" /></span>Console and platform services</a>
-          </div>
-          <div className="arch-inline-wire">
-            <span className="arch-wire"></span>
-            <span className="arch-wire-label">Provisions and reconciles</span>
-          </div>
-          <span className="arch-label">Your box · Managed clusters</span>
-          <div className="arch-caps">
-            <a className="arch-cap" href="/features/workloads/deploying-applications"><span className="arch-icon arch-icon-neutral"><Icon icon="cubes" /></span>Your applications</a>
-            <a className="arch-cap" href="/features/capabilities/gitops-and-composition"><span className="arch-icon"><Icon icon="code-merge" /></span>GitOps and composition</a>
-            <a className="arch-cap" href="/features/capabilities/secret-management"><span className="arch-icon"><Icon icon="key" /></span>Secret management</a>
-            <a className="arch-cap" href="/features/capabilities/certificate-management"><span className="arch-icon"><Icon icon="certificate" /></span>Certificate management</a>
-            <a className="arch-cap" href="/features/capabilities/gateway-and-login"><span className="arch-icon"><Icon icon="shield-halved" /></span>Gateway and login</a>
-            <a className="arch-cap" href="/features/capabilities/networking-and-dns"><span className="arch-icon"><Icon icon="network-wired" /></span>Networking and DNS</a>
-            <a className="arch-cap" href="/features/capabilities/admission-policy"><span className="arch-icon"><Icon icon="scale-balanced" /></span>Admission policy</a>
-            <a className="arch-cap" href="/features/capabilities/observability"><span className="arch-icon"><Icon icon="chart-line" /></span>Observability</a>
-            <a className="arch-cap" href="/features/capabilities/databases"><span className="arch-icon"><Icon icon="database" /></span>Databases</a>
-            <a className="arch-cap" href="/features/capabilities/console-and-platform-services"><span className="arch-icon"><Icon icon="desktop" /></span>Console and platform services</a>
-            <a className="arch-cap" href="/features/capabilities/cluster-lifecycle"><span className="arch-icon arch-icon-neutral"><Icon icon="house" /></span>On-premises nodes (optional)</a>
-          </div>
-        </div>
-        <div className="arch-caps">
-            <a className="arch-cap" href="/features/admin/escrow"><span className="arch-icon arch-icon-neutral"><Icon icon="vault" /></span>Break-glass escrow (outside the box)</a>
-        </div>
+<div className="arch-cl">
+  <div className="arch-cl-git">
+    <div className="arch-group">
+      <span className="arch-label">Your git organization</span>
+      <div className="arch-caps">
+        <a className="arch-cap" href="/features/box/bundle"><span className="arch-icon arch-icon-neutral"><Icon icon="code-branch" /></span>GitOps repository</a>
+        <a className="arch-cap" href="/features/workloads/deploying-applications"><span className="arch-icon arch-icon-neutral"><Icon icon="folder-open" /></span>Application repositories</a>
+        <a className="arch-cap" href="/versions/upgrades"><span className="arch-icon arch-icon-neutral"><Icon icon="robot" /></span>Upgrade proposals (Renovate)</a>
+        <a className="arch-cap" href="/features/capabilities/cluster-lifecycle"><span className="arch-icon arch-icon-neutral"><Icon icon="terminal" /></span>Day-0 runner (your CI)</a>
       </div>
     </div>
-    <div className="arch-links">
-      <div className="arch-link">
-        <span className="arch-wire-label">Published bundle versions</span>
-        <span className="arch-wire arch-wire-h arch-wire-rev"></span>
-      </div>
-      <div className="arch-lock">
-        <Icon icon="lock" />
-        <span>Outbound only. Kamarkat holds no credentials.</span>
-      </div>
-    </div>
-    <div className="arch-zone arch-zone-key">
-      <span className="arch-zone-tab">Kamarkat</span>
-      <div className="arch-zone-body">
-        <div className="arch-caps">
-            <a className="arch-cap" href="/versions/overview"><span className="arch-icon"><Icon icon="rocket" /></span>Release pipeline</a>
-            <a className="arch-cap" href="/versions/overview"><span className="arch-icon"><Icon icon="box-archive" /></span>Bundle registry</a>
-        </div>
-      </div>
+    <div className="arch-inline-wire">
+      <span className="arch-wire"></span>
+      <span className="arch-wire-label">Desired state</span>
     </div>
   </div>
+
+  <div className="arch-group arch-group-managed arch-cl-box">
+  <span className="arch-label">Your box</span>
+  <div className="arch-cl-row">
+  <div className="arch-cl-cluster">
+    <a className="arch-cl-title" href="/features/box/overview">Management cluster</a>
+    <span className="arch-cl-sub">One per box. Operates the box.</span>
+    <div className="arch-cl-node">
+      <span className="arch-label">Control plane nodes</span>
+      <span className="arch-cl-what">Kubernetes itself</span>
+    </div>
+    <a className="arch-cl-node arch-cl-node-main" href="/features/capabilities/overview">
+      <span className="arch-label">Worker nodes</span>
+      <span className="arch-cl-what">Platform services</span>
+      <span className="arch-cl-detail">GitOps, cluster lifecycle, secrets, identity, login, observability, console</span>
+    </a>
+  </div>
+
+  <div className="arch-cl-flows">
+    <div className="arch-cl-flow">
+      <a className="arch-wire-label" href="/features/capabilities/gitops-and-composition">Creates and reconciles</a>
+      <span className="arch-wire arch-wire-h"></span>
+    </div>
+    <div className="arch-cl-flow">
+      <a className="arch-wire-label" href="/features/capabilities/secret-management">Secrets, identity, login</a>
+      <span className="arch-wire arch-wire-h"></span>
+    </div>
+    <div className="arch-cl-flow">
+      <a className="arch-wire-label" href="/features/capabilities/observability">Metrics, logs, alerts</a>
+      <span className="arch-wire arch-wire-h arch-wire-rev"></span>
+    </div>
+  </div>
+
+  <div className="arch-cl-cluster">
+    <a className="arch-cl-title" href="/features/workloads/environments">Managed clusters</a>
+    <span className="arch-cl-sub">One or more per environment. Runs your apps.</span>
+    <div className="arch-cl-node">
+      <span className="arch-label">Control plane nodes</span>
+      <span className="arch-cl-what">Kubernetes itself</span>
+    </div>
+    <a className="arch-cl-node arch-cl-node-main" href="/features/workloads/deploying-applications">
+      <span className="arch-label">Worker nodes</span>
+      <span className="arch-cl-what">Your applications</span>
+      <span className="arch-cl-detail">with the local services they need: gateways, databases, agents</span>
+    </a>
+    <a className="arch-cl-node arch-cl-node-opt" href="/features/capabilities/cluster-lifecycle">
+      <span className="arch-label">On-premises worker nodes · dev only</span>
+      <span className="arch-cl-detail">Your own machines, joining over your tailnet</span>
+    </a>
+  </div>
+  </div>
+  </div>
+
+  <div className="arch-caps arch-cl-escrow">
+    <a className="arch-cap" href="/features/admin/escrow"><span className="arch-icon arch-icon-neutral"><Icon icon="vault" /></span>Break-glass escrow (outside the box)</a>
+  </div>
+</div>
 </div>
 
-Select any part to read about it. Your GitOps repository is the only source of desired state: your control plane on the management cluster reconciles it and provisions each managed cluster you declare, where your applications run. Kamarkat only publishes versions, which your box pulls.
+Select any part to read about it.
+
+- **Control plane nodes** run Kubernetes on every cluster. Nothing of yours runs on them.
+- **The management cluster's workers** run the platform's services. Your applications never run there.
+- **A managed cluster's workers** run your applications. The management cluster creates each managed cluster, then delivers its platform and your apps to it; the managed cluster reads its secrets and identities from the management cluster and reports its telemetry back.
+
+To see every component on each node type, open any version under [Releases](/versions/lines/0-1).
 
 ## Deployment boundaries
 
@@ -105,7 +110,7 @@ A selectable capability is part of its boundary only when you select it in your 
 
 ## Components
 
-Each box in the diagram is a capability. What each one gives you, and the open-source projects it is built on, is on its page under [Capabilities](/features/capabilities/overview). Your git organization's part is described in [Git connection](/features/admin/git-connection), and the break-glass escrow in [Escrow](/features/admin/escrow).
+The platform's services are grouped into capabilities. What each one gives you, and the open-source projects it is built on, is on its page under [Capabilities](/features/capabilities/overview). Your git organization's part is described in [Git connection](/features/admin/git-connection), and the break-glass escrow in [Escrow](/features/admin/escrow).
 
 ## Connectivity model
 
@@ -118,7 +123,7 @@ Stopping using Kamarkat stops nothing running: your box holds everything it need
 
 ## Delivery and upgrades
 
-**Day-0** runs once, from your CI, under your credentials. It creates the management cluster and commits the facts it discovers to your GitOps repository. After that, **the repository is the only authority** for the box.
+**Day-0** runs once, from your CI, under your credentials. It creates the management cluster and your first managed cluster, and commits the facts it discovers to your GitOps repository. After that, **the repository is the only authority** for the box.
 
 **Platform upgrades** arrive as pull requests from your own upgrade automation, each changing one version field. A pre-flight check runs inside your box against the target cluster and reports its verdict. Nothing changes until you merge.
 

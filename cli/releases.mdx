@@ -16,11 +16,7 @@ Rehearses the next version and checks every component behind its latest release 
 soloz release check
 ```
 
-It runs every packaging step and release gate for the next version. It then lists every component behind its project's newest release that the component catalog does not explain. Each [release page](/versions/lines/0-1) shows those reasons beside red versions, and a version that cannot be explained cannot be documented. It ends with `Ready. <version> can be released.`
-
-| Flag | Meaning |
-| :- | :- |
-| `--docs-dir` | The docs checkout whose sync script checks the reasons. Defaults to `../kamarkat` |
+It runs every packaging step and release gate for the next version. It then lists every component behind its project's newest release today that the component catalog does not explain. Each [release page](/versions/lines/0-1) shows those reasons beside red versions, and a version that cannot be explained cannot be documented. It ends with `Ready. <version> can be released.`
 
 ## soloz release publish
 
@@ -72,6 +68,21 @@ KUBECONFIG=<hub kubeconfig> soloz release sync --version 0.1.17-rc.1
 ```
 
 Use it when a release reported that the box did not converge. Fix the Applications it named, then run this again. Never publish the version again.
+
+## soloz release docs
+
+Adds published versions to the [release pages](/versions/lines/0-1), and renders every release page.
+
+```bash
+soloz release docs 0.1.17-rc.1
+soloz release docs
+```
+
+For each version named, it records each component's repository link, the newest upstream release on the version's release date, whether the version shipped it, and the catalog's reason when it did not. A version behind with no reason fails, and nothing is written for it. It then renders the release and line pages from every version the docs hold. With no version, it only renders.
+
+| Flag | Meaning |
+| :- | :- |
+| `--docs-dir` | The docs checkout to write into. Defaults to `../kamarkat` |
 
 ## Flags every release command takes
 

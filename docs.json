@@ -107,7 +107,8 @@
               "cli/boxes-and-clusters",
               "cli/applications",
               "cli/escrow-and-encryption",
-              "cli/support"
+              "cli/support",
+              "cli/releases"
             ]
           }
         ]

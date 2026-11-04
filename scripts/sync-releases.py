@@ -43,7 +43,7 @@ import subprocess
 import sys
 import tempfile
 import urllib.request
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import yaml
@@ -72,10 +72,24 @@ def slug(v: str) -> str:
     return v.replace(".", "-")
 
 
-def gh(path: str, paginate: bool = True) -> list[dict]:
-    out = subprocess.run(["gh", "api", *(["--paginate"] if paginate else []), path, "--jq", ".[] | @json"],
-                         check=True, capture_output=True, text=True).stdout
-    return [json.loads(line) for line in out.splitlines()]
+def gh(path: str, paginate: bool = True, missing_ok: bool = False) -> list[dict] | None:
+    """The API's rows, or None when it has no such resource and that is expected.
+
+    `check=True` raised a CalledProcessError whose message was the command line,
+    so a 404 on one package surfaced as a traceback that named no component and
+    discarded the reason gh printed. Every failure now says what gh said, and a
+    caller that can carry on without the resource asks for `missing_ok`.
+    """
+    r = subprocess.run(["gh", "api", *(["--paginate"] if paginate else []), path, "--jq", ".[] | @json"],
+                       capture_output=True, text=True)
+    if r.returncode:
+        err = " ".join((r.stderr or "").split()) or "no output on stderr"
+        if "HTTP 404" in err:
+            if missing_ok:
+                return None
+            sys.exit(f"sync-releases: {path} does not exist\n  {err}")
+        sys.exit(f"sync-releases: gh api {path} failed\n  {err}")
+    return [json.loads(line) for line in r.stdout.splitlines()]
 
 
 def published(owner: str) -> dict[str, str]:
@@ -173,7 +187,17 @@ class Upstream:
         owner, name = package.split("/", 1)
         path = f"/orgs/{owner}/packages/container/{name.replace('/', '%2F')}/versions?per_page=100"
         if ("ghcr", package) not in self.cache:
-            self.cache[("ghcr", package)] = gh(path)
+            rows = gh(path, missing_ok=True)
+            if rows is None:
+                # The platform builds this image, but nothing has been published
+                # under that name: a component whose build workflow has not run
+                # yet, usually because the commit that adds it is not pushed.
+                # There is no latest for it to be behind, so it is reported as
+                # neither current nor behind rather than failing the run.
+                print(f"sync-releases: {package} is not published in the registry; "
+                      f"reporting no latest version for it", file=sys.stderr)
+                rows = []
+            self.cache[("ghcr", package)] = rows
         built = [v for v in self.cache[("ghcr", package)] if v["created_at"] <= before]
         if not built:
             return "", ""
@@ -301,7 +325,12 @@ def unexplained(doc: dict, catalog: list[dict]) -> list[str]:
         items = [i for i in entries[c["component"]].get("behind") or []
                  if i.get("reason") and i.get("status") in STATUSES]
         found = []
+        # A row lists every version of the artefact it ships; only those behind need
+        # a reason. A build the platform makes has a commit for latest, not a version.
+        numbered = re.fullmatch(r"\d+(?:\.\d+)*", c["latest"] or "")
         for v in (t.strip() for t in c["version"].split(",")):
+            if numbered and current(v, c["latest"]):
+                continue
             item = next((i for i in items if v in i.get("versions", [])), None)
             if not item:
                 missing.append(f"{c['component']} [{v}]")
@@ -349,7 +378,7 @@ def check(inventory: str, catalog: list[dict]) -> None:
     """Before a version is published: which of its components are behind their latest
     release today with no reason in the catalog. Writes nothing."""
     doc = json.loads(Path(inventory).read_text())
-    annotate(doc, datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"), catalog, Upstream())
+    annotate(doc, datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), catalog, Upstream())
     missing = unexplained(doc, catalog)
     behind = sum(1 for c in doc["components"] if c["current"] is False)
     print(f"check: {behind} of {len(doc['components'])} components behind their latest release, "

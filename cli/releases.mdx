@@ -1,0 +1,82 @@
+---
+title: "Releases"
+description: "How the platform team rehearses, publishes and promotes a bundle version."
+keywords: ["soloz release", "publish", "promote", "bundle version", "release"]
+---
+
+> These commands are for the platform team. They publish the bundle versions every box installs. You never run them on your own box: a new version reaches you as an upgrade proposal you accept.
+
+Each command runs from the root of a `zero-ops` checkout and runs that checkout's own release scripts, so there is one release path. Without an installed `soloz`, use `go run ./cmd/soloz release …` from the checkout.
+
+## soloz release check
+
+Rehearses the next version and checks every component behind its latest release has a reason. Nothing is pushed, so the version stays free.
+
+```bash
+soloz release check
+```
+
+It runs every packaging step and release gate for the next version. It then lists every component behind its project's newest release that the component catalog does not explain. Each [release page](/versions/lines/0-1) shows those reasons beside red versions, and a version that cannot be explained cannot be documented. It ends with `Ready. <version> can be released.`
+
+| Flag | Meaning |
+| :- | :- |
+| `--docs-dir` | The docs checkout whose sync script checks the reasons. Defaults to `../kamarkat` |
+
+## soloz release publish
+
+Publishes the next version, promotes the tenant to it, and verifies the box reached it.
+
+```bash
+soloz release publish --dry-run
+soloz release publish
+soloz release publish --version 0.1.17-rc.1
+```
+
+The steps run in a fixed order:
+
+1. **Pull** the tenant's GitOps repository.
+2. **Decide the version** from the tenant's current one: the next release candidate, unless `--version` names one. A version already referenced is refused.
+3. **Publish** it: package, run every release gate, write the component inventory, push. If this fails, nothing is promoted.
+4. **Promote** every reference to the old version, check none survives, commit and push.
+5. **Sync** the box and verify every Application reached the version.
+
+It ends with `Done. <version> is published, promoted and running.` A version is published once: if a step fails after publishing starts, the next attempt takes the next version.
+
+| Flag | Meaning |
+| :- | :- |
+| `--dry-run` | Say what each step would do; change nothing |
+| `--no-promote` | Publish only |
+| `--no-sync` | Publish and promote; do not sync the box |
+
+## soloz release promote
+
+Promotes the tenant to a version already published, then syncs and verifies the box. This is for a stable version, which is published when a release is created on GitHub.
+
+```bash
+soloz release promote --version 0.1.17
+```
+
+The version must be named and must already be in the registry: promoting first would write a reference to nothing.
+
+| Flag | Meaning |
+| :- | :- |
+| `--dry-run` | Say what each step would do; change nothing |
+| `--no-sync` | Promote; do not sync the box |
+
+## soloz release sync
+
+Syncs the box to a version already promoted, and verifies every Application reached it.
+
+```bash
+KUBECONFIG=<hub kubeconfig> soloz release sync --version 0.1.17-rc.1
+```
+
+Use it when a release reported that the box did not converge. Fix the Applications it named, then run this again. Never publish the version again.
+
+## Flags every release command takes
+
+| Flag | Meaning |
+| :- | :- |
+| `--version` | The version. Defaults to the tenant's current release candidate + 1 |
+| `--gitops-dir` | The tenant's GitOps checkout. Defaults to `.local-e2e/nutgraf-gitops` |
+| `--owner` | The GitHub organisation whose registry the bundle is published to. Defaults to `soloz-io` |

@@ -1,0 +1,32 @@
+---
+title: "Remove an environment"
+description: "Delete the environment's directory and commit. Its apps are removed from their clusters; the clusters keep running until you remove them."
+keywords: ["remove environment", "retire environment", "delete environment", "teardown"]
+---
+
+> Removing an environment removes its apps. It never removes a cluster.
+
+An environment is a directory of app declarations. Deleting it removes those apps from the clusters they ran on. The clusters themselves are declared separately, under `registry/clusters/`, and keep running, and billing, until you remove them.
+
+## Before you start
+
+- **Each app's database goes with it.** An app's database lives on its cluster, and removing the app removes the database. Anything you still need must be out before you push.
+- **Check which clusters are left empty.** Note every `clusterName` in `environments/<env>/`. A cluster that runs no other environment's apps is empty once you are done.
+
+## Step 1: Remove its apps
+
+```bash
+git rm -r environments/stg
+kakt app hosts aggregate
+git add registry && git commit -m "Remove stg" && git push
+```
+
+The platform removes each app it no longer finds a declaration for, and everything the app ran on its cluster with it. `kakt app hosts aggregate` drops the environment's hostnames from each cluster's gateway.
+
+## Step 2: Remove the clusters it leaves empty
+
+Each cluster the environment ran on is still there. For each one no other app names, follow [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster).
+
+## What stays behind
+
+- **Secrets.** An app's secrets are stored in your box's secret store under its cluster and app, and removing the app does not delete them. Delete them there once you no longer need them.

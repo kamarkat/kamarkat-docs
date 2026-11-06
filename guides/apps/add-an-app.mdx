@@ -1,0 +1,44 @@
+---
+title: "Add an app"
+description: "Declare the app in an environment, on a managed cluster that serves it, then supply its secrets and point its build at it."
+keywords: ["add app", "kakt tenant add-app", "declare", "application", "workload"]
+---
+
+> An app is a directory in an environment. It names the cluster it runs on.
+
+## Before you start
+
+- **A managed cluster serves the environment.** The app must run on a cluster declared with that `--environment`. See [Add a managed cluster](/guides/clusters/add-a-managed-cluster).
+
+## Step 1: Declare it
+
+From the root of your GitOps repository:
+
+```bash
+kakt tenant add-app \
+  --env dev \
+  --app shop \
+  --cluster acme-01 \
+  --owner-email platform@acme.example \
+  --workload frontend \
+  --workload bff
+```
+
+The cluster is checked before anything is written: it must be declared, it must be a managed cluster, and it must serve `dev`. It writes `environments/dev/shop/values.yaml` and a `Chart.yaml` per workload, then regenerates the hostname aggregate.
+
+## Step 2: Fill in what the app is
+
+In `environments/dev/shop/values.yaml`, set its public hostnames, its quota and the secrets it declares. See [Declare your app](/quickstart/declare-your-app) for each field.
+
+```bash
+kakt app hosts aggregate
+git add environments registry && git commit -m "Declare shop" && git push
+```
+
+## Step 3: Supply its secrets
+
+See [Supply secrets](/guides/secrets/supply-secrets). Its workloads do not start until every declared secret is present.
+
+## Step 4: Deploy it
+
+Point the app's build at the `Chart.yaml` files you just declared. See [Deploy a new version](/guides/apps/deploy-a-new-version).

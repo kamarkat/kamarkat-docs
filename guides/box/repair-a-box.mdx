@@ -1,0 +1,33 @@
+---
+title: "Repair a box"
+description: "Find what is not converging, then re-run Day-0 if it failed part-way, or re-apply the seed when a seed parameter changed."
+keywords: ["repair", "reseed", "day-0", "failed", "not converging"]
+---
+
+> Find the outstanding invariant first. The repair follows from it.
+
+## Step 1: Find what is outstanding
+
+```bash
+kakt verify --cluster acme-hub
+```
+
+It names the invariant that does not hold and what it is waiting on. Most causes are a commit away: fix the declaration it names and push.
+
+## Day-0 failed part-way
+
+Start the **Bootstrap cluster** workflow in your repository again. Completed phases are not repeated, so it resumes where it stopped. See [Bootstrap your box](/quickstart/bootstrap-your-box) for each stage.
+
+## A seed parameter changed
+
+The Day-0 seed reaches only newly created clusters. To bring an existing management cluster up to the seed the current CLI renders:
+
+```bash
+kakt reseed --kubeconfig acme-hub.kubeconfig
+```
+
+The environment, provider and topology come from the cluster's existing seed, so a reseed cannot change which cluster the seed describes. The platform version is left as the cluster records it.
+
+## Nobody can sign in
+
+Use the admin kubeconfig in your escrow. See [Use break-glass access](/guides/escrow/use-break-glass-access).

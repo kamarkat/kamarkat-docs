@@ -1,0 +1,40 @@
+---
+title: "Resize the management cluster"
+description: "Change the worker count in the management cluster's topology file and commit. Nothing scales it for you."
+keywords: ["resize", "scale", "workers", "management cluster", "replicas", "capacity"]
+---
+
+> One number in one file. Nothing changes the size of a cluster for you.
+
+The management cluster's topology is written by Day-0 into your repository. Once the cluster is provisioned, Day-0 never writes it again, and the file is yours: the management cluster reconciles itself from it.
+
+## Before you start
+
+- **Lowering it moves workloads.** The nodes removed take their pods with them, and those pods start again on the nodes that remain. The platform's services run here, so make sure what is left can hold them.
+- **It is billed.** Each cloud worker is a server in your cloud account.
+
+## Step 1: Change the count
+
+In `registry/clusters/<management-cluster>/generated/hub-cluster.yaml`, set the worker `replicas`:
+
+```yaml registry/clusters/acme-hub/generated/hub-cluster.yaml
+  topology:
+    workers:
+      machineDeployments:
+      - class: default-worker
+        name: md-0
+        replicas: 3   # was 2
+```
+
+<Warning>
+Do not add autoscaler annotations to this file while `replicas` is set. The cluster rejects a topology carrying both, and the rejection blocks every later change to the cluster.
+</Warning>
+
+## Step 2: Commit and verify
+
+```bash
+git commit -am "Resize acme-hub to 3 workers" && git push
+kakt verify --cluster acme-hub
+```
+
+To resize a managed cluster, see [Resize a managed cluster](/guides/clusters/resize-a-managed-cluster).

@@ -1,0 +1,30 @@
+---
+title: "Remove an app"
+description: "Delete the app's directory, regenerate the hostname aggregate, commit. Its database goes with it; its secrets stay."
+keywords: ["remove app", "delete app", "decommission"]
+---
+
+> Delete the declaration. The platform removes everything the app ran.
+
+An app is removed from one environment at a time. To remove it everywhere, repeat this for each environment it is declared in.
+
+## Before you start
+
+- **Its database goes with it.** Anything you still need must be out before you push.
+- **Stop its build from deploying it.** A build that commits a version to a removed app's `Chart.yaml` declares it again.
+
+## Step 1: Delete the declaration
+
+```bash
+git rm -r environments/dev/shop
+kakt app hosts aggregate
+git add registry && git commit -m "Remove shop from dev" && git push
+```
+
+The platform removes the app from its cluster on the next pass: its namespace, its workloads and its database. Its hostnames are dropped from the cluster's gateway.
+
+## What stays behind
+
+- **Secrets.** Stored in your box's secret store under the cluster and the app, and not deleted with it. Delete them there once you no longer need them.
+- **Its charts.** Every version stays in your registry.
+- **Backups.** The app's database backups stay in your object storage.

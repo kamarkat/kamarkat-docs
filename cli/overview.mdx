@@ -28,6 +28,24 @@ kakt bundle-version
 Run `kakt <command> --help` for the complete flag set of any command. This page lists what exists; the pages below document the flags that change what a command does.
 </Note>
 
+### Sign in
+
+| Command | What it does |
+| :- | :- |
+| `kakt login` | Authenticate to the Infisical your boxes escrow to, as yourself |
+| `kakt whoami` | Show which identity `kakt` would use to reach a hub, and where the session is kept |
+| `kakt logout` | Remove this machine's stored session |
+
+A command that reaches a management cluster — `kakt kubeconfig`, `kakt teardown` — does not read a kubeconfig off your disk. The box's repository declares which escrow holds its credentials, and `kakt` reads the escrowed kubeconfig with **your** identity, uses it, and discards it. So any authorized workstation can operate the box, and none of them needs a copy of anything.
+
+Automation does not log in. Set the machine identity instead, which every command prefers when it is present: `INFISICAL_ESCROW_URL`, `INFISICAL_ESCROW_PROJECT_ID`, `INFISICAL_ESCROW_CLIENT_ID`, `INFISICAL_ESCROW_CLIENT_SECRET`.
+
+<Note>
+Reading the escrowed kubeconfig gives you **cluster-admin**, because that is what the credential is. Being logged in is an authorization boundary at the credential, not per-person RBAC inside the cluster — day-to-day access is OIDC through your box's own identity provider, where you authenticate as yourself to the API server.
+</Note>
+
+[Signing in →](/cli/signing-in)
+
 ### Create and declare
 
 | Command | What it does |
@@ -63,14 +81,15 @@ Run `kakt <command> --help` for the complete flag set of any command. This page 
 
 | Command | What it does |
 | :- | :- |
-| `kakt spoke teardown` | Destroy managed clusters, through your provider's API |
+| `kakt tenant remove-cluster` | Remove a managed cluster: its declaration, then, with `--destroy`, the cluster |
+| `kakt spoke teardown` | Destroy managed clusters through your provider's API, when the management cluster is gone |
 | `kakt teardown` | Destroy a whole box: its management cluster, the managed clusters it holds, and their infrastructure |
 
 <Warning>
-These delete infrastructure in your cloud account and are not reversible. Both require an explicit confirmation flag.
+These delete infrastructure in your cloud account and are not reversible. Each requires an explicit flag: `--destroy`, `--force` or `--confirm`.
 </Warning>
 
-`kakt teardown` takes the whole box: it reads the managed clusters from the management cluster and removes them with it. `kakt spoke teardown` is for taking managed clusters down on their own, and for the case where the management cluster is already gone and its clusters would otherwise be left running.
+`kakt teardown` takes the whole box: it reads the managed clusters from the management cluster and removes them with it. `kakt tenant remove-cluster` takes one managed cluster down while the box runs. `kakt spoke teardown` is only for when the management cluster is already gone and its clusters would otherwise be left running.
 
 Removing an **application** is not a command. Delete its directory under `environments/<env>/<app>/`, regenerate the hostname aggregate with `kakt app hosts aggregate`, and commit — your management cluster removes what the declaration no longer asks for.
 

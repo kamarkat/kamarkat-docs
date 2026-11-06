@@ -12,7 +12,7 @@ Both clusters serve the same environment while you do this. Several clusters may
 
 ## Before you start
 
-- **The replacement needs a new name.** A cluster's name also names its secret path and its database backup prefix, so a name is never reused. See [Retire an environment](/guides/retire-an-environment#the-cluster-name-cannot-be-reused).
+- **The replacement needs a new name.** A cluster's name also names its secret path and its database backup prefix, so a name is never reused. See [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster#a-cluster-name-is-never-reused).
 - **An app's data does not follow it.** Each app's database lives on the cluster it runs on. An app moved to a replacement gets a new, empty database there. Decide how its data gets across — a restore from the predecessor's backups, or an export and load the app performs itself — before you move anything that holds data you need.
 - **Its secrets do not follow it either.** They are stored under the cluster's own path, so they are supplied again against the replacement. Step 3 covers this.
 - **You pay for both.** The replacement is a new set of nodes in your cloud account, running alongside the cluster it replaces for as long as the overlap lasts.
@@ -31,7 +31,7 @@ kakt tenant add-cluster \
   --gitops-repo-url https://github.com/acme-inc/acme-gitops
 ```
 
-Commit it and wait for it to converge, as in [Add a managed cluster](/guides/add-a-managed-cluster). Nothing moves yet: no app names `acme-stg-02`, so nothing is generated onto it.
+Commit it and wait for it to converge, as in [Add a managed cluster](/guides/clusters/add-a-managed-cluster). Nothing moves yet: no app names `acme-stg-02`, so nothing is generated onto it.
 
 Use this moment to take the newer platform version if that is why you are replacing the cluster. `--bundle-version` is per cluster, so the replacement can run a version the predecessor never will.
 
@@ -86,10 +86,10 @@ The app is removed from the predecessor as part of the same commit. Its database
 
 Repeat step 3 for each app. Between apps the environment is split across two clusters, which is supported and visible: each app's declaration says where it is.
 
-When no app names the predecessor, retire it with [Retire an environment](/guides/retire-an-environment#step-2-remove-the-cluster) — the cluster half only, since the environment itself is staying.
+When no app names the predecessor, remove it with [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster). The environment itself stays.
 
 <Note>
-Removing the predecessor's files does not destroy it. The management cluster never deletes a cluster because its declaration disappeared, so the cluster is removed by hand with its kubeconfig. Its backups stay in your object storage under its own prefix after it is gone.
+Removing the predecessor's files does not destroy it. The management cluster never deletes a cluster because its declaration disappeared, so `kakt tenant remove-cluster --destroy` does that as a separate step. Its backups stay in your object storage under its own prefix after it is gone.
 </Note>
 
 ## What this does not change

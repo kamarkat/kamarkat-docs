@@ -57,14 +57,73 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Operate your box",
+            "group": "Box",
             "pages": [
-              "guides/create-a-management-cluster",
-              "guides/add-a-managed-cluster",
-              "guides/add-an-environment",
-              "guides/promote-a-release",
-              "guides/replace-a-managed-cluster",
-              "guides/retire-an-environment"
+              "guides/box/create-a-box",
+              "guides/box/check-your-box",
+              "guides/box/resize-the-management-cluster",
+              "guides/box/rotate-the-build-credential",
+              "guides/box/repair-a-box",
+              "guides/box/delete-a-box"
+            ]
+          },
+          {
+            "group": "Managed clusters",
+            "pages": [
+              "guides/clusters/add-a-managed-cluster",
+              "guides/clusters/resize-a-managed-cluster",
+              "guides/clusters/replace-a-managed-cluster",
+              "guides/clusters/remove-a-managed-cluster"
+            ]
+          },
+          {
+            "group": "Environments",
+            "pages": [
+              "guides/environments/add-an-environment",
+              "guides/environments/remove-an-environment"
+            ]
+          },
+          {
+            "group": "Apps",
+            "pages": [
+              "guides/apps/add-an-app",
+              "guides/apps/deploy-a-new-version",
+              "guides/apps/promote-an-app",
+              "guides/apps/roll-back-an-app",
+              "guides/apps/change-hostnames",
+              "guides/apps/move-an-app",
+              "guides/apps/remove-an-app"
+            ]
+          },
+          {
+            "group": "Secrets",
+            "pages": [
+              "guides/secrets/supply-secrets",
+              "guides/secrets/check-secrets",
+              "guides/secrets/rotate-a-secret",
+              "guides/secrets/remove-a-secret"
+            ]
+          },
+          {
+            "group": "Platform versions",
+            "pages": [
+              "guides/platform/upgrade-your-box",
+              "guides/platform/roll-back-a-version"
+            ]
+          },
+          {
+            "group": "Escrow and encryption",
+            "pages": [
+              "guides/escrow/verify-your-escrow",
+              "guides/escrow/use-break-glass-access",
+              "guides/escrow/turn-on-encryption",
+              "guides/escrow/rotate-the-encryption-key"
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "guides/support/review-what-your-box-reports"
             ]
           }
         ]
@@ -121,6 +180,7 @@
             "group": "Commands",
             "pages": [
               "cli/overview",
+              "cli/signing-in",
               "cli/boxes-and-clusters",
               "cli/applications",
               "cli/escrow-and-encryption",

@@ -1,0 +1,49 @@
+---
+title: "Upgrade your box"
+description: "Merge the pull request your Renovate opens, or set the version in a cluster's bundle.yaml yourself. Each cluster upgrades on its own."
+keywords: ["upgrade", "platform version", "bundle.yaml", "renovate", "preflight"]
+---
+
+> A platform upgrade is a change to one cluster's `bundle.yaml`. Nothing changes until you merge it.
+
+Each cluster pins its platform version in `registry/clusters/<cluster>/bundle.yaml`, on two fields: `targetRevision` and `bundleVersion`. Upgrading a cluster is changing both. Each cluster is upgraded on its own, so you can take a version on `dev` before `prod`.
+
+## Step 1: Read what the version brings
+
+Each version's release page lists its changes, its security fixes and a **Taking this version** table. Check two of its fields:
+
+- **Minimum version this may be taken from.** The cluster must already run this version or a later one. If it does not, upgrade to an intermediate version first.
+- **Predecessor restorable from this version.** Whether going back restores the cluster's previous state. See [Roll back a platform version](/guides/platform/roll-back-a-version).
+
+See [Versions](/versions/overview).
+
+## Step 2: Check the cluster can take it
+
+```bash
+kakt proposal preflight --candidate <version> --cluster acme-hub
+```
+
+It checks the version's minimum permits the step, that the version is published where your box pulls from, and that the cluster is reconciling now. A check that cannot run reports unverified rather than passing.
+
+## Step 3: Change the version
+
+Your Renovate opens a pull request for each new version, changing those two fields and nothing else. Merge it.
+
+To take a version Renovate did not propose, make the same change yourself:
+
+```yaml registry/clusters/acme-hub/bundle.yaml
+targetRevision: <version>
+bundleVersion: <version>
+```
+
+```bash
+git commit -am "Upgrade acme-hub to <version>" && git push
+```
+
+## Step 4: Verify
+
+```bash
+kakt verify --cluster acme-hub
+```
+
+To decline a version, close its pull request. The cluster stays on the version it pins.

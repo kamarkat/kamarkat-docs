@@ -17,9 +17,20 @@ kakt tenant scaffold \
   --tenant acme \
   --org acme-inc \
   --domain acme.example \
-  --region hel1 \
-  --environment dev
+  --region hel1
 ```
+
+<Note>
+**The management hub takes no `--environment`.** It is environment-independent: it
+has its own identity (`boxId`), its own secret scope
+(`management.infisicalEnvironmentSlug`) and its own capacity policy. A `dev`, `stg`
+or `prod` stage is a property of each **workload** cluster, declared with
+`kakt tenant add-cluster --environment`, and one hub manages clusters in all of
+them.
+
+The hub's secret scope is created for the box during bootstrap, so there is
+nothing to set up in Infisical beforehand.
+</Note>
 
 Scaffolding happens once. Every change after it is a commit or a pull request. See [Scaffold your repository](/quickstart/scaffold-your-repository) for the credentials it expects and what the repository contains.
 
@@ -31,7 +42,6 @@ Scaffolding happens once. Every change after it is a commit or a pull request. S
 | `--subdomain` | A DNS label every hostname sits under; empty publishes on the apex |
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines |
 | `--region` | The cloud region your clusters run in. Defaults to `hel1` |
-| `--environment` | The stage this cluster serves: `dev` (default), `stg` or `prod`. Not a destination — applications name the cluster they run on |
 | `--cluster` | The management cluster's name. Defaults to `<tenant>-hub` |
 | `--box-id` | The logical box, **pinned forever**. Defaults to the cluster name |
 | `--workers` | Cloud worker nodes the box starts with. Defaults to 2. Pass `0` to run on nodes on your own premises alone, which then have to be there |
@@ -52,7 +62,7 @@ Scaffolding happens once. Every change after it is a commit or a pull request. S
 
 ### kakt tenant add-cluster
 
-Declares an additional managed cluster. It renders the cluster template your GitOps repository carries; the management cluster provisions the cluster from your commit. No Day-0 run is involved. For the whole task, see [Add a managed cluster](/guides/add-a-managed-cluster).
+Declares an additional managed cluster. It renders the cluster template your GitOps repository carries; the management cluster provisions the cluster from your commit. No Day-0 run is involved. For the whole task, see [Add a managed cluster](/guides/clusters/add-a-managed-cluster).
 
 ```bash
 kakt tenant add-cluster \
@@ -68,7 +78,7 @@ kakt tenant add-cluster \
 | `--mgmt-cluster` | The management cluster that creates this one. Required |
 | `--name` | The managed cluster's name, and what applications name to run on it. Required |
 | `--tenant` | The tenant that owns it. Required |
-| `--bundle-version` | The platform version this cluster starts on. Required |
+| `--bundle-version` | The platform version this cluster is declared at, recorded in its values file. Required. A managed cluster receives the management cluster's platform, so this does not pin one of its own |
 | `--gitops-repo-url` | Your GitOps repository's URL. Required |
 | `--provider`, `--region` | Where and what it is, if it differs from the defaults |
 | `--environment` | The stage this cluster serves. Several clusters may serve one stage, which is how a replacement runs beside the cluster it replaces |
@@ -77,7 +87,7 @@ kakt tenant add-cluster \
 | `--gitops-dir` | Your GitOps repository. Defaults to the current directory |
 
 <Note>
-`--bundle-version` must already be published, in the registry your `bundle.yaml` files pull from, and pullable without credentials. The cluster cannot converge on a version its registry does not hold.
+`--bundle-version` on `bootstrap-mgmt` must already be published, in the registry your `bundle.yaml` files pull from, and pullable without credentials: the box cannot converge on a version its registry does not hold. On `add-cluster` it is a record, since the managed cluster runs the management cluster's platform.
 </Note>
 
 <Warning>
@@ -103,7 +113,7 @@ Day-0 runs as a workflow in your GitOps repository and calls these for you. Run 
 Creates the management cluster and stops there. The gates that decide whether the box is usable — secrets present, the secret store reachable, databases provisioned, declared managed clusters actually up — are separate steps.
 
 ```bash
-kakt bootstrap-mgmt --name acme-hub --provider hetzner --region hel1 --environment dev
+kakt bootstrap-mgmt --name acme-hub --provider hetzner --region hel1
 ```
 
 <Warning>
@@ -117,7 +127,7 @@ Notable flags: `--workers` (pass `0` to run on your own premises alone), `--on-p
 Generates the bootstrap secrets the secret store starts from, and creates the machine identity the platform authenticates with afterwards. Aliased as `kakt bootstrap-secrets`.
 
 ```bash
-kakt init-secrets --environment dev
+kakt init-secrets
 ```
 
 ### kakt configure-github-access
@@ -192,7 +202,7 @@ Re-renders the Day-0 seed from the current CLI and applies it. Use it after a se
 kakt reseed --kubeconfig acme-hub.kubeconfig
 ```
 
-The environment, provider and topology come from the cluster's existing seed, so a reseed cannot change which cluster the seed describes. The version is left as the cluster records it; `--bundle-version` moves it deliberately, and the move is printed against the version it replaces.
+The management secret scope, provider and topology come from the cluster's existing seed, so a reseed cannot change which cluster the seed describes. The version is left as the cluster records it; `--bundle-version` moves it deliberately, and the move is printed against the version it replaces.
 
 ### kakt spoke restore-pki
 
@@ -211,14 +221,18 @@ For reconstruction, not for provisioning: a new managed cluster gets new trust r
 Deletes a box: the management cluster, the managed clusters it holds, and the cloud infrastructure behind them. It reads the managed clusters from the management cluster, so one run takes the box.
 
 ```bash
+kakt login
 kakt teardown --name acme-hub --gitops-dir . --confirm
 ```
+
+Access is resolved before anything is destroyed: the box's declaration names its escrow, and the escrowed kubeconfig and provider credential are read with your identity ([Signing in](/cli/signing-in)). Nothing is read from your disk, so the machine that created the box has no special standing.
 
 | Flag | Meaning |
 | :- | :- |
 | `--name` | The management cluster to destroy. Required |
 | `--confirm` | Confirm deletion. Required |
-| `--gitops-dir` | The GitOps repository this box was bootstrapped from, which holds its state and kubeconfig |
+| `--gitops-dir` | The box's repository, which declares its escrow and its box id |
+| `--kubeconfig` | Use this kubeconfig instead of the escrowed one, for a box that never finished bootstrapping and so escrowed none. Requires `HCLOUD_TOKEN` |
 | `--tenant` | The box's name prefix. Every server whose name or label starts with it belongs to this box |
 | `--spoke` | A managed cluster this box declares, repeatable. For when the management cluster can no longer be reached |
 | `--dns-only` | Release this box's DNS records and nothing else |
@@ -227,16 +241,43 @@ kakt teardown --name acme-hub --gitops-dir . --confirm
 <Warning>
 This destroys infrastructure in your cloud account and is not reversible.
 
-Pass `--gitops-dir`. Day-0 writes the box's state and kubeconfig there, and a teardown run from anywhere else reads an empty cluster, destroys nothing, and reports success.
+If it cannot resolve access it stops rather than proceeding: a teardown that cannot read the cluster reports its cleanup as incomplete, and one with no provider credential fails instead of deleting nothing and claiming success.
 </Warning>
 
 <Note>
 `--tenant` and `--spoke` exist for a box that is already partly gone. The managed-cluster list normally comes from the management cluster; once that cluster is unreachable it answers nothing, and its clusters survive a teardown that was meant to take them — their servers carry their own names and mention the management cluster nowhere. `--dns-only` covers the matching case for DNS: records whose owner no longer exists are ignored rather than reclaimed, so a hostname resolves to a decommissioned address until someone releases it.
 </Note>
 
+### kakt tenant remove-cluster
+
+Removes a managed cluster, in two runs. For the whole task, see [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster).
+
+```bash
+kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-02
+git add -A registry && git commit -m "Remove acme-02" && git push
+kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-02 --destroy
+```
+
+The first run refuses while anything still names the cluster — any app's `clusterName`, and the management cluster's own `burstSpokePool` — and lists what does. Otherwise it deletes the cluster's declaration from your repository and destroys nothing. The second, with `--destroy`, refuses until the management cluster no longer reads that declaration from git, and also refuses when it cannot tell, because a management cluster that has not reconciled since your push is not the same as a declaration that is gone. It then deletes the cluster's Applications on the management cluster, the infrastructure one last, which destroys the cluster and its nodes. Run again after it succeeds and it reports the cluster as already destroyed.
+
+| Flag | Meaning |
+| :- | :- |
+| `--mgmt-cluster` | The management cluster that created it. Required |
+| `--name` | The managed cluster to remove. Required |
+| `--destroy` | Destroy the cluster, once its removed declaration is pushed and synced |
+| `--kubeconfig` | The management cluster's kubeconfig. Defaults to `k8-secrets/kubeconfig/<mgmt-cluster>.kubeconfig` |
+| `--timeout` | How long to wait for each Application to be deleted. Defaults to 30m |
+| `--gitops-dir` | Your GitOps repository. Defaults to the current directory |
+
+<Warning>
+`--destroy` destroys the cluster and its databases. Its secrets and backups stay, and its name is never reused.
+</Warning>
+
 ### kakt spoke teardown
 
-Deletes managed clusters directly through your provider's API, discovering them from server labels and names. Omit `--name` and it deletes all of them; `--mgmt-cluster` is excluded.
+Deletes managed clusters directly through your provider's API, discovering them from server labels and names. Omit `--name` and it deletes all of them; `--mgmt-cluster` is excluded. It is for when the management cluster can no longer be reached: on a running one, use `kakt tenant remove-cluster`, because the management cluster rebuilds a cluster whose servers disappear behind its back.
+
+It reports which of three things happened — servers deleted, the cluster already absent from your project, or a failure — and exits non-zero on a failure, so a teardown that left servers running does not read as success.
 
 ```bash
 kakt spoke teardown --name acme-02 --force --mgmt-cluster acme-hub

@@ -1,0 +1,40 @@
+---
+title: "Delete a box"
+description: "One command destroys the management cluster, every managed cluster it holds, and the infrastructure behind them."
+keywords: ["delete box", "teardown", "kakt teardown", "destroy"]
+---
+
+> One command takes the whole box. It is not reversible.
+
+`kakt teardown` reads the managed clusters from the management cluster and destroys them with it, together with the cloud infrastructure and DNS records behind them.
+
+## Before you start
+
+- **Everything goes.** Every cluster, every app and every database on them. Anything you need must be out first.
+- **Run it from your GitOps repository.** Day-0 wrote the box's state and kubeconfig there. A teardown run from anywhere else reads an empty cluster, destroys nothing, and reports success.
+
+## Step 1: Tear it down
+
+```bash
+kakt teardown --name acme-hub --gitops-dir . --confirm
+```
+
+<Warning>
+This destroys infrastructure in your cloud account. There is no undo.
+</Warning>
+
+## When the management cluster is already gone
+
+The list of managed clusters comes from the management cluster. Once it cannot be reached, it answers nothing, and its clusters would survive the teardown. Name them yourself:
+
+```bash
+kakt teardown --name acme-hub --gitops-dir . --tenant acme --spoke acme-01 --spoke acme-stg-01 --confirm
+```
+
+`--tenant` matches every server whose name or label starts with it. To release only the box's DNS records, pass `--dns-only`.
+
+## What stays behind
+
+- **Your GitOps repository.** Archive or delete it in your git provider.
+- **Your escrow.** It holds this box's keys and break-glass kubeconfigs. Delete them there once you no longer need them.
+- **Backups.** Database backups stay in your object storage.

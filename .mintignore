@@ -4,3 +4,8 @@ scripts/
 data/
 # Working material and deferred pages, not yet published.
 scratch/
+# A vendored copy of someone else's documentation, kept for reference and
+# gitignored. .gitignore does not stop the dev server reading the working
+# directory, so it is excluded here too: it is 286M of .mdx whose own broken
+# snippet imports and unbalanced tags were reported as warnings against this site.
+reference-projects/

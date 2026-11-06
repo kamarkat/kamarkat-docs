@@ -1,7 +1,7 @@
 ---
-title: "Create a management cluster"
+title: "Create a box"
 description: "A box has one management cluster, built once by Day-0 from your own CI. Every cluster after it is a commit."
-keywords: ["management cluster", "day-0", "scaffold", "bootstrap", "kakt tenant scaffold"]
+keywords: ["box", "management cluster", "day-0", "scaffold", "bootstrap", "kakt tenant scaffold"]
 ---
 
 > One management cluster per box, built once by Day-0. Everything after it is a commit.
@@ -27,8 +27,7 @@ kakt tenant scaffold \
   --tenant acme \
   --org acme-inc \
   --domain acme.example \
-  --region hel1 \
-  --environment dev
+  --region hel1
 ```
 
 Add `--dry-run` first to see the repository without creating anything. The management cluster is named `<tenant>-hub` unless you pass `--cluster`, and it starts on the platform version the CLI carries unless you pass `--bundle-version`. Every flag, and the escrow and credential flags a real run needs, are in [Scaffold your repository](/quickstart/scaffold-your-repository).
@@ -61,7 +60,7 @@ You never run Day-0 again for this box. Every further cluster, environment, app 
   <Card title="Access your box" icon="right-to-bracket" href="/quickstart/access-your-box">
     Sign in, and know where break-glass access is.
   </Card>
-  <Card title="Add a managed cluster" icon="server" href="/guides/add-a-managed-cluster">
+  <Card title="Add a managed cluster" icon="server" href="/guides/clusters/add-a-managed-cluster">
     Where your apps run, from a commit.
   </Card>
 </CardGroup>

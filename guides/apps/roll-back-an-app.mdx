@@ -1,0 +1,34 @@
+---
+title: "Roll back an app"
+description: "Commit the previous version to the workload's Chart.yaml. Every published version stays in your registry."
+keywords: ["rollback", "roll back", "revert", "previous version", "Chart.yaml"]
+---
+
+> A rollback is a deployment of the previous version.
+
+Every version your build publishes stays in your registry, so the previous one is always there to go back to.
+
+## Step 1: Commit the previous version
+
+```diff environments/stg/shop/frontend/Chart.yaml
+-    version: 1.4.0
++    version: 1.3.2
+```
+
+```bash
+git commit -am "Roll back shop/frontend to 1.3.2 in stg" && git push
+```
+
+Or revert the commit that deployed it: `git revert <commit> && git push`.
+
+## Step 2: Check it
+
+```bash
+kakt verify --cluster acme-stg-01
+```
+
+## What a rollback does not undo
+
+It restores the chart, not the data. A version that migrated its database leaves the database migrated, and the previous version must be able to read it.
+
+If a build would deploy the bad version again, stop the build first: it commits to `dev` on every run.

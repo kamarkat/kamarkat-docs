@@ -1,0 +1,34 @@
+---
+title: "Review what your box reports"
+description: "List every field that may leave your box, see what those fields hold today, and subtract what you will not send. Nothing is transmitted."
+keywords: ["support", "kakt support scope", "preview", "deny", "telemetry"]
+---
+
+> Read the payload before you enrol. Nothing leaves until you do.
+
+The Support Agent runs on every cluster and sends nothing until you enrol. These commands show what it may send and what it would send. Neither transmits anything.
+
+## Step 1: See what may leave
+
+```bash
+kakt support scope
+```
+
+Every field that may leave the box: the platform's allowlist, minus anything you denied. Nothing outside this list can be sent. The list widens only when a new platform version adds to it, which reaches you as an upgrade you review.
+
+## Step 2: See what it would send today
+
+```bash
+kakt support preview
+```
+
+Runs every collector in scope against this cluster and prints the result; `--json` prints it as JSON. A collector that could not run is listed with its reason, never left out.
+
+## Step 3: Subtract what you will not send
+
+```bash
+kakt support scope --deny <collector>
+kakt support preview --deny <collector>.<field>
+```
+
+`--deny` removes a whole collector, or one field of it, and the output shows the scope with that applied.

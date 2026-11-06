@@ -24,7 +24,7 @@ kakt tenant add-cluster \
 | :- | :- |
 | `--name` | The cluster's name for its whole life. Your apps name it to run on it. |
 | `--environment` | The stage it serves. An app in `environments/dev/` must run on a cluster that serves `dev`. |
-| `--bundle-version` | The platform version it starts on: the one your management cluster runs. |
+| `--bundle-version` | Recorded as the version this cluster is declared at. Use the one your management cluster runs — the cluster receives that cluster's platform. |
 
 <Note>
 A managed cluster is a new set of nodes in your cloud account. On `hetzner` it starts with 2 worker nodes unless you pass `--workers`.
@@ -44,7 +44,7 @@ The management cluster provisions the cluster from this commit, then installs th
 kakt verify --cluster acme-01
 ```
 
-It waits for the cluster to converge and reports anything outstanding. For a further cluster later, see [Add a managed cluster](/guides/add-a-managed-cluster).
+It waits for the cluster to converge and reports anything outstanding. For a further cluster later, see [Add a managed cluster](/guides/clusters/add-a-managed-cluster).
 
 ## Next
 

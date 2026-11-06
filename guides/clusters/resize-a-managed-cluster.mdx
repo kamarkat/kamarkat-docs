@@ -1,0 +1,46 @@
+---
+title: "Resize a managed cluster"
+description: "Change the number of cloud worker nodes in the cluster's declaration and commit. Nothing scales a cluster for you."
+keywords: ["resize", "scale", "workers", "nodePool", "capacity"]
+---
+
+> One number in one file. Nothing changes the size of a cluster for you.
+
+A managed cluster's cloud worker count is declared in your repository. Raising it adds nodes; lowering it removes them. The box never does this on its own, so a node that is briefly unreachable does not become a bill.
+
+## Before you start
+
+- **Lowering it moves workloads.** The nodes removed take their pods with them, and those pods start again on the nodes that remain. Make sure what is left can hold them.
+- **It is billed.** Each cloud worker is a server in your cloud account.
+
+## Step 1: Change the count
+
+In `registry/clusters/<name>/infrastructure/spokepool.yaml`, set `nodePool.count`:
+
+```yaml registry/clusters/acme-stg-01/infrastructure/spokepool.yaml
+spec:
+  nodePool:
+    count: 3   # was 2
+```
+
+## Step 2: Commit
+
+```bash
+git commit -am "Resize acme-stg-01 to 3 workers" && git push
+```
+
+The management cluster adds or removes nodes to match.
+
+## Step 3: Verify
+
+```bash
+kakt verify --cluster acme-stg-01
+```
+
+<Note>
+A `hybrid` cluster buys no cloud workers. Its capacity is the machines you list in its `spokepool.yaml`.
+</Note>
+
+## What a resize cannot change
+
+The node type, the Kubernetes version and the machine templates are fixed for a cluster's life. To change them, build a new cluster beside it: see [Replace a managed cluster](/guides/clusters/replace-a-managed-cluster).

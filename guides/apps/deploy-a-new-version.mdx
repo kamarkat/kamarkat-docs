@@ -1,0 +1,39 @@
+---
+title: "Deploy a new version"
+description: "Your app's build publishes its chart and commits the version to the workload's Chart.yaml. That commit is the deployment."
+keywords: ["deploy", "new version", "Chart.yaml", "build", "pin"]
+---
+
+> A deployment is a commit that changes one version line.
+
+Each workload's running version is the dependency `version` in `environments/<env>/<app>/<workload>/Chart.yaml`. Changing it deploys that version on the GitOps engine's next pass.
+
+## From your build
+
+Normally your app's build does this for you after publishing the chart, for the first environment. See [Deploy your app](/quickstart/deploy-your-app#step-3-publish-and-pin-from-your-build) for the build job.
+
+## By hand
+
+To deploy a version that is already published, change the line and commit:
+
+```diff environments/dev/shop/frontend/Chart.yaml
+ dependencies:
+   - name: frontend
+     repository: oci://ghcr.io/acme-inc/charts
+-    version: 1.3.2
++    version: 1.4.0
+```
+
+```bash
+git commit -am "shop/frontend 1.4.0" && git push
+```
+
+## Check it
+
+```bash
+kakt verify --cluster acme-01
+```
+
+The app runs in namespace `tenant-<tenant>-<app>` on its cluster.
+
+To take the version to the next environment, see [Promote an app](/guides/apps/promote-an-app). To go back, see [Roll back an app](/guides/apps/roll-back-an-app).

@@ -81,15 +81,18 @@ Presence is not recovery. `escrow verify` reports that a key exists; this report
 Retrieves a cluster's admin kubeconfig from the escrow.
 
 ```bash
-kakt kubeconfig --box acme-hub --cluster acme-hub --out acme-hub.kubeconfig
+kakt login
+kakt kubeconfig --cluster acme-hub --gitops-dir . --out acme-hub.kubeconfig
 kubectl --kubeconfig acme-hub.kubeconfig get nodes
 ```
+
+With `--gitops-dir`, the box's own declaration names its escrow and the read is performed with your identity ([Signing in](/cli/signing-in)) — so this works from any authorized workstation. Without it, pass `--box` and the four `INFISICAL_ESCROW_*` values in the environment, which is what automation does.
 
 <Warning>
 This is break-glass access. Normal access is through your own identity provider, where each person authenticates as themselves. Use this when that is not available: the identity provider is down, the cluster is broken, or nobody can sign in. The credential is cluster-admin, is not tied to a person, and must never be committed.
 </Warning>
 
-The escrow holds one kubeconfig per cluster, so pass the cluster you need. Without `--out` it prints to stdout.
+The escrow holds one kubeconfig per cluster, so pass the cluster you need. Without `--out` it prints to stdout. `--box` overrides the declaration, which matters for a successor hub: it reads its predecessor's artefacts under the box they share, while the declaration names only the current cluster.
 
 ### kakt escrow migrate-paths
 

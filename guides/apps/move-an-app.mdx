@@ -1,0 +1,47 @@
+---
+title: "Move an app to another cluster"
+description: "Change clusterName, regenerate the hostname aggregate, supply its secrets again, commit. Its database does not move with it."
+keywords: ["move app", "clusterName", "migrate", "cluster"]
+---
+
+> An app names the cluster it runs on. Moving it is changing that name.
+
+The new cluster must serve the same environment. The app is removed from the old cluster and generated on the new one by the same commit.
+
+## Before you start
+
+- **Its database does not follow it.** The app gets a new, empty database on the new cluster, and the old one is removed with the app. Decide how the data gets across — a restore from the old cluster's backups, or an export and load the app performs itself — before you push.
+- **Its secrets do not follow it.** They are stored under the cluster's name, so you supply them again in step 2.
+
+## Step 1: Change the cluster
+
+```yaml environments/stg/shop/values.yaml
+clusterName: acme-stg-02   # was acme-stg-01
+```
+
+```bash
+kakt app hosts aggregate
+```
+
+The aggregate is written per cluster, so the app's hostnames move from one cluster's gateway to the other's.
+
+## Step 2: Supply its secrets on the new cluster
+
+The commands read the cluster from the declaration you just changed:
+
+```bash
+kakt app secrets status stg shop
+kakt app secrets set stg shop <KEY>
+```
+
+## Step 3: Commit
+
+```bash
+git add environments registry && git commit -m "Move shop to acme-stg-02" && git push
+```
+
+<Warning>
+The app and its database are removed from the old cluster by this commit. Anything you still need from that database must be out before you push.
+</Warning>
+
+To move every app off a cluster and remove it, see [Replace a managed cluster](/guides/clusters/replace-a-managed-cluster).

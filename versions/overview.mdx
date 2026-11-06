@@ -12,7 +12,7 @@ A release publishes one semantic version, such as `0.1.15`. The same string name
 
 | Part of a release | Where it is published |
 | :- | :- |
-| **Bundle chart** | `oci://ghcr.io/soloz-io/charts/environment-manager` |
+| **Bundle chart** | `oci://ghcr.io/kamarkat/charts/environment-manager` |
 | **`kakt` CLI** | Release assets `kakt-darwin-amd64`, `kakt-darwin-arm64`, `kakt-linux-amd64` and `kakt-linux-arm64` |
 | **Release notes** | The release page for tag `v<version>` on `kamarkat/kamarkat` |
 | **Third-party inputs** | Release asset `third-party-charts-<version>.tar.gz`: the upstream charts the bundle was built from |
@@ -32,7 +32,7 @@ Each cluster pins its own version in your GitOps repository, at `registry/cluste
 
 ```yaml
 sources:
-  - repoURL: ghcr.io/soloz-io/charts
+  - repoURL: ghcr.io/kamarkat/charts
     chart: environment-manager
     targetRevision: 0.1.15
     helm:

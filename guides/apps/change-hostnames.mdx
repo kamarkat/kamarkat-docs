@@ -1,0 +1,31 @@
+---
+title: "Change an app's hostnames"
+description: "Edit public.hosts in the app's values.yaml, regenerate the hostname aggregate, and commit both."
+keywords: ["hostnames", "public.hosts", "hosts aggregate", "domain", "gateway"]
+---
+
+> Hostnames are declared per app. The cluster's gateway is regenerated from every app's declaration.
+
+Each managed cluster has one shared gateway. Its listeners come from every app's `public.hosts`, collected into one aggregate file per cluster. Changing a hostname is changing both.
+
+## Step 1: Edit the hostnames
+
+```yaml environments/dev/shop/values.yaml
+public:
+  hosts:
+    - shop.acme.example
+    - www.shop.acme.example   # added
+```
+
+An empty list publishes nothing: the app is then reachable only from inside the box.
+
+## Step 2: Regenerate and commit
+
+```bash
+kakt app hosts aggregate
+git add environments registry && git commit -m "shop: add www hostname" && git push
+```
+
+A check fails review if the aggregate does not match the declarations, so a forgotten run cannot become a hostname that never resolves.
+
+The box publishes the DNS records and issues the certificates for the new hostnames, and serves them behind the box's login.

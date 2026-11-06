@@ -1,0 +1,45 @@
+---
+title: "Verify your escrow"
+description: "Check that the escrow holds every artefact a rebuild needs, and that the encryption key it holds actually decrypts your cluster's data."
+keywords: ["escrow verify", "verify-recovery", "recovery", "rebuild", "break-glass"]
+---
+
+> Presence is not recovery. Check both, before you need either.
+
+Your escrow holds what your box cannot be rebuilt without: master keys, trust roots, and each cluster's break-glass kubeconfig. An escrow cannot be added to a box afterwards, so find out now if it is incomplete.
+
+Every command here reads the escrow from four values:
+
+```bash
+export INFISICAL_ESCROW_URL=https://app.infisical.com
+export INFISICAL_ESCROW_PROJECT_ID=<project-id>
+export INFISICAL_ESCROW_CLIENT_ID=<machine-identity-client-id>
+export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
+```
+
+`--box` is the box id you scaffolded with, which defaults to the management cluster's name.
+
+## Step 1: Check every artefact is present
+
+```bash
+kakt escrow verify --box acme-hub --cluster acme-hub --hub
+kakt escrow verify --box acme-hub --cluster acme-01 --workload
+```
+
+`--hub` for the management cluster, `--workload` for each managed cluster. It reports each artefact by fingerprint, never by value.
+
+## Step 2: Check the encryption key decrypts
+
+A key that is present but is not the one your cluster encrypts with looks identical in step 1. Prove it with one stored value:
+
+1. Create a probe Secret for this, not a real one.
+2. On a control-plane node, read the probe's stored value into a file.
+3. Decrypt it with the escrowed key:
+
+```bash
+kakt escrow verify-recovery --box acme-hub --cluster acme-hub --from /tmp/probe.bin
+```
+
+Neither the key nor the decrypted value is printed. Delete the probe file and Secret afterwards.
+
+Run both steps after Day-0, after adding a cluster, and after rotating an encryption key.

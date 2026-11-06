@@ -8,7 +8,7 @@ keywords: ["upgrades", "renovate", "pull request", "rollback", "minimum version"
 
 ## What it is
 
-An upgrade changes the version a cluster pins. Your GitOps repository carries a `renovate.json`. Renovate, running in your own git organization, reads it, watches the bundle chart in `ghcr.io/soloz-io/charts`, and opens a pull request against your repository when a newer version is published.
+An upgrade changes the version a cluster pins. Your GitOps repository carries a `renovate.json`. Renovate, running in your own git organization, reads it, watches the bundle chart in `ghcr.io/kamarkat/charts`, and opens a pull request against your repository when a newer version is published.
 
 The pull request changes `targetRevision` and `bundleVersion` in `registry/clusters/<cluster>/bundle.yaml` and nothing else. It carries none of the bundle's content and never writes to your `values.yaml`.
 

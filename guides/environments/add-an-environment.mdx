@@ -14,7 +14,7 @@ This guide adds `stg` to a box that runs `shop` in `dev`. The order matters: an 
 
 ## Step 1: Declare the cluster
 
-Add a managed cluster for the environment, if it does not have one yet, and wait for it to converge. See [Add a managed cluster](/guides/add-a-managed-cluster).
+Add a managed cluster for the environment, if it does not have one yet, and wait for it to converge. See [Add a managed cluster](/guides/clusters/add-a-managed-cluster).
 
 Several apps in one environment can share a cluster, so a second app in `stg` needs no second one. Give the cluster `--environment stg`: that is the stage it serves, and the CLI refuses an app whose directory and whose cluster disagree about it.
 
@@ -45,7 +45,7 @@ public:
 
 Declare the same `secrets` as in `dev`: the keys are the same, the values are not.
 
-In each workload's `Chart.yaml`, set the version to promote. See [Promote between environments](/guides/promote-a-release).
+In each workload's `Chart.yaml`, set the version to promote. See [Promote an app](/guides/apps/promote-an-app).
 
 ## Step 3: Supply its secrets
 
@@ -70,6 +70,6 @@ The platform generates the app on its cluster on the next pass. Every declared s
 
 ## Next
 
-<Card title="Promote between environments" icon="arrow-right-arrow-left" href="/guides/promote-a-release">
+<Card title="Promote an app" icon="arrow-right-arrow-left" href="/guides/apps/promote-an-app">
   Move a tested version from dev to stg.
 </Card>

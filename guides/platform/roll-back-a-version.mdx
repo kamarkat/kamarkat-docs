@@ -1,0 +1,35 @@
+---
+title: "Roll back a platform version"
+description: "Revert the change to the cluster's bundle.yaml. Whether that also restores the cluster's previous state depends on the version, and its release page says."
+keywords: ["rollback", "platform version", "revert", "bundle.yaml", "predecessor restorable"]
+---
+
+> Going back restores what the cluster asks for. It does not always restore what the upgrade already did.
+
+## Before you start
+
+Read the release page of the version you are leaving. Its **Predecessor restorable from this version** field says whether reverting restores the previous state:
+
+| Value | Meaning |
+| :- | :- |
+| `yes` | Going back restores the cluster's previous state. |
+| `no` | The upgrade changed something going back does not undo — a controller that migrated stored resources to a new API version leaves them migrated. Going back may leave the cluster unable to reconcile. |
+| `unknown` | The release states nothing. Treat it as `no`. |
+
+## Step 1: Revert the version
+
+Revert the commit that upgraded the cluster:
+
+```bash
+git revert <commit> && git push
+```
+
+Or set both fields in `registry/clusters/<cluster>/bundle.yaml` back to the version it ran before, and commit.
+
+## Step 2: Verify
+
+```bash
+kakt verify --cluster acme-hub
+```
+
+If the cluster does not converge on the previous version, go forward instead: a later version that fixes the problem is the way out of a `no`.

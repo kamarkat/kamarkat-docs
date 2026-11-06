@@ -1,0 +1,73 @@
+---
+title: "Remove a managed cluster"
+description: "Remove its declaration and push, then destroy it on the management cluster. Removing the files alone destroys nothing."
+keywords: ["remove cluster", "delete cluster", "kakt tenant remove-cluster", "spoke teardown", "decommission", "cluster name"]
+---
+
+> Declaration out of git first, then destroy. A removed cluster's name is never used again.
+
+The management cluster never destroys a cluster because its declaration disappeared from your repository: a bad merge must not be able to take a cluster down. So removing one is two steps. The declaration leaves git first, because while it is there the management cluster recreates anything you delete. Then the cluster is destroyed on the management cluster, deliberately.
+
+## Before you start
+
+- **No app may run on it.** The command refuses, and lists them, while any app's `clusterName` names the cluster. Move each to another cluster ([Move an app to another cluster](/guides/apps/move-an-app)) or remove it ([Remove an app](/guides/apps/remove-an-app)), and wait until the apps are gone from it.
+- **Its databases go with it.** Anything you still need must be out before step 3.
+- **It must not be your burst pool.** The command refuses while the management cluster's `burstSpokePool` names it: the autoscaler adds cloud capacity to that cluster by name, and a name that stops resolving leaves it waiting for a kubeconfig nobody writes. Point it at another cluster or clear it first.
+- **You need the management cluster's kubeconfig** for step 3. Day-0 writes it to `k8-secrets/kubeconfig/<management-cluster>.kubeconfig`; otherwise see [Use break-glass access](/guides/escrow/use-break-glass-access).
+
+## Step 1: Remove the declaration
+
+From the root of your GitOps repository:
+
+```bash
+kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-stg-01
+```
+
+It deletes `registry/clusters/acme-stg-01/` and both of the cluster's Applications in the management cluster's directory — `acme-stg-01-infrastructure.yaml` and `acme-stg-01-generated.yaml`. Nothing is destroyed yet.
+
+## Step 2: Commit and push
+
+```bash
+git add -A registry && git commit -m "Remove acme-stg-01" && git push
+```
+
+Wait for the management cluster to sync the commit. The cluster keeps running until step 3.
+
+## Step 3: Destroy the cluster
+
+```bash
+kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-stg-01 --destroy
+```
+
+It first confirms the management cluster no longer reads the declaration from git, and refuses if it still does — or if it cannot tell, because a management cluster that has not reconciled since your push is not the same as a declaration that is gone. If it refuses for that reason, refresh the root Application, wait for it to report, and run it again.
+
+It then deletes the cluster's Applications on the management cluster — `acme-stg-01-generated`, then `acme-stg-01-infrastructure`, which destroys the cluster and its nodes in your cloud account — and waits up to `--timeout` (30 minutes by default) for each to go. Pass `--kubeconfig` if the management cluster's kubeconfig is elsewhere.
+
+Running it again after it has succeeded is safe: it reports the cluster as already destroyed rather than failing.
+
+<Warning>
+This destroys the cluster and everything on it, including its databases. There is no undo.
+</Warning>
+
+## When the management cluster is gone
+
+If the management cluster cannot be reached, there are no Applications to delete. Destroy the cluster through your provider's API instead:
+
+```bash
+kakt spoke teardown --name acme-stg-01 --mgmt-cluster acme-hub --force
+```
+
+Use it only in that case. On a running management cluster it removes the servers behind the management cluster's back, and the management cluster builds the cluster again.
+
+It reports what it did: servers deleted, the cluster already absent from your cloud project, or a failure — and it exits non-zero on a failure, so a teardown that left servers running cannot read as success.
+
+Without `--name` it deletes **every** managed cluster in the project, which is why it then requires `--mgmt-cluster`: both carry the same ownership label, and that is how the management cluster is excluded from the sweep.
+
+## What stays behind
+
+- **Secrets.** Each app's secrets are stored under the cluster's name and the app's, and removing the cluster does not delete them. Delete them in your box's secret store once you no longer need them.
+- **Backups.** The cluster's database backups stay in your object storage, under a prefix named for the cluster.
+
+## A cluster name is never reused
+
+A cluster's name names more than the cluster: its secret path and its backup prefix are named for it too. A new cluster under a removed name would read the old cluster's secrets, and its databases would find the old backups where theirs must go and refuse to back up at all. Give a replacement a new name. See [Replace a managed cluster](/guides/clusters/replace-a-managed-cluster).

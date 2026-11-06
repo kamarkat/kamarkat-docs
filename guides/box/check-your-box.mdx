@@ -1,0 +1,35 @@
+---
+title: "Check your box"
+description: "Verify each cluster converged, and that your escrow holds what a rebuild needs."
+keywords: ["verify", "health", "kakt verify", "escrow verify", "converge"]
+---
+
+> A cluster is healthy when every invariant holds. `kakt verify` tells you which one does not.
+
+Run this after any change you are waiting on — a new cluster, a platform upgrade, a resize — or whenever something looks wrong.
+
+## Check a cluster
+
+```bash
+kakt verify --cluster acme-hub
+kakt verify --cluster acme-01
+```
+
+It checks that nodes are Ready, secret stores valid, secrets synced, Applications Synced and Healthy, and pods Running, and waits up to `--timeout` (15 minutes by default) for them all to hold. It then reports which invariant is outstanding and what it is waiting on, so a cluster still settling reads differently from one that is stuck.
+
+It reads the cluster's kubeconfig from `k8-secrets/kubeconfig/<cluster>.kubeconfig`. Pass `--kubeconfig` to point elsewhere.
+
+## Check what a rebuild needs
+
+A box is rebuilt from its escrow. Check it holds every artefact, before you need them:
+
+```bash
+kakt escrow verify --box acme-hub --cluster acme-hub --hub
+kakt escrow verify --box acme-hub --cluster acme-01 --workload
+```
+
+See [Verify your escrow](/guides/escrow/verify-your-escrow), which also proves a held key actually decrypts.
+
+## Check what version runs
+
+Each cluster's platform version is `bundleVersion` in `registry/clusters/<cluster>/bundle.yaml`. To see what a newer one would bring, see [Upgrade your box](/guides/platform/upgrade-your-box).

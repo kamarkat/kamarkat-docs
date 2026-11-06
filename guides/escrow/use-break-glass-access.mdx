@@ -1,0 +1,38 @@
+---
+title: "Use break-glass access"
+description: "Retrieve a cluster's admin kubeconfig from your escrow when nobody can sign in. Use it, then discard it."
+keywords: ["break-glass", "kubeconfig", "kakt kubeconfig", "admin", "emergency access"]
+---
+
+> For when sign-in is not available. Not for everyday access.
+
+Normal access is through your box's identity provider, where each person signs in as themselves. The admin kubeconfig in your escrow is for when that is not possible: the identity provider is down, the cluster is broken, or nobody can sign in.
+
+## Step 1: Retrieve it
+
+```bash
+export INFISICAL_ESCROW_URL=https://app.infisical.com
+export INFISICAL_ESCROW_PROJECT_ID=<project-id>
+export INFISICAL_ESCROW_CLIENT_ID=<machine-identity-client-id>
+export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
+
+kakt kubeconfig --box acme-hub --cluster acme-hub --out acme-hub.kubeconfig
+```
+
+The escrow holds one kubeconfig per cluster. Pass the cluster you need.
+
+## Step 2: Use it
+
+```bash
+kubectl --kubeconfig acme-hub.kubeconfig get nodes
+```
+
+## Step 3: Discard it
+
+```bash
+rm acme-hub.kubeconfig
+```
+
+<Warning>
+The credential is cluster-admin and is not tied to a person. Never commit it, and never keep it after the emergency.
+</Warning>

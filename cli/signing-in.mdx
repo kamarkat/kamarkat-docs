@@ -1,0 +1,83 @@
+---
+title: "Signing in"
+description: "kakt login authenticates you to the escrow that holds your boxes' credentials, so any authorized workstation can operate a hub and none of them needs a copied kubeconfig."
+keywords: ["kakt login", "kakt whoami", "kakt logout", "escrow", "keychain", "credential store", "machine identity"]
+---
+
+> Log in as yourself. The box says where its credentials are; your identity decides whether you may read them.
+
+A command that reaches a management cluster needs that cluster's admin credential. It does not come from your disk — it comes from the box's **escrow**, an Infisical outside the box, written by the platform when the cluster reconciles. Your repository declares which escrow and which project; `kakt login` establishes who you are.
+
+That is what makes a second workstation work: nothing is copied from the first one.
+
+## Log in
+
+```bash
+kakt login
+```
+
+A browser opens, you authenticate as yourself, and the session is kept in your operating system's credential store — Keychain on macOS, Credential Manager on Windows, the login keyring on Linux. Nothing is written to a file in your home directory.
+
+Against your own Infisical instead of the hosted one:
+
+```bash
+kakt login --domain https://infisical.example.com
+```
+
+<Warning>
+Infisical hands the session to your terminal only within **30 seconds** of the login completing. If that window lapses it drops the token and still shows "You've successfully logged in to the Infisical CLI" — with nothing to copy. Complete the browser steps without pausing; if you miss it, run `kakt login` again.
+</Warning>
+
+If the push did not happen and the page shows a token with a **Copy** button, use it directly:
+
+```bash
+kakt login --token <token>
+```
+
+## Check who you are
+
+```bash
+kakt whoami
+```
+
+It reports the identity in the order `kakt` actually resolves it, so what it prints is what would be used: a machine identity from the environment takes precedence over any stored session, which is what keeps your workstation and your pipelines behaving the same way.
+
+## Log out
+
+```bash
+kakt logout
+```
+
+The session is removed from the credential store. Any kubeconfig a command wrote was temporary and is already gone; credentials you exported into a shell yourself are not.
+
+## Automation
+
+CI does not log in. Give it the box's machine identity:
+
+```bash
+INFISICAL_ESCROW_URL=…  INFISICAL_ESCROW_PROJECT_ID=…
+INFISICAL_ESCROW_CLIENT_ID=…  INFISICAL_ESCROW_CLIENT_SECRET=…
+```
+
+Every command prefers these when present, and no credential store is needed — which is also the answer for a machine that has no keyring: `kakt` tells you so rather than writing the session to a file.
+
+## What a box must declare
+
+Reaching an escrow needs three things: a URL, a project, and an identity. The first two are **names and grant nothing**, so they live in your repository, written by `kakt tenant scaffold`:
+
+```yaml
+# registry/clusters/<management-cluster>/values.yaml
+escrow:
+  url: https://app.infisical.com
+  projectId: <the escrow project this box was enrolled in>
+```
+
+The third is you. If a box was scaffolded before this was declared, add the two lines — `kakt escrow init` printed both when it created the project, and they are in `k8-secrets/infisical/` on the machine that ran it.
+
+## Being authorized
+
+Logging in is not the same as being allowed. Whether you can reach a given box is decided by your permissions on that box's escrow project in Infisical, granted to you or to a group you belong to by a platform administrator. Adding a developer is a change there — not a change to any box's manifests, and not a credential anyone emails you.
+
+<Note>
+Reading an escrowed kubeconfig gives you cluster-admin on that cluster, because that is what the credential is. Treat it as something to use and discard, and prefer your identity provider for day-to-day access ([break-glass access](/guides/escrow/use-break-glass-access)).
+</Note>

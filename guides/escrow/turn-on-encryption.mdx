@@ -1,0 +1,42 @@
+---
+title: "Turn on encryption at rest"
+description: "Deliver an escrowed key to a running cluster, roll its control plane, then rewrite every Secret under the key."
+keywords: ["encryption at rest", "kakt encryption enable", "secrets encryption", "key"]
+---
+
+> The key is escrowed before anything is applied. Then every Secret is rewritten under it.
+
+At-rest encryption seals every Kubernetes Secret a cluster stores. This turns it on for a cluster that already exists. Run every command against the **management cluster**, for any cluster: that is where the configuration lives.
+
+## Step 1: Deliver the key
+
+```bash
+kakt encryption enable --box acme-hub --cluster acme-hub \
+  --apply-class --kubeconfig acme-hub.kubeconfig
+```
+
+The key is restored from the escrow if it holds one, and generated otherwise — a generated key is escrowed before anything is applied. Pass `--apply-class` for the management cluster; leave it off for a managed cluster, whose template the GitOps engine already carries. `--dry-run` shows what would be applied.
+
+## Step 2: Roll the control plane
+
+Adopting the new control-plane template replaces each control-plane node. Wait until every one has been replaced:
+
+```bash
+kakt verify --cluster acme-hub
+```
+
+## Step 3: Rewrite every Secret
+
+Secrets written before step 1 are still in plaintext. Rewrite each one so it is stored under the key:
+
+```bash
+kubectl get secrets --all-namespaces -o json | kubectl replace -f -
+```
+
+## Step 4: Verify the key decrypts
+
+See [Verify your escrow](/guides/escrow/verify-your-escrow#step-2-check-the-encryption-key-decrypts).
+
+<Warning>
+Only after step 4, and only once every Secret is verified encrypted, may you re-run step 1 with `--no-plaintext-fallback`. Any Secret still in plaintext then becomes unreadable.
+</Warning>

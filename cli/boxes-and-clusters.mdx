@@ -227,13 +227,48 @@ kakt teardown --name acme-hub --gitops-dir . --confirm
 
 Access is resolved before anything is destroyed: the box's declaration names its escrow, and the escrowed kubeconfig and provider credential are read with your identity ([Signing in](/cli/signing-in)). Nothing is read from your disk, so the machine that created the box has no special standing.
 
+Then the provider is asked what the box actually has, and you confirm against **that**, not against a name:
+
+```
+Target
+  management cluster  acme-hub
+  workload clusters   acme-stg-01
+  state               infrastructure present, Kubernetes reachable
+
+To delete (3)
+  server           acme-hub-control-plane-x7k      id=62418891   caph-cluster-acme-hub=owned
+  ...
+Excluded (2) -- not deleted
+  server           acme-prod-01-md-9fj             id=62418744   owned by acme-prod-01, which this operation does not target
+  volume           pvc-5c1e                        id=20114      shared with other clusters (caph-cluster-acme-hub=shared)
+```
+
+A resource is deleted only when it carries `caph-cluster-<cluster>: owned` for a cluster in that target set — the ownership label CAPH writes. Resources marked `shared`, resources with no ownership label, and resources belonging to a cluster you did not name are listed and left alone. Nothing is selected by name, prefix or substring, which is why a box whose clusters share a prefix (`acme-hub`, `acme-stg-01`) cannot lose the wrong one.
+
+### Two modes, chosen explicitly
+
+**Normal.** The Kubernetes API is reachable: the cluster's own cleanup runs first — load balancers deprovisioned by the controller that owns them, finalizers stripped, DNS ownership read — and then the provider resources go.
+
+**Infrastructure-only.** The API cannot be reached, so you ask for the recovery path by name:
+
+```bash
+kakt teardown --name acme-hub --gitops-dir . --confirm \
+  --infrastructure-only acme-hub,acme-stg-01
+```
+
+It deletes only positively owned provider resources and reports everything the cluster would have done as outstanding. A missing kubeconfig never turns the first mode into the second: without access and without the flag the command refuses, and asking for the flag on a box that *is* reachable is refused too.
+
+<Note>
+If anything could not be done, the command says what and exits non-zero — including a provider deletion that failed. "Teardown completed" means completed.
+</Note>
+
 | Flag | Meaning |
 | :- | :- |
 | `--name` | The management cluster to destroy. Required |
 | `--confirm` | Confirm deletion. Required |
 | `--gitops-dir` | The box's repository, which declares its escrow and its box id |
 | `--kubeconfig` | Use this kubeconfig instead of the escrowed one, for a box that never finished bootstrapping and so escrowed none. Requires `HCLOUD_TOKEN` |
-| `--tenant` | The box's name prefix. Every server whose name or label starts with it belongs to this box |
+| `--infrastructure-only` | Destroy the provider infrastructure of a box whose Kubernetes API cannot be reached, naming the clusters to destroy. The cluster's own cleanup is reported as not done |
 | `--spoke` | A managed cluster this box declares, repeatable. For when the management cluster can no longer be reached |
 | `--dns-only` | Release this box's DNS records and nothing else |
 | `--dns-owner`, `--dns-zone` | Which records, and the zone they live in, when the cluster can no longer be read |
@@ -245,7 +280,9 @@ If it cannot resolve access it stops rather than proceeding: a teardown that can
 </Warning>
 
 <Note>
-`--tenant` and `--spoke` exist for a box that is already partly gone. The managed-cluster list normally comes from the management cluster; once that cluster is unreachable it answers nothing, and its clusters survive a teardown that was meant to take them — their servers carry their own names and mention the management cluster nowhere. `--dns-only` covers the matching case for DNS: records whose owner no longer exists are ignored rather than reclaimed, so a hostname resolves to a decommissioned address until someone releases it.
+`--infrastructure-only` and `--spoke` exist for a box that is already partly gone. The managed-cluster list normally comes from the management cluster; once that cluster is unreachable it answers nothing, and its clusters survive a teardown that was meant to take them. So you name them, and each one's resources are still matched by its own ownership label rather than by anything about its name. `--dns-only` covers the matching case for DNS: records whose owner no longer exists are ignored rather than reclaimed, so a hostname resolves to a decommissioned address until someone releases it.
+
+`--tenant` is gone. It named the box's prefix so servers could be matched by it, and because a box's clusters share that prefix by construction, a management-cluster teardown would sweep its workload clusters' servers too. Passing it now errors rather than quietly changing what gets deleted.
 </Note>
 
 ### kakt tenant remove-cluster

@@ -94,6 +94,22 @@ This is break-glass access. Normal access is through your own identity provider,
 
 The escrow holds one kubeconfig per cluster, so pass the cluster you need. Without `--out` it prints to stdout. `--box` overrides the declaration, which matters for a successor hub: it reads its predecessor's artefacts under the box they share, while the declaration names only the current cluster.
 
+### kakt escrow enroll-provider-credential
+
+Puts the cloud credential this box was built with into its escrow, so lifecycle commands can reach the provider from any authorized workstation.
+
+```bash
+kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-hub < token
+```
+
+A bootstrap enrols it for you, and refuses to create infrastructure if it cannot — a box whose provider credential is nowhere but the bootstrapping machine cannot be destroyed from anywhere else. This command is for initial enrolment on a box built before that, and for supplying a credential externally.
+
+The credential arrives on stdin, never an argument, and is never printed back. Re-running with the same credential writes nothing; a *different* one is refused unless you pass `--rotate`, because the escrowed copy may be the only one that reaches infrastructure the box already owns.
+
+<Note>
+It is escrowed under the **box**, not the cluster. The credential buys and destroys the box's infrastructure and outlives any cluster in it, so a successor management cluster finds the same one (ADR-111 §1).
+</Note>
+
 ### kakt escrow migrate-paths
 
 Copies a box's admin kubeconfig and both at-rest encryption key generations onto the per-cluster paths a cluster now has.

@@ -42,7 +42,7 @@ A GitOps repository holds exactly one management cluster and any number of manag
 
 ### You name your managed clusters
 
-A managed cluster's name is chosen by you, written once, and never computed. It is the cluster's `clusterName`, and every per-cluster identity (secret path, backup location, labels, autoscaling targets) derives from it. It is also what an application names to run there, so a cluster is swapped out by building its successor and moving each app across: see [Replace a managed cluster](/guides/clusters/replace-a-managed-cluster).
+A managed cluster's name is chosen by you, written once, and never computed. It is the cluster's `clusterName`, and every per-cluster identity (secret path, backup location, labels, autoscaling targets) derives from it. Applications name no cluster: they are deployed to every cluster serving their environment, so a cluster is swapped out by building a successor that serves the same environment and retiring the old one — no application is edited. See [Replace a managed cluster](/guides/clusters/replace-a-managed-cluster).
 
 ### Policy attaches to cells
 

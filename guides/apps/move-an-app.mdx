@@ -1,47 +1,52 @@
 ---
-title: "Move an app to another cluster"
-description: "Change clusterName, regenerate the hostname aggregate, supply its secrets again, commit. Its database does not move with it."
-keywords: ["move app", "clusterName", "migrate", "cluster"]
+title: "Where an app runs"
+description: "An app is deployed to every cluster serving its environment. There is nothing to move — but moving data between clusters is a separate, deliberate operation."
+keywords: ["where app runs", "placement", "environmentSlug", "multiple clusters", "relocate data"]
 ---
 
-> An app names the cluster it runs on. Moving it is changing that name.
+> An app runs on every managed cluster that serves its environment. It names no cluster, so there is no placement to change.
 
-The new cluster must serve the same environment. The app is removed from the old cluster and generated on the new one by the same commit.
+This page used to describe editing an app's `clusterName`. That field is gone. A cluster declares the environment it serves, and **every application declared in that environment is deployed to it**:
 
-## Before you start
-
-- **Its database does not follow it.** The app gets a new, empty database on the new cluster, and the old one is removed with the app. Decide how the data gets across — a restore from the old cluster's backups, or an export and load the app performs itself — before you push.
-- **Its secrets do not follow it.** They are stored under the cluster's name, so you supply them again in step 2.
-
-## Step 1: Change the cluster
-
-```yaml environments/stg/shop/values.yaml
-clusterName: acme-stg-02   # was acme-stg-01
 ```
+cluster.environmentSlug == the environment directory your app is declared in
+```
+
+So an app's deployment set changes when **clusters** change, never when the app does.
+
+## To run an app on another cluster
+
+Declare a cluster that serves its environment. The app deploys to it on the next sync, as an independent instance.
 
 ```bash
-kakt app hosts aggregate
+kakt tenant add-cluster --mgmt-cluster acme-hub --name acme-stg-02 \
+  --environment stg --provider hetzner --region hel1 --workers 2
 ```
 
-The aggregate is written per cluster, so the app's hostnames move from one cluster's gateway to the other's.
+Nothing under `environments/stg/` is edited, and the app keeps running on every other cluster serving `stg`.
 
-## Step 2: Supply its secrets on the new cluster
+## To stop running it on a cluster
 
-The commands read the cluster from the declaration you just changed:
+Remove that cluster ([Remove a managed cluster](/guides/clusters/remove-a-managed-cluster)). Its instances go; the app's definition and its instances elsewhere stay. Removing a cluster never requires editing an application.
 
-```bash
-kakt app secrets status stg shop
-kakt app secrets set stg shop <KEY>
-```
+If you want one app gone from the environment entirely, delete its directory under `environments/<env>/` — that removes it from every cluster serving the environment.
 
-## Step 3: Commit
+## What each instance owns, and what it does not share
 
-```bash
-git add environments registry && git commit -m "Move shop to acme-stg-02" && git push
-```
+Each deployment is independent. Sharing the definition does not share state:
 
-<Warning>
-The app and its database are removed from the old cluster by this commit. Anything you still need from that database must be out before you push.
-</Warning>
+| Per instance | Shared |
+| :- | :- |
+| Database, persistent volumes | The application's definition and version |
+| Secrets, under that cluster's own `/spoke-pool/<cluster>/` path | What secrets it declares |
+| Namespace and in-cluster resources | — |
 
-To move every app off a cluster and remove it, see [Replace a managed cluster](/guides/clusters/replace-a-managed-cluster).
+So `kakt app secrets set` writes the value once per cluster serving the environment, and `kakt app secrets status` reports each deployment separately — a secret supplied on one cluster and absent on another is a real state, not a display artifact.
+
+<Note>
+**Public hostnames are the exception, and deliberately so.** A hostname has one owner: two Gateways claiming it would each order a certificate and each publish the same DNS record. So an environment's hostnames are served by one cluster — the only one serving it, or the one declaring `publicIngress: true`. With two or more and no declaration, `kakt app hosts aggregate` refuses rather than choosing.
+</Note>
+
+## Relocating data is a different operation
+
+Adding or removing a cluster moves no data. If an app's **data** needs to end up on another cluster, that is a restore, not a declaration change: back up the database on the source cluster, let the new instance provision, restore into it, then retire the old cluster. Nothing in the CLI does that as a side effect of an edit, and nothing here should be read as implying it.

@@ -10,7 +10,7 @@ The management cluster never destroys a cluster because its declaration disappea
 
 ## Before you start
 
-- **No app may run on it.** The command refuses, and lists them, while any app's `clusterName` names the cluster. Move each to another cluster ([Move an app to another cluster](/guides/apps/move-an-app)) or remove it ([Remove an app](/guides/apps/remove-an-app)), and wait until the apps are gone from it.
+- **Its deployments stop; the applications stay.** The command lists the environment's applications before removing anything — what stops running on this cluster. Their definitions stay in `environments/<env>/` and keep running on every other cluster serving that environment. Removing a cluster never requires editing an application ([Where an app runs](/guides/apps/move-an-app)).
 - **Its databases go with it.** Anything you still need must be out before step 3.
 - **It must not be your burst pool.** The command refuses while the management cluster's `burstSpokePool` names it: the autoscaler adds cloud capacity to that cluster by name, and a name that stops resolving leaves it waiting for a kubeconfig nobody writes. Point it at another cluster or clear it first.
 - **You need the management cluster's kubeconfig** for step 3. Day-0 writes it to `k8-secrets/kubeconfig/<management-cluster>.kubeconfig`; otherwise see [Use break-glass access](/guides/escrow/use-break-glass-access).

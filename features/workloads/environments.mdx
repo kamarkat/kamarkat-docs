@@ -10,7 +10,7 @@ keywords: ["environments", "dev", "stg", "prod", "promotion", "rollback"]
 
 An environment is a deployment stage for your applications. Kamarkat recognizes the slugs `dev`, `stg` and `prod`.
 
-Each managed cluster declares the environment it serves (`environmentSlug`), and each application declares the cluster it runs on (`clusterName`). Those are two separate statements: the environment a cluster serves does not place anything on it, and several clusters may serve one environment — which is what lets a replacement cluster be built and verified beside the one it replaces.
+Each managed cluster declares the environment it serves (`environmentSlug`), and that single statement decides what runs on it: **every application declared in that environment is deployed to it.** An application declares no cluster. Several clusters may serve one environment, each receiving its own deployment of the environment's applications — which is what lets a replacement cluster be built and verified beside the one it replaces.
 
 Each environment is a directory in your GitOps repository. Every application you run in it has its own directory there, holding its declaration and the chart version of each of its workloads.
 
@@ -28,7 +28,7 @@ environments/
 
 | | What differs per environment |
 | :- | :- |
-| **Cluster** | Each app declares the managed cluster it runs on in that environment (`clusterName`). |
+| **Cluster** | A managed cluster declares the environment it serves (`environmentSlug`). Every application in that environment deploys to it; applications name no cluster. |
 | **Hostnames** | Each app declares its public hosts per environment. |
 | **Versions** | Each workload pins its own chart version per environment. |
 | **Secrets** | Secrets are supplied per environment: `kakt app secrets set <env> <app> <KEY>`. |
@@ -79,9 +79,9 @@ Who may change `environments/prod` and `registry/clusters/<prod-cluster>` is set
 
 <AccordionGroup>
   <Accordion title="Can an environment span several managed clusters?">
-    Yes. Each app in an environment declares one cluster, and different apps in the same environment can run on different managed clusters. Several clusters may also declare the same `environmentSlug`.
+    Yes. Several clusters may declare the same `environmentSlug`, and each receives its own deployment of every application in that environment — one independent instance per cluster, with its own database, secrets and resources. Nothing is placed per application.
   </Accordion>
   <Accordion title="Can I add a staging environment later?">
-    Yes. See [Add an environment](/guides/environments/add-an-environment): declare its cluster first, then each app, then its secrets.
+    Yes. See [Add an environment](/guides/environments/add-an-environment): declare a cluster that serves it, then each app, then its secrets. The cluster's `environmentSlug` is what deploys those apps to it.
   </Accordion>
 </AccordionGroup>

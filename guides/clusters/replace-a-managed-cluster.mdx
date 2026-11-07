@@ -1,10 +1,10 @@
 ---
 title: "Replace a managed cluster"
-description: "Build the replacement beside the cluster it replaces, verify it, then move each app by changing one line. Both clusters serve the same environment while you check."
-keywords: ["replace cluster", "cluster replacement", "cutover", "kubernetes upgrade", "clusterName", "migration"]
+description: "Build the replacement declaring the same environment and it receives that environment's applications automatically. Both clusters serve it while you verify, then retire the predecessor."
+keywords: ["replace cluster", "cluster replacement", "cutover", "kubernetes upgrade", "environmentSlug", "restore"]
 ---
 
-> A managed cluster is replaced, not upgraded. The replacement runs beside it until you move each app across.
+> A managed cluster is replaced, not upgraded. The replacement declares the same environment, so it receives that environment's applications without a single declaration being edited.
 
 A managed cluster's Kubernetes version, its node types and its machine templates are fixed for its life: changing them is a new cluster, not an edit. So a cluster is replaced by building its successor, verifying it, and moving each app over one commit at a time.
 
@@ -47,46 +47,32 @@ It waits for the cluster to converge and reports anything outstanding.
 
 If you are replacing the cluster to prove a recovery path, restore into it now, while the predecessor is still serving and still holds the data you are comparing against.
 
-## Step 3: Move one app
+## Step 3: Let the replacement receive the environment
 
-Pick the app with the least to lose first. Change one line in its declaration:
+There is nothing to move. The replacement declares the same `environmentSlug`, so every application in that environment is already deployed to it as an independent instance — no application is edited, and none can be left pointing at the wrong cluster.
 
-```yaml environments/stg/shop/values.yaml
-clusterName: acme-stg-02   # was acme-stg-01
-```
-
-Then regenerate the public hostname aggregate, because it is written per cluster and the app's listener has to move from one to the other:
-
-```bash
-kakt app hosts aggregate
-```
-
-Supply the app's secrets against the replacement. They are stored under the cluster's path, so the new cluster has none of them; the command reads the cluster from the declaration you just changed, so run it after that edit:
+What each new instance does **not** inherit is state. Supply the environment's secrets, which are stored per cluster:
 
 ```bash
 kakt app secrets status stg shop
 kakt app secrets set stg shop <KEY>
 ```
 
-`status` lists what the app declares and what is present. Every declared secret is checked before the app's workloads start, so a key you miss is reported by name rather than becoming a crash loop.
-
-Commit the lot:
+`status` reports each deployment separately, so the replacement's missing keys are listed by name rather than becoming a crash loop. `set` writes to every cluster serving the environment, including the replacement.
 
 ```bash
-git add environments registry && git commit -m "Move shop to acme-stg-02" && git push
+kakt app hosts aggregate
 ```
 
-The platform removes the app from `acme-stg-01` and generates it on `acme-stg-02`. Its public hostnames follow it: the aggregate on the old cluster no longer lists them, the new one does, and DNS is republished to the replacement's address.
+Public hostnames have one owner, so they are served by one cluster in the environment. While both run, declare which with `publicIngress: true` on that cluster and leave it false on the other; `aggregate` refuses to choose if neither says.
 
 <Warning>
-The app is removed from the predecessor as part of the same commit. Its database there goes with it, so anything you still need from that database must be out before you push.
+Each instance has its own empty database. Data does not follow a cluster, so anything the replacement needs must be restored into it — see the backup and restore guides. Retiring the predecessor removes its databases with it.
 </Warning>
 
-## Step 4: Move the rest, then retire the predecessor
+## Step 4: Retire the predecessor
 
-Repeat step 3 for each app. Between apps the environment is split across two clusters, which is supported and visible: each app's declaration says where it is.
-
-When no app names the predecessor, remove it with [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster). The environment itself stays.
+Verify the replacement is serving, cut the hostnames over by moving `publicIngress: true`, then remove the predecessor with [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster). Its instances stop; the environment's application definitions are untouched.
 
 <Note>
 Removing the predecessor's files does not destroy it. The management cluster never deletes a cluster because its declaration disappeared, so `kakt tenant remove-cluster --destroy` does that as a separate step. Its backups stay in your object storage under its own prefix after it is gone.

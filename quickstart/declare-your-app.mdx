@@ -23,7 +23,6 @@ Declare it, then fill it in:
 kakt tenant add-app \
   --env dev \
   --app shop \
-  --cluster acme-01 \
   --owner-email platform@acme.example
 ```
 
@@ -36,7 +35,6 @@ first secret.
 ```yaml environments/dev/shop/values.yaml
 tenantId: acme          # the tenant that owns the box, the same in every app
 appId: shop             # this product; it gets namespace tenant-acme-shop
-clusterName: acme-01    # the managed cluster it runs on
 
 public:
   hosts:
@@ -61,7 +59,7 @@ secrets: []             # secrets you supply; see "Supply your secrets"
 | :- | :- |
 | `tenantId` | Your tenant. The same value in every app's file. |
 | `appId` | The product, and its isolation unit. It never defaults to `tenantId`. |
-| `clusterName` | The managed cluster this app runs on. It must name a cluster your box declares, serving this directory's environment, or nothing is generated for the app. |
+| *(no cluster field)* | An app names no cluster. It is deployed to every managed cluster whose `environmentSlug` is this directory's environment — one independent instance each. Declaring a cluster for the environment is what puts the app on it. |
 | `public.hosts` | Public hostnames. An empty list publishes nothing. |
 | `database.enabled` | Provisions the app's own database and role. |
 
@@ -71,7 +69,7 @@ Each workload directory holds one chart dependency. Pass `--workload` once per
 workload when you declare the app, or add one later:
 
 ```bash
-kakt tenant add-app --env dev --app shop --cluster acme-01 \
+kakt tenant add-app --env dev --app shop \
   --owner-email platform@acme.example \
   --workload frontend --workload bff
 ```

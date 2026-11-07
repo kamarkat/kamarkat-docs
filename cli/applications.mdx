@@ -16,7 +16,6 @@ Declares an application in an environment: writes `environments/<env>/<app>/valu
 kakt tenant add-app \
   --env stg \
   --app shop \
-  --cluster acme-stg-01 \
   --owner-email platform@acme.example \
   --workload frontend \
   --workload api
@@ -26,7 +25,7 @@ kakt tenant add-app \
 | :- | :- |
 | `--env` | The environment the application is declared in |
 | `--app` | The application: the product, and its isolation unit |
-| `--cluster` | The managed cluster it runs on |
+
 | `--owner-email` | Who is paged for it |
 | `--workload` | A deployable inside it. Repeat for each; an application may start with none |
 | `--gitops-dir` | Your GitOps repository. Defaults to the current directory |

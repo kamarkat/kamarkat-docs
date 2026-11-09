@@ -1,23 +1,49 @@
 ---
 title: "Delete a box"
-description: "One command destroys the management cluster, every managed cluster it holds, and the infrastructure behind them."
+description: "Destroy the managed clusters first, then the management cluster. The command enforces that order."
 keywords: ["delete box", "teardown", "kakt teardown", "destroy"]
 ---
 
-> One command takes the whole box. It is not reversible.
+> Managed clusters first, the management cluster last. It is not reversible.
 
-`kakt teardown` reads the managed clusters from the management cluster and destroys them with it, together with the cloud infrastructure and DNS records behind them.
+`kakt teardown` destroys a management cluster, the cloud infrastructure behind it and the DNS records it published. It does **not** take the clusters it manages with it, and it refuses to run while one of them is still there.
+
+## Why the order is enforced
+
+The management cluster holds each managed cluster's CAPI objects, and the controller that deprovisions that cluster's load balancers runs inside it on a credential delivered from the management cluster's secret store. Once the management cluster is gone, nothing on the platform can delete the managed cluster: its servers keep running, and keep billing, with nothing left that knows they exist.
+
+So a teardown that found one refuses, names it, and deletes nothing:
+
+```
+teardown failed: the management cluster goes last
+
+acme-hub manages a cluster that is still there:
+
+  acme-stg-01                      the management cluster's own CAPI inventory
+```
 
 ## Before you start
 
 - **Everything goes.** Every cluster, every app and every database on them. Anything you need must be out first.
-- **Run it from your GitOps repository.** Day-0 wrote the box's state and kubeconfig there. A teardown run from anywhere else reads an empty cluster, destroys nothing, and reports success.
+- **Nothing is read from your disk.** The box's declaration names its escrow, and the escrowed kubeconfig and provider credential are read with your identity ([Signing in](/cli/signing-in)). The machine that created the box has no special standing, and a run that cannot resolve access stops rather than destroying what it can reach.
 
-## Step 1: Tear it down
+## Step 1: Remove each managed cluster
+
+Two runs per cluster — the declaration leaves git first, then the cluster is destroyed. See [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster).
+
+```bash
+kakt tenant remove-cluster --name acme-stg-01 --mgmt-cluster acme-hub --gitops-dir .
+# commit and push, wait for the management cluster to sync, then:
+kakt tenant remove-cluster --name acme-stg-01 --mgmt-cluster acme-hub --gitops-dir . --destroy
+```
+
+## Step 2: Tear down the management cluster
 
 ```bash
 kakt teardown --name acme-hub --gitops-dir . --confirm
 ```
+
+It asks the provider what the box has, shows you the resources it is about to delete with the ownership label that admits each one, and runs the cluster's own cleanup before touching them.
 
 <Warning>
 This destroys infrastructure in your cloud account. There is no undo.
@@ -25,16 +51,22 @@ This destroys infrastructure in your cloud account. There is no undo.
 
 ## When the management cluster is already gone
 
-The list of managed clusters comes from the management cluster. Once it cannot be reached, it answers nothing, and its clusters would survive the teardown. Name them yourself:
+Its cluster list dies with it, so name the clusters to destroy. They go first and the management cluster last, in one run:
 
 ```bash
-kakt teardown --name acme-hub --gitops-dir . --tenant acme --spoke acme-01 --spoke acme-stg-01 --confirm
+export HCLOUD_TOKEN=...   # only if this box escrowed no provider credential
+
+kakt teardown --name acme-hub --gitops-dir . --confirm \
+  --infrastructure-only acme-hub,acme-stg-01
 ```
 
-`--tenant` matches every server whose name or label starts with it. To release only the box's DNS records, pass `--dns-only`.
+Between the two the provider is asked again. If anything of `acme-stg-01` survived, `acme-hub` is left standing deliberately — it is the only thing that could still finish the job — and the run exits non-zero saying what remains.
+
+A recovery run reports the cluster's own cleanup as not performed: load balancers the in-cluster controller owns, finalizers, and the DNS records whose owner id only the cluster knows. To release those records afterwards, pass `--dns-only` with `--dns-owner` and `--dns-zone`.
 
 ## What stays behind
 
 - **Your GitOps repository.** Archive or delete it in your git provider.
 - **Your escrow.** It holds this box's keys and break-glass kubeconfigs. Delete them there once you no longer need them.
 - **Backups.** Database backups stay in your object storage.
+- **Secret paths and cluster names.** Both outlive the infrastructure, which is why a name is never reused.

@@ -83,13 +83,13 @@ Reading the escrowed kubeconfig gives you **cluster-admin**, because that is wha
 | :- | :- |
 | `kakt tenant remove-cluster` | Remove a managed cluster: its declaration, then, with `--destroy`, the cluster |
 | `kakt spoke teardown` | Destroy managed clusters through your provider's API, when the management cluster is gone |
-| `kakt teardown` | Destroy a whole box: its management cluster, the managed clusters it holds, and their infrastructure |
+| `kakt teardown` | Destroy a box's management cluster and its infrastructure, once the clusters it manages are gone |
 
 <Warning>
 These delete infrastructure in your cloud account and are not reversible. Each requires an explicit flag: `--destroy`, `--force` or `--confirm`.
 </Warning>
 
-`kakt teardown` takes the whole box: it reads the managed clusters from the management cluster and removes them with it. `kakt tenant remove-cluster` takes one managed cluster down while the box runs. `kakt spoke teardown` is only for when the management cluster is already gone and its clusters would otherwise be left running.
+`kakt teardown` takes the management cluster, and refuses while a cluster it manages is still there — the management cluster holds those clusters' CAPI objects and the only controller that can deprovision their load balancers, so it goes last. `kakt tenant remove-cluster` takes one managed cluster down while the box runs, which is how you empty a box before tearing it down. `kakt spoke teardown` is only for when the management cluster is already gone and its clusters would otherwise be left running.
 
 Removing an **application** is not a command. Delete its directory under `environments/<env>/<app>/`, regenerate the hostname aggregate with `kakt app hosts aggregate`, and commit — your management cluster removes what the declaration no longer asks for.
 

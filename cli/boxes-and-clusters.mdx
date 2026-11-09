@@ -245,6 +245,33 @@ Excluded (2) -- not deleted
 
 A resource is deleted only when it carries `caph-cluster-<cluster>: owned` for a cluster in that target set — the ownership label CAPH writes. Resources marked `shared`, resources with no ownership label, and resources belonging to a cluster you did not name are listed and left alone. Nothing is selected by name, prefix or substring, which is why a box whose clusters share a prefix (`acme-hub`, `acme-stg-01`) cannot lose the wrong one.
 
+### The management cluster goes last
+
+A management cluster is not torn down while a cluster it manages is still there. The command refuses, names what it found and where it learned of it, and deletes nothing:
+
+```
+teardown failed: the management cluster goes last
+
+acme-hub manages a cluster that is still there:
+
+  acme-stg-01                      the management cluster's own CAPI inventory
+
+A management cluster is not torn down while a cluster it manages is running.
+It holds that cluster's CAPI objects and the only controller that can deprovision
+its load balancers, so once this box is gone the platform cannot delete the cluster
+at all: its servers keep running, and keep billing, with nothing left that knows
+they exist.
+```
+
+Remove each managed cluster first with [`kakt tenant remove-cluster`](#kakt-tenant-remove-cluster), then tear the box down.
+
+The check is made twice, from different evidence, because each source is blind to something the other sees:
+
+- **The management cluster's own CAPI inventory**, asked before anything is destroyed. Authoritative while the cluster answers, and the gate runs before the drain and the finalizer strip, both of which are already irreversible.
+- **The provider's inventory**, for every cluster the box declares in `registry/clusters/` or you name with `--spoke`. This catches a cluster whose CAPI objects were deleted while its servers survived — a half-finished removal — and it is the only check available for a box whose API is gone. A cluster the provider says owns nothing is gone for this purpose: no resource in the project carries its ownership label.
+
+A management-cluster teardown no longer cascades into the clusters it manages. It used to read the hub's cluster list and sweep them into the same run, which destroyed clusters nobody named on the command line and, when half the sweep failed, left the remainder with no management cluster to delete them from.
+
 ### Two modes, chosen explicitly
 
 **Normal.** The Kubernetes API is reachable: the cluster's own cleanup runs first — load balancers deprovisioned by the controller that owns them, finalizers stripped, DNS ownership read — and then the provider resources go.
@@ -258,6 +285,8 @@ kakt teardown --name acme-hub --gitops-dir . --confirm \
 
 It deletes only positively owned provider resources and reports everything the cluster would have done as outstanding. A missing kubeconfig never turns the first mode into the second: without access and without the flag the command refuses, and asking for the flag on a box that *is* reachable is refused too.
 
+The clusters named on the flag are the ones this run destroys, **in order**: each workload cluster first, then the provider is asked again, and the management cluster goes only once nothing in the project carries the others' ownership labels. If anything of theirs survives, the management cluster is left standing on purpose — it is the only thing that could still finish the job — and the run exits non-zero saying so. Naming a workload cluster is the only way one enters a teardown's target set; `--spoke` names a cluster for the ordering check and does not authorize deleting it.
+
 <Note>
 If anything could not be done, the command says what and exits non-zero — including a provider deletion that failed. "Teardown completed" means completed.
 </Note>
@@ -268,8 +297,8 @@ If anything could not be done, the command says what and exits non-zero — incl
 | `--confirm` | Confirm deletion. Required |
 | `--gitops-dir` | The box's repository, which declares its escrow and its box id |
 | `--kubeconfig` | Use this kubeconfig instead of the escrowed one, for a box that never finished bootstrapping and so escrowed none. Requires `HCLOUD_TOKEN` |
-| `--infrastructure-only` | Destroy the provider infrastructure of a box whose Kubernetes API cannot be reached, naming the clusters to destroy. The cluster's own cleanup is reported as not done |
-| `--spoke` | A managed cluster this box declares, repeatable. For when the management cluster can no longer be reached |
+| `--infrastructure-only` | Destroy the provider infrastructure of a box whose Kubernetes API cannot be reached, naming the clusters to destroy. The workload clusters named are destroyed first and the management cluster last. The cluster's own cleanup is reported as not done |
+| `--spoke` | A managed cluster this box declares, repeatable. For when the management cluster can no longer be asked for its list. It feeds the ordering check; it does not authorize deleting that cluster |
 | `--dns-only` | Release this box's DNS records and nothing else |
 | `--dns-owner`, `--dns-zone` | Which records, and the zone they live in, when the cluster can no longer be read |
 

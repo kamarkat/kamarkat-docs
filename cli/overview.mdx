@@ -81,14 +81,15 @@ Reading the escrowed kubeconfig gives you **cluster-admin**, because that is wha
 
 | Command | What it does |
 | :- | :- |
-| `kakt tenant remove-cluster` | Remove a managed cluster: its declaration, then, with `--destroy`, the cluster |
+| `kakt tenant remove-cluster` | Delete a managed cluster's declaration; committing it destroys the cluster |
+| `kakt tenant cluster-status` | Report what is actually left of a managed cluster |
 | `kakt teardown` | Destroy a box's management cluster and its infrastructure, once the clusters it manages are gone |
 
 <Warning>
-These delete infrastructure in your cloud account and are not reversible. Each requires an explicit flag: `--destroy`, `--force` or `--confirm`.
+These delete infrastructure in your cloud account and are not reversible. Each requires an explicit flag — `--force` or `--confirm` — except removing a managed cluster, where the destruction is the commit and your repository's review is what stands in for the flag.
 </Warning>
 
-`kakt teardown` takes the management cluster, and refuses while a cluster it manages is still there — the management cluster holds those clusters' CAPI objects and the only controller that can deprovision their load balancers, so it goes last. To empty a box in the same run, name the clusters with `--destroy-managed`: the platform deletes each one first, and the management cluster goes only once that has finished. `kakt tenant remove-cluster` takes one managed cluster down while the box keeps running, which is the right form when the box is staying.
+`kakt teardown` takes the management cluster, and refuses while a cluster it manages is still there — the management cluster holds those clusters' CAPI objects and the only controller that can deprovision their load balancers, so it goes last. To empty a box in the same run, name the clusters with `--destroy-managed`: the platform deletes each one first, and the management cluster goes only once that has finished. `kakt tenant remove-cluster` takes one managed cluster down while the box keeps running, which is the right form when the box is staying: it deletes the cluster's declaration, and the commit is what destroys the cluster. `kakt tenant cluster-status` reports how far that has got.
 
 Removing an **application** is not a command. Delete its directory under `environments/<env>/<app>/`, regenerate the hostname aggregate with `kakt app hosts aggregate`, and commit — your management cluster removes what the declaration no longer asks for.
 

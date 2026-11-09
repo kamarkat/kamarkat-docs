@@ -75,7 +75,7 @@ Each instance has its own empty database. Data does not follow a cluster, so any
 Verify the replacement is serving, cut the hostnames over by moving `publicIngress: true`, then remove the predecessor with [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster). Its instances stop; the environment's application definitions are untouched.
 
 <Note>
-Removing the predecessor's files does not destroy it. The management cluster never deletes a cluster because its declaration disappeared, so `kakt tenant remove-cluster --destroy` does that as a separate step. Its backups stay in your object storage under its own prefix after it is gone.
+Removing the predecessor's declaration **is** what destroys it: the management cluster generates that cluster's Applications from its claim file, so the commit that removes the file deletes the cluster. Push it only when the replacement is serving. Its backups stay in your object storage under its own prefix after it is gone.
 </Note>
 
 ## What this does not change

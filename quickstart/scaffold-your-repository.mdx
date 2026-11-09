@@ -76,6 +76,8 @@ acme-gitops/
 └── renovate.json                  proposes new platform versions as pull requests
 ```
 
+Two workflows come with it. **Bundle pre-flight** judges an upgrade proposal against the cluster it targets. **Cluster removal** reviews a commit that removes a managed cluster's declaration — which is what destroys that cluster — so the branch your management cluster reconciles should require review and that check.
+
 The platform version in `bundle.yaml` changes only through upgrade proposals. Its `repoURL` names the registry the platform's charts are pulled from, and changes if that registry moves. `values.yaml` holds only what you change from the defaults.
 
 ## Next

@@ -29,12 +29,12 @@ acme-hub manages a cluster that is still there:
 
 ## Step 1: Remove each managed cluster
 
-Two runs per cluster — the declaration leaves git first, then the cluster is destroyed. See [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster).
+One commit per cluster: delete the declaration, push, and the management cluster destroys the cluster. See [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster).
 
 ```bash
 kakt tenant remove-cluster --name acme-stg-01 --mgmt-cluster acme-hub --gitops-dir .
-# commit and push, wait for the management cluster to sync, then:
-kakt tenant remove-cluster --name acme-stg-01 --mgmt-cluster acme-hub --gitops-dir . --destroy
+git add -A registry && git commit -m "Destroy acme-stg-01" && git push
+kakt tenant cluster-status --name acme-stg-01 --mgmt-cluster acme-hub   # watch it finish
 ```
 
 <Tip>

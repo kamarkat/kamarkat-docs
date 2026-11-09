@@ -327,28 +327,66 @@ If it cannot resolve access it stops rather than proceeding: a teardown that can
 
 ### kakt tenant remove-cluster
 
-Removes a managed cluster, in two runs. For the whole task, see [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster).
+Deletes a managed cluster's declaration. **The commit is the removal.** For the whole task, see [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster).
 
 ```bash
 kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-02
-git add -A registry && git commit -m "Remove acme-02" && git push
-kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-02 --destroy
+git add -A registry && git commit -m "Destroy acme-02" && git push
 ```
 
-The first run lists the environment's applications — what stops running on this cluster — and refuses only while the management cluster's own `burstSpokePool` names it. Applications are never a precondition: they name no cluster, their definitions belong to the environment, and they keep running on every other cluster serving it. Otherwise it deletes the cluster's declaration from your repository and destroys nothing. The second, with `--destroy`, refuses until the management cluster no longer reads that declaration from git, and also refuses when it cannot tell, because a management cluster that has not reconciled since your push is not the same as a declaration that is gone. It then deletes the cluster's Applications on the management cluster, the infrastructure one last, which destroys the cluster and its nodes. Run again after it succeeds and it reports the cluster as already destroyed.
+A managed cluster exists because `registry/clusters/<name>/infrastructure/spokepool.yaml` exists: the management cluster generates that cluster's Applications from the claim file. So once the commit reaches the branch the management cluster reconciles, the Applications stop being generated, the infrastructure one is deleted with Argo CD's resources-finalizer, the claim goes with it, and Crossplane and Cluster API unwind the cluster.
+
+The command lists the environment's applications — what stops running on this cluster — and refuses only while the management cluster's own `burstSpokePool` names it. Applications are never a precondition: they name no cluster, their definitions belong to the environment, and they keep running on every other cluster serving it. Then it deletes the declaration from your working tree and destroys nothing, because nothing is committed yet.
 
 | Flag | Meaning |
 | :- | :- |
 | `--mgmt-cluster` | The management cluster that created it. Required |
 | `--name` | The managed cluster to remove. Required |
-| `--destroy` | Destroy the cluster, once its removed declaration is pushed and synced |
-| `--kubeconfig` | The management cluster's kubeconfig. Defaults to `k8-secrets/kubeconfig/<mgmt-cluster>.kubeconfig` |
-| `--timeout` | How long to wait for each Application to be deleted. Defaults to 30m |
 | `--gitops-dir` | Your GitOps repository. Defaults to the current directory |
 
 <Warning>
-`--destroy` destroys the cluster and its databases. Its secrets and backups stay, and its name is never reused.
+The commit destroys the cluster and its databases. Its secrets and backups stay, and its name is never reused.
 </Warning>
+
+<Note>
+`--destroy` is gone, with `--kubeconfig` and `--timeout`. It existed because the per-cluster Applications used to be flat files in the management cluster's directory, which is applied by a root that does not prune — so removing the files left both Applications, and the cluster, running, and a second credentialled step had to delete the objects. The claim file is the declaration now, so there is no window left for that step to close.
+</Note>
+
+### kakt tenant cluster-status
+
+Reports what is actually left of a managed cluster. Read-only.
+
+```bash
+kakt tenant cluster-status --name acme-02 --mgmt-cluster acme-hub
+```
+
+```
+cluster  acme-02
+
+Observed
+  declaration in git                 absent
+  Application acme-02-generated      absent
+  Application acme-02-infrastructure deleting
+  SpokePool acme-02                  present
+  Cluster acme-02                    deleting
+  provider resources                 4 owned
+
+state    deleting
+  - acme-02-infrastructure is being deleted
+  - the claim is no longer declared; the platform is still unwinding the cluster
+```
+
+A commit returns at once and a cluster takes minutes to unwind, so this is how you watch it. It reads four sources in increasing order of authority about existence — your working tree, the management cluster's two Applications, the claim and Cluster API object, and your provider's inventory — and prints all of it before the verdict, so the verdict can be checked.
+
+| State | Meaning |
+| :- | :- |
+| `declared` | The claim is in git and the platform holds the cluster |
+| `deleting` | The claim is gone and the platform is still unwinding it |
+| `removed` | Nothing holds it, and your provider reports nothing carrying its ownership label |
+| `failed` | Needs attention, and the reason says why. Exits non-zero |
+| `unknown` | Something could not be read, so nothing is concluded |
+
+`removed` requires the provider to have been asked: **a declaration removed from git is not a destroyed cluster.** The case where nothing on the management cluster holds the cluster any more and its servers are still running is `failed`, not `deleting`, because nothing is left that can finish the job.
 
 ### Destroying a managed cluster
 

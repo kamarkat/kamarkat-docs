@@ -52,7 +52,7 @@ A cell groups your clusters for policy, and is not a cluster. It holds no comput
 
 You can add on-premises worker nodes to a cluster at any point in its life. They run workloads and burst capacity, never cluster-machinery state, so replacing one is a capacity operation rather than a recovery.
 
-### Spokes are not workflows
+### Managed clusters are not workflows
 
 A workflow provisions once and then stops caring; a controller does not. That is why managed clusters are declarations reconciled continuously, not jobs run by CI.
 

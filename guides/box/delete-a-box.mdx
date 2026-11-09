@@ -37,6 +37,10 @@ kakt tenant remove-cluster --name acme-stg-01 --mgmt-cluster acme-hub --gitops-d
 kakt tenant remove-cluster --name acme-stg-01 --mgmt-cluster acme-hub --gitops-dir . --destroy
 ```
 
+<Tip>
+To do both in one run, skip step 1 and name the clusters on the teardown: `--destroy-managed acme-stg-01`. The management cluster deletes each one, in order, and goes last. It leaves their declarations in the repository, which is correct only because the repository is going too.
+</Tip>
+
 ## Step 2: Tear down the management cluster
 
 ```bash

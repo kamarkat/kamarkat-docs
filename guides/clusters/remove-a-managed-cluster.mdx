@@ -1,7 +1,7 @@
 ---
 title: "Remove a managed cluster"
 description: "Remove its declaration and push, then destroy it on the management cluster. Removing the files alone destroys nothing."
-keywords: ["remove cluster", "delete cluster", "kakt tenant remove-cluster", "spoke teardown", "decommission", "cluster name"]
+keywords: ["remove cluster", "delete cluster", "kakt tenant remove-cluster", "destroy cluster", "decommission", "cluster name"]
 ---
 
 > Declaration out of git first, then destroy. A removed cluster's name is never used again.
@@ -51,17 +51,14 @@ This destroys the cluster and everything on it, including its databases. There i
 
 ## When the management cluster is gone
 
-If the management cluster cannot be reached, there are no Applications to delete. Destroy the cluster through your provider's API instead:
+There are no Applications to delete, and nothing on the platform can destroy the cluster. The cluster goes with the box, on the teardown that names it:
 
 ```bash
-kakt spoke teardown --name acme-stg-01 --mgmt-cluster acme-hub --force
+kakt teardown --name acme-hub --gitops-dir . --confirm \
+  --infrastructure-only acme-hub,acme-stg-01
 ```
 
-Use it only in that case. On a running management cluster it removes the servers behind the management cluster's back, and the management cluster builds the cluster again.
-
-It reports what it did: servers deleted, the cluster already absent from your cloud project, or a failure — and it exits non-zero on a failure, so a teardown that left servers running cannot read as success.
-
-Without `--name` it deletes **every** managed cluster in the project, which is why it then requires `--mgmt-cluster`: both carry the same ownership label, and that is how the management cluster is excluded from the sweep.
+The named cluster's resources are deleted first, the provider is asked again, and the management cluster goes only once nothing carries the other's ownership label. The run reports the cluster's own cleanup as not performed, and exits non-zero if anything is left — see [Delete a box](/guides/box/delete-a-box).
 
 ## What stays behind
 

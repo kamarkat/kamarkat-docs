@@ -182,12 +182,12 @@ kakt proposal preflight --candidate <version> --cluster acme-hub
 
 A check that cannot run returns unverified rather than passing. `--fail-on-unverified` exits non-zero on that, `--out` writes the markdown verdict to a file and `--json` writes it as JSON. See [Upgrades](/versions/upgrades) for how proposals reach you.
 
-### kakt spoke match-inventory
+### kakt cluster match-inventory
 
 Lists the machines your management cluster holds for a managed cluster alongside the servers your provider actually has, and classifies every relationship between them. Matched means one server carries that machine's name in the provider's own labels.
 
 ```bash
-kakt spoke match-inventory --cluster acme-02
+kakt cluster match-inventory --cluster acme-02
 ```
 
 Read-only. It changes nothing in either the cluster or the provider, and unresolved rows stay unresolved — nothing here adopts or remediates. `--hcloud-token` is taken explicitly, or from `HCLOUD_TOKEN`, rather than read from the cluster, because during a reconstruction the cluster's own copy is itself restored state.
@@ -204,12 +204,12 @@ kakt reseed --kubeconfig acme-hub.kubeconfig
 
 The management secret scope, provider and topology come from the cluster's existing seed, so a reseed cannot change which cluster the seed describes. The version is left as the cluster records it; `--bundle-version` moves it deliberately, and the move is printed against the version it replaces.
 
-### kakt spoke restore-pki
+### kakt cluster restore-pki
 
 Writes a managed cluster's escrowed trust roots into a replacement management cluster, so it can issue node certificates for a cluster that is already running.
 
 ```bash
-kakt spoke restore-pki --box acme-hub --cluster acme-02 --kubeconfig new-hub.kubeconfig
+kakt cluster restore-pki --box acme-hub --cluster acme-02 --kubeconfig new-hub.kubeconfig
 ```
 
 For reconstruction, not for provisioning: a new managed cluster gets new trust roots on the ordinary declarative path. It refuses to run unless cluster lifecycle is paused on that cluster, fails closed when the escrow holds nothing, and fails explicitly when a live value disagrees with the escrow rather than overwriting either. Safe to re-run, and it reports fingerprints only.
@@ -263,12 +263,21 @@ at all: its servers keep running, and keep billing, with nothing left that knows
 they exist.
 ```
 
-Remove each managed cluster first with [`kakt tenant remove-cluster`](#kakt-tenant-remove-cluster), then tear the box down.
+Remove each managed cluster first with [`kakt tenant remove-cluster`](#kakt-tenant-remove-cluster), then tear the box down. Or, when the whole box is going, name them on the teardown itself:
+
+```bash
+kakt teardown --name acme-hub --gitops-dir . --confirm \
+  --destroy-managed acme-stg-01
+```
+
+The management cluster then does the deleting: the box's root Application is removed so nothing recreates what goes next, each named cluster's Applications are deleted and waited on — which is what destroys the cluster, with its load balancers deprovisioned by the controller that owns them — and only then is the management cluster itself touched. A cluster that does not finish deleting stops the run, with the management cluster intact, because it is the only thing that can still complete it.
+
+That leaves the clusters' declarations in the repository, which is correct only because the repository is going too. To keep the box, use `remove-cluster`.
 
 The check is made twice, from different evidence, because each source is blind to something the other sees:
 
 - **The management cluster's own CAPI inventory**, asked before anything is destroyed. Authoritative while the cluster answers, and the gate runs before the drain and the finalizer strip, both of which are already irreversible.
-- **The provider's inventory**, for every cluster the box declares in `registry/clusters/` or you name with `--spoke`. This catches a cluster whose CAPI objects were deleted while its servers survived — a half-finished removal — and it is the only check available for a box whose API is gone. A cluster the provider says owns nothing is gone for this purpose: no resource in the project carries its ownership label.
+- **The provider's inventory**, for every cluster the box declares in `registry/clusters/` or you name with `--managed-cluster`. This catches a cluster whose CAPI objects were deleted while its servers survived — a half-finished removal — and it is the only check available for a box whose API is gone. A cluster the provider says owns nothing is gone for this purpose: no resource in the project carries its ownership label.
 
 A management-cluster teardown no longer cascades into the clusters it manages. It used to read the hub's cluster list and sweep them into the same run, which destroyed clusters nobody named on the command line and, when half the sweep failed, left the remainder with no management cluster to delete them from.
 
@@ -285,7 +294,7 @@ kakt teardown --name acme-hub --gitops-dir . --confirm \
 
 It deletes only positively owned provider resources and reports everything the cluster would have done as outstanding. A missing kubeconfig never turns the first mode into the second: without access and without the flag the command refuses, and asking for the flag on a box that *is* reachable is refused too.
 
-The clusters named on the flag are the ones this run destroys, **in order**: each workload cluster first, then the provider is asked again, and the management cluster goes only once nothing in the project carries the others' ownership labels. If anything of theirs survives, the management cluster is left standing on purpose — it is the only thing that could still finish the job — and the run exits non-zero saying so. Naming a workload cluster is the only way one enters a teardown's target set; `--spoke` names a cluster for the ordering check and does not authorize deleting it.
+The clusters named on the flag are the ones this run destroys, **in order**: each workload cluster first, then the provider is asked again, and the management cluster goes only once nothing in the project carries the others' ownership labels. If anything of theirs survives, the management cluster is left standing on purpose — it is the only thing that could still finish the job — and the run exits non-zero saying so. Naming a workload cluster is the only way one enters a teardown's target set; `--managed-cluster` names a cluster for the ordering check and does not authorize deleting it.
 
 <Note>
 If anything could not be done, the command says what and exits non-zero — including a provider deletion that failed. "Teardown completed" means completed.
@@ -296,9 +305,11 @@ If anything could not be done, the command says what and exits non-zero — incl
 | `--name` | The management cluster to destroy. Required |
 | `--confirm` | Confirm deletion. Required |
 | `--gitops-dir` | The box's repository, which declares its escrow and its box id |
+| `--destroy-managed` | Also destroy these managed clusters first, through the management cluster, before it is destroyed itself (comma-separated) |
+| `--timeout` | How long to wait for each managed cluster's own deletion (default 30m) |
 | `--kubeconfig` | Use this kubeconfig instead of the escrowed one, for a box that never finished bootstrapping and so escrowed none. Requires `HCLOUD_TOKEN` |
 | `--infrastructure-only` | Destroy the provider infrastructure of a box whose Kubernetes API cannot be reached, naming the clusters to destroy. The workload clusters named are destroyed first and the management cluster last. The cluster's own cleanup is reported as not done |
-| `--spoke` | A managed cluster this box declares, repeatable. For when the management cluster can no longer be asked for its list. It feeds the ordering check; it does not authorize deleting that cluster |
+| `--managed-cluster` | A managed cluster this box declares, repeatable. For when the management cluster can no longer be asked for its list. It feeds the ordering check; it does not authorize deleting that cluster |
 | `--dns-only` | Release this box's DNS records and nothing else |
 | `--dns-owner`, `--dns-zone` | Which records, and the zone they live in, when the cluster can no longer be read |
 
@@ -309,7 +320,7 @@ If it cannot resolve access it stops rather than proceeding: a teardown that can
 </Warning>
 
 <Note>
-`--infrastructure-only` and `--spoke` exist for a box that is already partly gone. The managed-cluster list normally comes from the management cluster; once that cluster is unreachable it answers nothing, and its clusters survive a teardown that was meant to take them. So you name them, and each one's resources are still matched by its own ownership label rather than by anything about its name. `--dns-only` covers the matching case for DNS: records whose owner no longer exists are ignored rather than reclaimed, so a hostname resolves to a decommissioned address until someone releases it.
+`--infrastructure-only` and `--managed-cluster` exist for a box that is already partly gone. The managed-cluster list normally comes from the management cluster; once that cluster is unreachable it answers nothing, and its clusters survive a teardown that was meant to take them. So you name them, and each one's resources are still matched by its own ownership label rather than by anything about its name. `--dns-only` covers the matching case for DNS: records whose owner no longer exists are ignored rather than reclaimed, so a hostname resolves to a decommissioned address until someone releases it.
 
 `--tenant` is gone. It named the box's prefix so servers could be matched by it, and because a box's clusters share that prefix by construction, a management-cluster teardown would sweep its workload clusters' servers too. Passing it now errors rather than quietly changing what gets deleted.
 </Note>
@@ -339,16 +350,8 @@ The first run lists the environment's applications — what stops running on thi
 `--destroy` destroys the cluster and its databases. Its secrets and backups stay, and its name is never reused.
 </Warning>
 
-### kakt spoke teardown
+### Destroying a managed cluster
 
-Deletes managed clusters directly through your provider's API, discovering them from server labels and names. Omit `--name` and it deletes all of them; `--mgmt-cluster` is excluded. It is for when the management cluster can no longer be reached: on a running one, use `kakt tenant remove-cluster`, because the management cluster rebuilds a cluster whose servers disappear behind its back.
+There is no command that deletes a managed cluster's servers through your provider's API on its own. With the management cluster running, the cluster exists because a declaration says so and is removed by that declaration leaving — [`kakt tenant remove-cluster`](#kakt-tenant-remove-cluster). With the whole box going, name it on the teardown: `--destroy-managed` while the management cluster still answers, `--infrastructure-only` once it does not.
 
-It reports which of three things happened — servers deleted, the cluster already absent from your project, or a failure — and exits non-zero on a failure, so a teardown that left servers running does not read as success.
-
-```bash
-kakt spoke teardown --name acme-02 --force --mgmt-cluster acme-hub
-```
-
-<Warning>
-`--force` is required, because graceful deletion needs the management cluster. This destroys infrastructure in your cloud account.
-</Warning>
+Deleting the servers behind a running management cluster's back is not a removal: the claim is still reconciled, so the platform rebuilds the cluster on new servers — under a name whose secret path and backup prefix are never reused.

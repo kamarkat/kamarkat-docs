@@ -15,7 +15,7 @@ Creates `<org>/<tenant>-gitops`, renders it from the platform template, stores y
 ```bash
 kakt tenant scaffold \
   --tenant acme \
-  --org acme-inc \
+  --box acme-inc \
   --domain acme.example \
   --region hel1
 ```
@@ -37,7 +37,7 @@ Scaffolding happens once. Every change after it is a commit or a pull request. S
 | Flag | Meaning |
 | :- | :- |
 | `--tenant` | Your tenant identifier, lower-case. Required. It names the repository and your box |
-| `--org` | The git organization the repository is created in. Required |
+| `--box` | The box: the git organization the repository is created in. Required |
 | `--domain` | Your base domain. Required |
 | `--subdomain` | A DNS label every hostname sits under; empty publishes on the apex |
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines |

@@ -48,7 +48,7 @@ container for users, projects and clients. A tenant is bound to one. That is the
 place the word may carry the platform's meaning.
 
 The one other legitimate use is **"git organization"**, which names the reader's entity
-in their git provider — what `--org` sets, and where their repositories, runners and
+in their git provider — what `--box` sets, and where their repositories, runners and
 package registry live. Always qualify it with "git". A bare "your organization" is
 forbidden precisely because it has meant both the tenant and the git organization,
 sometimes in the same sentence.

@@ -13,7 +13,7 @@ A dry run renders the repository locally and creates nothing:
 ```bash
 kakt tenant scaffold \
   --tenant acme \
-  --org acme-inc \
+  --box acme-inc \
   --domain acme.example \
   --region hel1 \
   --dry-run
@@ -22,7 +22,7 @@ kakt tenant scaffold \
 | Flag | Meaning |
 | :- | :- |
 | `--tenant` | Your tenant identifier, lower-case. It names the repository and your box. |
-| `--org` | The git organization the repository is created in. |
+| `--box` | The box: the git organization the repository is created in. |
 | `--domain` | Your base domain. |
 | `--subdomain` | Optional. A DNS label every hostname sits under; empty publishes on the apex. |
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines. |
@@ -38,7 +38,7 @@ Run the same command without `--dry-run`, from a shell where you exported your [
 ```bash
 kakt tenant scaffold \
   --tenant acme \
-  --org acme-inc \
+  --box acme-inc \
   --domain acme.example \
   --region hel1 \
   --escrow-url "$INFISICAL_ESCROW_URL" \

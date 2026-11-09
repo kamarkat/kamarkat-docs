@@ -104,6 +104,45 @@ kakt tenant set-gitops-token --org acme-inc
 
 The token is read from stdin when `--token` is omitted, which keeps it out of your shell history. `--repo owner/name` publishes on one repository instead of the whole git organization, and `--discover --gitops-repo acme-inc/acme-gitops` finds the repositories whose workflows write to it.
 
+### kakt tenant add-management
+
+Declares a new management cluster for the box this repository is. A box outlives
+its clusters: the box keeps its `boxId` and the management cluster's own name
+changes, because that name keys the cluster's objects, its nodes and its
+database's WAL archive prefix.
+
+```bash
+kakt tenant add-management --name acme-mgmt-02
+```
+
+| Flag | Meaning |
+| --- | --- |
+| `--name` | The new management cluster's name. Required, and never a name this box has used |
+| `--from` | The cluster this one succeeds. Needed only when the box already declares more than one |
+| `--gitops-dir` | The box's repository. Defaults to the working directory |
+
+The box is not a flag. It is read from the repository you run this in, because
+`boxId` is already written there and a mistyped one does not fail — it addresses
+another box's escrow, or claims another box's DNS records. A directory that
+declares no box says so.
+
+It renders from the management cluster already declared here, so the new one
+inherits this box's domain, provider, region and escrow coordinates. Day-0's
+output is not carried over: `generated/` holds the previous cluster's CAPI
+Cluster, its PKI and its load balancer address, and the new cluster's Day-0
+writes its own.
+
+Committing declares it. Create it by dispatching the repository's own workflow
+with the new name:
+
+```bash
+gh workflow run bootstrap-cluster -f cluster=acme-mgmt-02
+```
+
+Both declarations can exist at once, which is what makes a replacement
+reversible: the predecessor keeps serving and stays demotable until the
+switchover.
+
 ## Day-0, one step at a time
 
 Day-0 runs as a workflow in your GitOps repository and calls these for you. Run them directly only when you are working on a box deliberately.

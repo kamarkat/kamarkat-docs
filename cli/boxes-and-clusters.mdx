@@ -143,6 +143,94 @@ Both declarations can exist at once, which is what makes a replacement
 reversible: the predecessor keeps serving and stays demotable until the
 switchover.
 
+### One management cluster at a time
+
+A box has at most one management cluster holding infrastructure. It may have had
+several over its life — that is what `boxId` is for — but two at once are two
+control planes reconciling the same repository, each provisioning the other's
+workload clusters under names already taken.
+
+`bootstrap` establishes this before it provisions anything, and it asks the
+**provider**, not Kubernetes and not this repository. A declaration here outlives
+every cluster by design, an escrow artefact is kept deliberately, and an
+unreachable Kubernetes API is also what a wedged cluster with running servers
+looks like. Provider resources carry their owning cluster's name as a label, so
+they answer without a kubeconfig:
+
+```text
+Cannot create the management cluster.
+
+Box: acme-hub
+Creating: acme-mgmt-02
+
+This box already has a management cluster:
+
+  acme-hub still owns 7 provider resource(s)
+
+A box has one management cluster at a time. Two of them reconcile the same
+declarations in this repository, so each would provision the other's workload
+clusters under names already taken.
+
+Inspect it, then destroy it:
+  kakt tenant cluster-status --name acme-hub
+  kakt teardown --name acme-hub --confirm
+
+Nothing here needs deleting by hand, and nothing is lost by this refusal:
+this repository is reused as it is, boxId stays acme-hub, and the escrow
+artefacts and database archives of every past incarnation stay under their
+own names.
+```
+
+Three things follow from asking the provider:
+
+- A cluster you destroyed is **verifiably** gone — it owns no labelled resource —
+  so a new incarnation is admitted immediately. You never delete this repository.
+- A failed attempt at the *same* cluster is a retry, not a duplicate. The run
+  reports what it is resuming.
+- An inventory that cannot be read is refused rather than read as empty, because
+  an unreadable answer is the same evidence as an unasked question.
+
+Workload clusters are included: a replacement is refused while any workload
+cluster this box declares still owns provider resources. The management cluster
+goes last, so build the replacement first and those clusters are left unmanaged
+and still billing — then rebuilt from the claims still committed here.
+
+Two further properties, because a check alone is not a guarantee:
+
+- **A removed declaration does not hide a cluster.** The names asked about come from
+  what this repository declares *and* from every management cluster its history
+  shows was ever declared. Delete a cluster's directory while its servers are
+  running and it is still asked about, because the provider's label identifies a
+  cluster and only the box's own records can enumerate its clusters.
+- **One bootstrap at a time per box.** `bootstrap-cluster` is serialized on the
+  repository, so two overlapping dispatches cannot both read an empty inventory and
+  both build. A second dispatch of the same cluster waits and resumes; a different
+  one waits and is then refused.
+
+A record that cannot be read — an unreadable inventory, a directory that is not a
+repository — is refused rather than read as "nothing there".
+
+### Replacing a management cluster
+
+```bash
+# 1. remove the workload clusters, which is a commit each
+kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-stg-01
+
+# 2. destroy the current management cluster
+kakt teardown --name acme-hub --confirm
+
+# 3. declare the replacement; boxId is untouched
+kakt tenant add-management --name acme-mgmt-02
+
+# 4. build it
+gh workflow run bootstrap-cluster -f cluster=acme-mgmt-02
+```
+
+The repository, the box's identity, its escrow scope and every past incarnation's
+backups are preserved throughout. Application declarations under
+`environments/` belong to the environment, not to the cluster, so they are
+untouched by a replacement.
+
 ## Day-0, one step at a time
 
 Day-0 runs as a workflow in your GitOps repository and calls these for you. Run them directly only when you are working on a box deliberately.

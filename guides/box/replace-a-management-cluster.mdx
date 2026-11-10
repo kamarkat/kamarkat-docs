@@ -1,0 +1,104 @@
+---
+title: "Replace a management cluster"
+description: "A box keeps its identity while its management cluster is replaced. The replacement takes a new name, the repository is reused, and the clusters it managed are removed first."
+keywords: ["replace management cluster", "boxId", "clusterName", "incarnation", "succession", "kakt tenant add-management", "teardown"]
+---
+
+> The box outlives the cluster. `boxId` stays, the management cluster takes a new name, and the same repository builds the replacement.
+
+A management cluster's Kubernetes version, its node types and its machine templates are fixed for its life, so changing them is a new cluster rather than an edit. Replacing it does not create a new box: the repository, the box's identity, its escrow scope, the DNS records it owns and every past cluster's backups all survive.
+
+Unlike [replacing a managed cluster](/guides/clusters/replace-a-managed-cluster), there is no overlap. A box has at most one management cluster holding infrastructure, so the predecessor is destroyed before the replacement is built — and the clusters it managed are removed before that. See [Core concepts](/documentation/core-concepts#one-management-cluster-per-box).
+
+<Warning>
+This is destructive and it is not a cutover. Every managed cluster of this box is destroyed, and each one's database goes with it. Their backups remain in your object storage under their own prefixes, but the replacement's clusters start empty. If you need their data, restore it after step 5.
+</Warning>
+
+## Before you start
+
+- **The replacement needs a new name.** A management cluster's name keys its own objects and nodes and the archive prefix for its database, so a name is never reused. `boxId` is not changing — only the cluster's name.
+- **Managed clusters need new names too.** The same rule applies to each one you rebuild: a cluster's name also names its secret path and its backup prefix.
+- **Decide about data first.** Each managed cluster's database lives on that cluster. Removing it removes the database; the rebuilt cluster gets a new, empty one.
+- **You need the box's recovery material.** The replacement is a new cluster in the same box, so it reads the box's escrow. Confirm it is there before you destroy anything:
+
+  ```bash
+  kakt escrow verify --box acme-hub --cluster acme-hub --management
+  ```
+
+<Note>
+If the management cluster was **lost** rather than deliberately replaced, and its managed clusters are still running and serving, this guide is not the procedure — and the platform cannot currently re-adopt those clusters. See [Disaster reconstruction](/documentation/core-concepts#disaster-reconstruction) for what is and is not supported.
+</Note>
+
+## Step 1: Remove every managed cluster
+
+The management cluster goes last. It holds its managed clusters' Cluster API objects and is the only thing that can deprovision their load balancers, so destroying it first leaves them running, unmanaged and billing.
+
+Remove each one, which is a commit each:
+
+```bash
+kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-stg-01
+```
+
+Then confirm each is actually gone before continuing. Removing a declaration from Git is not a destroyed cluster:
+
+```bash
+kakt tenant cluster-status --name acme-stg-01
+```
+
+Wait for `removed`. `failed` means its resources are still at your provider with nothing left to delete them, and the next step would strand them.
+
+## Step 2: Destroy the management cluster
+
+```bash
+kakt teardown --name acme-hub --confirm
+```
+
+It refuses while any cluster it manages still owns infrastructure, so a cluster missed in step 1 stops it here rather than being orphaned.
+
+Its declaration stays in the repository — teardown destroys infrastructure, not declarations — and that is fine. The next step renders the replacement from it.
+
+## Step 3: Declare the replacement
+
+Run this inside the box's repository. The box is read from it, so there is no box flag to get wrong:
+
+```bash
+kakt tenant add-management --name acme-mgmt-02
+```
+
+This writes `registry/clusters/acme-mgmt-02/` from the cluster already declared here, so the replacement inherits this box's domain, provider, region and escrow coordinates. `boxId` is carried over unchanged, and so is the DNS owner id — the replacement adopts the zone's records rather than re-keying them.
+
+Day-0's output is not carried over: the predecessor's Cluster API object, its PKI and its load balancer address stay with it, and the new cluster writes its own.
+
+Commit and push.
+
+## Step 4: Build it
+
+```bash
+gh workflow run bootstrap-cluster -f cluster=acme-mgmt-02
+```
+
+Before provisioning anything, this establishes that the box has no other management cluster holding infrastructure. If the predecessor still owns resources, it refuses and names them — nothing is half-built. One bootstrap runs per box at a time, so a second dispatch waits rather than racing the first.
+
+When it finishes, check the box as in [Check your box](/guides/box/check-your-box).
+
+## Step 5: Rebuild the managed clusters
+
+Declare each one again, with a new name and the same `--environment` it had before:
+
+```bash
+kakt tenant add-cluster \
+  --mgmt-cluster acme-mgmt-02 \
+  --name acme-stg-02 \
+  --environment stg \
+  --tenant acme \
+  --bundle-version <version> \
+  --gitops-repo-url https://github.com/acme-inc/acme-gitops
+```
+
+The environment's applications are deployed to it because it declares that environment — no application declaration is edited. Supply each one's secrets against the new cluster, and restore any data you need, as in [Replace a managed cluster](/guides/clusters/replace-a-managed-cluster#step-3-let-the-replacement-receive-the-environment).
+
+Once the replacement is serving, you may remove the predecessor's `registry/clusters/acme-hub/` directory. The box still remembers it: every management cluster this repository has declared is part of the box's record, so a forgotten cluster's surviving infrastructure is never invisible to the next replacement.
+
+## What this does not change
+
+`boxId`, and everything keyed on it: the escrow path holding this box's master keys, the DNS records it owns, and your public hostnames. The repository is reused as it is and is never re-created or re-scaffolded. `environments/` is untouched — an environment belongs to your applications, not to a cluster, so replacing the cluster underneath is not a promotion and no application version moves. Every past cluster's escrow artifacts and database archives stay under their own names.

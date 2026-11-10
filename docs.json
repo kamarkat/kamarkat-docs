@@ -74,6 +74,7 @@
               "guides/box/check-your-box",
               "guides/box/resize-the-management-cluster",
               "guides/box/rotate-the-build-credential",
+              "guides/box/replace-a-management-cluster",
               "guides/box/repair-a-box",
               "guides/box/delete-a-box"
             ]

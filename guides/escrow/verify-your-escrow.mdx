@@ -22,11 +22,11 @@ export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
 ## Step 1: Check every artefact is present
 
 ```bash
-kakt escrow verify --box acme-hub --cluster acme-hub --hub
+kakt escrow verify --box acme-hub --cluster acme-hub --management
 kakt escrow verify --box acme-hub --cluster acme-01 --workload
 ```
 
-`--hub` for the management cluster, `--workload` for each managed cluster. It reports each artefact by fingerprint, never by value.
+`--management` for the management cluster, `--workload` for each managed cluster. It reports each artefact by fingerprint, never by value.
 
 ## Step 2: Check the encryption key decrypts
 

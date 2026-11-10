@@ -52,11 +52,11 @@ The project id is written where the rest of the tooling already reads it, so the
 Reports which artefacts your box cannot be rebuilt without are actually present, by fingerprint — so a missing one is visible before a recovery rather than during one.
 
 ```bash
-kakt escrow verify --box acme-hub --cluster acme-hub --hub
+kakt escrow verify --box acme-hub --cluster acme-hub --management
 kakt escrow verify --box acme-hub --cluster acme-02 --workload
 ```
 
-Pass `--hub` for the management cluster, where every artefact applies, and `--workload` for a managed cluster, where the management-cluster-only artefacts do not.
+Pass `--management` for the management cluster, where every artefact applies, and `--workload` for a managed cluster, where the management-cluster-only artefacts do not.
 
 <Tip>
 Run this after Day-0. An escrow cannot be added to a box afterwards, so the one time to find out it is empty is before you need it.

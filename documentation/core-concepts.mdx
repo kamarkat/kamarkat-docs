@@ -109,7 +109,7 @@ You are intentionally replacing the management cluster, and you are not preservi
 kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-stg-01
 
 # 2. destroy the management cluster
-kakt teardown --name acme-hub --confirm
+kakt teardown --name acme-hub --gitops-dir . --confirm
 
 # 3. declare the replacement — boxId is untouched
 kakt tenant add-management --name acme-mgmt-02
@@ -160,7 +160,7 @@ Infrastructure owned by the cluster currently being built is an earlier attempt 
 
 ## Observing
 
-`kakt tenant cluster-status --name <cluster>` reports what is actually there, with the evidence before the verdict:
+`kakt tenant cluster-status --name <cluster> --mgmt-cluster <management-cluster>` reports what is actually there, with the evidence before the verdict:
 
 - **declared** — the repository declares it; nothing has been built yet
 - **deleting** — removal is under way

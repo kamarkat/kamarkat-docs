@@ -171,9 +171,8 @@ A box has one management cluster at a time. Two of them reconcile the same
 declarations in this repository, so each would provision the other's workload
 clusters under names already taken.
 
-Inspect it, then destroy it:
-  kakt tenant cluster-status --name acme-hub
-  kakt teardown --name acme-hub --confirm
+Destroy it:
+  kakt teardown --name acme-hub --gitops-dir . --confirm
 
 Nothing here needs deleting by hand, and nothing is lost by this refusal:
 this repository is reused as it is, boxId stays acme-hub, and the escrow
@@ -217,7 +216,7 @@ repository — is refused rather than read as "nothing there".
 kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-stg-01
 
 # 2. destroy the current management cluster
-kakt teardown --name acme-hub --confirm
+kakt teardown --name acme-hub --gitops-dir . --confirm
 
 # 3. declare the replacement; boxId is untouched
 kakt tenant add-management --name acme-mgmt-02

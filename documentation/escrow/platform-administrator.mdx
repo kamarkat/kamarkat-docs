@@ -89,6 +89,35 @@ KAKT_IDENTITY=machine kakt escrow verify --box acme-hub --cluster acme-hub --man
 
 Your box's `hub-operator` uses a machine identity to escrow recovery material as it runs, and your bootstrap workflow uses one too. Those are the identities automation needs; how many you create is yours to decide, subject to the limit below.
 
+### Operating the machine identity
+
+One identity, and these are the facts your box depends on:
+
+| | |
+|---|---|
+| Auth method | **Universal Auth** — client ID and client secret. It is the only method the platform uses |
+| Role on the escrow project | **admin**, granted when it creates the project (`kakt escrow init` authenticates as it) |
+| Where its secret lives | your repository's secrets, and the Secret `hub-operator` reads in the box |
+| Token lifetime | a short-lived access token per login. Nothing renews one, because every consumer is a short run |
+
+<Warning>
+**Leave the client secret with no expiry, or set up an expiration alert when you give it one.**
+
+Infisical's default client-secret TTL is `0`, which never expires — and that is what the platform assumes. Give the secret a TTL and nothing in the platform warns you as the date approaches: the box keeps working until the secret dies, and the first symptom is a bootstrap or a teardown refusing to run.
+
+If you do set one, add a **Credential Expiration** alert on the identity. Infisical checks once a day and can notify from 1 to 90 days ahead, by email, Slack, PagerDuty or webhook.
+</Warning>
+
+**Rotating it.** Create the new client secret first, update both places that hold it — your repository's `INFISICAL_ESCROW_CLIENT_SECRET` and the box's `hub-operator` Secret — confirm the box still reconciles, then revoke the old secret. In that order: revoking first leaves the running box unable to escrow anything it generates.
+
+**If it leaks.** Revoke the credential, or delete the identity to revoke everything it issued. Deleting the credential or the identity takes effect immediately; revoking an access token alone can leave it usable for up to 12 minutes if Infisical's cache is briefly unavailable. Then rotate as above, because the box needs a working identity.
+
+<Note>
+**A wrong secret locks the identity, it does not just fail.** Infisical's default lockout blocks an auth method after three failed logins within 30 seconds, for five minutes. So a mistyped `INFISICAL_ESCROW_CLIENT_SECRET` in CI fails, the retry fails too, and the symptom reads like an outage rather than a bad credential. Fix the value and wait out the five minutes, or clear the lockout on the identity's auth method.
+</Note>
+
+**Consider an alert on auth-method changes.** Infisical can notify when an auth method or client secret on an identity is added, updated or revoked. For the credential that reaches every box's recovery material, that is the tamper signal — and nothing in the platform provides it.
+
 ## Identity count
 
 Infisical's free plan allows **five identities per organization, human and machine combined** — a person who logs in consumes one, exactly like a machine identity does. Nothing in the platform creates an identity: none is made per box, per cluster, per tenant, per application or per login, so the count does not grow as your estate does.

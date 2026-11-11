@@ -4,7 +4,7 @@ description: "What this design does not do, stated plainly: free-plan permission
 keywords: ["limitations", "Infisical free plan", "revocation", "branch protection", "disaster reconstruction", "identity limit"]
 ---
 
-> Six things to know before you rely on this. Each is a real boundary, not a caveat for completeness.
+> Seven things to know before you rely on this. Each is a real boundary, not a caveat for completeness.
 
 ## Escrow permissions cannot be scoped below the project
 
@@ -29,6 +29,16 @@ See [`kakt logout`](/cli/signing-in).
 Deletes the session from your operating system's credential store. It does not call Infisical, because there is no revocation endpoint this CLI can use.
 
 **What this means for you:** a lost or compromised workstation is remediated **in Infisical** — revoke the session or remove the identity there — not with `kakt logout`. Treat logout as tidying your own machine.
+
+The same applies to your automation credential, with one detail worth knowing: deleting a credential or an identity takes effect immediately, while revoking an access token on its own can leave it usable for up to **12 minutes** if Infisical's cache is briefly unavailable. When a leak matters, delete rather than revoke. [Operating the machine identity](/documentation/escrow/platform-administrator#operating-the-machine-identity) covers the rotation that has to follow.
+
+## A wrong machine-identity secret locks the identity
+
+Infisical blocks an auth method after three failed logins within 30 seconds, for five minutes. That default applies whether or not you configured it.
+
+**What this means for you:** a mistyped `INFISICAL_ESCROW_CLIENT_SECRET` in CI does not simply fail — the retry fails too, and the run reads like an escrow outage rather than a bad credential. Check the value before concluding anything is wrong with the escrow, and expect a five-minute wait after fixing it.
+
+Related: the platform sets no client-secret TTL and assumes none, so if you give that secret an expiry, add a Credential Expiration alert with it — nothing in the platform warns you as the date approaches. See [Operating the machine identity](/documentation/escrow/platform-administrator#operating-the-machine-identity).
 
 ## Branch protection is yours to set
 

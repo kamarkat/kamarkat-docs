@@ -27,10 +27,20 @@ kakt tenant scaffold \
   --tenant acme \
   --box acme-inc \
   --domain acme.example \
-  --region hel1
+  --region hel1 \
+  --platform-admin <your-infisical-id>
 ```
 
-Add `--dry-run` first to see the repository without creating anything. The management cluster is named `<tenant>-hub` unless you pass `--cluster`, and it starts on the platform version the CLI carries unless you pass `--bundle-version`. Every flag, and the escrow and credential flags a real run needs, are in [Scaffold your repository](/quickstart/scaffold-your-repository).
+<Note>
+Two values are easy to mix up, because `--box` means something different here than it does on the escrow commands.
+
+- `--box acme-inc` is your **git organization** — where the repository is created, as `github.com/acme-inc/acme-gitops`.
+- The **box's own name** is `--box-id`, which defaults to the management cluster's name (`acme-hub`). That is the value `kakt escrow verify --box`, `kakt kubeconfig --box` and the other escrow commands take.
+
+`--platform-admin` is the one human this box accepts for escrow-backed operations, by Infisical's account id; `kakt whoami` prints yours. Omit it and the box authorizes no human session at all.
+</Note>
+
+Add `--dry-run` first to see the repository without creating anything. The management cluster is named `<tenant>-hub` unless you pass `--cluster`. A released CLI starts the box on the version it carries; an unreleased build has none to offer and refuses, so pass `--bundle-version` with a published version, or `development` to read charts from your current branch. Every flag, and the escrow and credential flags a real run needs, are in [Scaffold your repository](/quickstart/scaffold-your-repository).
 
 The scaffold creates the repository, stores your credentials on it as secrets, and starts Day-0.
 

@@ -32,6 +32,8 @@ kakt bundle-version
 
 `kakt bundle-version` prints the platform version the binary carries.
 
+You sign in with it on the next page, once your escrow account exists: `kakt login` is how every command that reaches an escrow authenticates, and it is the only credential you keep on your own machine.
+
 <Note>
 The example downloads `kakt-linux-amd64`. Each release also publishes `kakt-linux-arm64`, `kakt-darwin-amd64` and `kakt-darwin-arm64`: use the one for your machine. To build from source instead: `go install github.com/kamarkat/kamarkat/cmd/kakt@v<version>`.
 </Note>
@@ -73,5 +75,5 @@ Export each value as an environment variable of the same name in the shell you w
 ## Next
 
 <Card title="Prepare the escrow" icon="vault" href="/quickstart/prepare-escrow">
-  Create the project your box's master keys are escrowed to.
+  Sign in, and create the project your box's master keys are escrowed to.
 </Card>

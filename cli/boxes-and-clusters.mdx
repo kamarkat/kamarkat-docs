@@ -10,14 +10,15 @@ keywords: ["kakt tenant", "scaffold", "verify", "teardown", "reseed", "proposal"
 
 ### kakt tenant scaffold
 
-Creates `<org>/<tenant>-gitops`, renders it from the platform template, stores your credentials on it as repository secrets, and starts Day-0.
+Creates `<box>/<tenant>-gitops`, renders it from the platform template, stores your credentials on it as repository secrets, and starts Day-0.
 
 ```bash
 kakt tenant scaffold \
   --tenant acme \
   --box acme-inc \
   --domain acme.example \
-  --region hel1
+  --region hel1 \
+  --platform-admin <your-infisical-id>
 ```
 
 <Note>
@@ -37,20 +38,29 @@ Scaffolding happens once. Every change after it is a commit or a pull request. S
 | Flag | Meaning |
 | :- | :- |
 | `--tenant` | Your tenant identifier, lower-case. Required. It names the repository and your box |
-| `--box` | The box: the git organization the repository is created in. Required |
+| `--box` | The git organization the repository is created in — `github.com/<box>/<tenant>-gitops`. Required. It is **not** the box's name: that is `--box-id` |
 | `--domain` | Your base domain. Required |
+| `--platform-admin` | Infisical's account id for the one human this box accepts for escrow-backed operations. `kakt whoami` prints yours |
 | `--subdomain` | A DNS label every hostname sits under; empty publishes on the apex |
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines |
 | `--region` | The cloud region your clusters run in. Defaults to `hel1` |
 | `--cluster` | The management cluster's name. Defaults to `<tenant>-hub` |
-| `--box-id` | The logical box, **pinned forever**. Defaults to the cluster name |
+| `--box-id` | The box's own permanent identity, **pinned forever**. Defaults to the cluster name. Different from `--box` above |
 | `--workers` | Cloud worker nodes the box starts with. Defaults to 2. Pass `0` to run on nodes on your own premises alone, which then have to be there |
 | `--private` | Create the repository private. Default `true` |
 | `--private-registry` | Your applications run private images, which makes a registry credential required |
-| `--bundle-version` | The platform version the box starts on. Defaults to the version the CLI carries |
+| `--bundle-version` | The platform version the box starts on. A released CLI defaults to the version it carries; an unreleased build has none and refuses rather than guess. `development` reads charts from your current branch |
 | `--dry-run` | Render only; create and push nothing |
 | `--out` | Render to this directory instead of a temporary one |
 | `--no-prompt` | Never prompt. Stops after creating the repository if a credential is missing |
+
+<Warning>
+**`--box` and `--box-id` are different values.** `--box` is your git organization — where the repository is created. `--box-id` is the box's permanent identity, which keys its escrow path and its DNS records. For `acme-inc/acme-gitops` holding a box called `acme-hub`, that is `--box acme-inc --box-id acme-hub`. One org can hold several boxes.
+</Warning>
+
+<Warning>
+**Pass `--platform-admin`.** Without it the repository is rendered with no `platformAdminIdentity`, and a box that declares none authorizes **no** human session — every escrow command against it refuses until you declare one. [Platform administrator and access](/documentation/escrow/platform-administrator) explains why it is an account id rather than an address.
+</Warning>
 
 <Warning>
 `--box-id` is chosen once and never changes. Your escrow is keyed by it, so every escrow command takes the same value — and a box that is rebuilt keeps it, which is how the new management cluster finds the old one's keys. Leave it unset unless you have a reason, and record what it resolved to.

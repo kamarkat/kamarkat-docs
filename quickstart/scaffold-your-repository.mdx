@@ -16,20 +16,26 @@ kakt tenant scaffold \
   --box acme-inc \
   --domain acme.example \
   --region hel1 \
+  --platform-admin <your-infisical-id> \
   --dry-run
 ```
+
+<Note>
+`--platform-admin` is the one human this box accepts for escrow-backed operations, by Infisical's account id — the `identity` value from [Prepare the escrow, Step 2](/quickstart/prepare-escrow#step-2-sign-in-as-yourself), or `kakt whoami` again. Omit it and the box authorizes no human session at all: every escrow command refuses until you declare one. See [Platform administrator and access](/documentation/escrow/platform-administrator).
+</Note>
 
 | Flag | Meaning |
 | :- | :- |
 | `--tenant` | Your tenant identifier, lower-case. It names the repository and your box. |
-| `--box` | The box: the git organization the repository is created in. |
+| `--box` | The git organization the repository is created in — `github.com/<box>/<tenant>-gitops`. Not the box's name; that is `--box-id`. |
 | `--domain` | Your base domain. |
+| `--platform-admin` | Infisical's account id for the one human this box accepts for escrow-backed operations. `kakt whoami` prints yours. |
 | `--subdomain` | Optional. A DNS label every hostname sits under; empty publishes on the apex. |
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines. |
 | `--region` | The cloud region your clusters run in. |
 | `--workers` | Cloud worker nodes the box starts with. Defaults to 2. |
 | `--cluster` | The management cluster's name. Defaults to `<tenant>-hub`. |
-| `--bundle-version` | The platform version the box starts on. Defaults to the version the CLI carries. |
+| `--bundle-version` | The platform version the box starts on. A released CLI defaults to the version it carries; an unreleased build refuses rather than guess. |
 
 ## Step 2: Scaffold and store your credentials
 
@@ -41,6 +47,7 @@ kakt tenant scaffold \
   --box acme-inc \
   --domain acme.example \
   --region hel1 \
+  --platform-admin <your-infisical-id> \
   --escrow-url "$INFISICAL_ESCROW_URL" \
   --escrow-project-id "$INFISICAL_ESCROW_PROJECT_ID" \
   --escrow-client-id "$INFISICAL_ESCROW_CLIENT_ID" \

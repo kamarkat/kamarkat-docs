@@ -1,0 +1,102 @@
+---
+title: "Bootstrap"
+description: "What bootstrap reads from escrow, how admission establishes that the box has no other management cluster, and why the gate and the provisioning must use one credential."
+keywords: ["kakt bootstrap", "admission", "provider credential", "escrow", "management cluster", "fail closed"]
+---
+
+> Bootstrap holds no credential of its own. It reads the box's, once, before it provisions anything.
+
+## What it reads
+
+One thing from escrow, at the start: the box's **provider credential**, resolved from `/hub-operator/<boxId>/provider-credential-hetzner` with your own session.
+
+There is no other source. `HCLOUD_TOKEN` in your shell, a token file beside a checkout, a `--hcloud-token` flag — none of them is consulted, and the flag no longer exists.
+
+<Warning>
+This is a correctness rule before it is an ergonomic one. A token for a *different* cloud project authenticates **perfectly** and then answers about that project: an inventory that comes back empty, a second management cluster admitted because the first was invisible, a teardown that deletes nothing and reports success. Every one of those reads as a pass.
+</Warning>
+
+If the escrow cannot be reached, or holds no credential, bootstrap stops before building anything and names the command that fixes it:
+
+```text
+this box's escrow holds no Hetzner credential, and clusters are created with one.
+
+Enrol it, as the platform administrator:
+
+  kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-hub < token
+```
+
+## One credential, both halves
+
+The credential is resolved **once** and handed to the admission check and to every provisioning step after it. Two reads would be two chances to answer about different infrastructure — and a gate passing while provisioning builds somewhere else is the worst ordering of that failure.
+
+## Admission: one management cluster per box
+
+Before anything is provisioned, bootstrap establishes that this box has no other management cluster holding infrastructure. It asks the **provider**, because that is the only source that answers the question that was asked:
+
+| Source | Why it is not asked |
+|---|---|
+| your repository | a declaration outlives its cluster by design. It proves a cluster was *wanted* |
+| the escrow | holds a predecessor's artifacts deliberately, for as long as its recovery point matters |
+| the Kubernetes API | answers only while a cluster is healthy — and an unreachable API is also what a wedged cluster with running servers looks like |
+
+Provider resources carry their owning cluster's name as a label, so they answer without a kubeconfig. A cluster that owns no labelled resource is **verifiably** destroyed; one that owns any is present whether or not it answers.
+
+The names asked about come from the box's own records: what the repository declares now, **and** every management cluster its history shows was ever declared. A cluster whose directory someone removed is still asked about — otherwise deleting a directory would hide its running servers from this check.
+
+### What admission does
+
+| Condition | Behaviour |
+|---|---|
+| nothing else owns resources | proceeds, printing the box id |
+| another management cluster owns resources | **refused**, listing every blocker at once |
+| the cluster being built owns resources | proceeds as a **retry**, reporting what it is resuming |
+| a workload cluster of this box owns resources | **refused** — the management cluster goes last |
+| the inventory cannot be read | **refused** — an unreadable answer is the same evidence as an unasked question |
+| the cluster is not declared | **refused**, pointing at `kakt tenant add-management` |
+
+A refusal names the box, each blocker with its resource count, and the commands that clear it — then says what is preserved:
+
+```text
+Cannot create the management cluster.
+
+Box: acme-hub
+Creating: acme-mgmt-02
+
+This box already has a management cluster:
+
+  acme-hub still owns 7 provider resource(s)
+
+Destroy it:
+  kakt teardown --name acme-hub --gitops-dir . --confirm
+
+Nothing here needs deleting by hand, and nothing is lost by this refusal:
+this repository is reused as it is, boxId stays acme-hub, and the escrow
+artefacts and database archives of every past incarnation stay under their
+own names.
+```
+
+## Running it
+
+A box is built by dispatching its own workflow, which runs in your organization under your secrets:
+
+```bash
+gh workflow run bootstrap-cluster -f cluster=acme-mgmt-02
+```
+
+The cluster must be declared first, with [`kakt tenant add-management`](/cli/boxes-and-clusters#kakt-tenant-add-management).
+
+One bootstrap runs per box at a time — the workflow is serialized on the repository, so two overlapping dispatches cannot both read an empty inventory and both build. A second dispatch of the **same** cluster waits and then resumes it; a **different** one waits and is then refused by admission.
+
+In CI the provider credential is enrolled from a repository secret on **stdin**, and that step is skipped when the secret is absent — which is the state of an already-enrolled box. Once enrolled, you can delete the secret; a second copy only widens where it can leak from.
+
+## What is written back
+
+During bootstrap the box escrows its own recovery material: master keys, the identity provider's key, its admin kubeconfig and its at-rest encryption key. That is `hub-operator`'s doing, using a machine identity — not your session. See [Artifacts and scopes](/documentation/escrow/artifacts-and-scopes).
+
+## Related topics
+
+- [Configure and bind escrow](/documentation/escrow/configure-escrow)
+- [Inventory and status](/documentation/escrow/infrastructure-operations/inventory-and-status)
+- [Core concepts](/documentation/core-concepts#one-management-cluster-per-box) — the invariant itself
+- [Boxes and clusters CLI reference](/cli/boxes-and-clusters) — `kakt bootstrap-mgmt` and `kakt tenant add-management`

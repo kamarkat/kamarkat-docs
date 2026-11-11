@@ -1,0 +1,118 @@
+---
+title: "Configure and bind escrow"
+description: "Declare the administrator and the coordinates, log in, bind the box to its escrow, enrol the provider credential, and verify — including on a box that already exists."
+keywords: ["kakt escrow bind-destination", "kakt escrow enroll-provider-credential", "rebind", "rotate", "kakt escrow verify", "configure escrow"]
+---
+
+> Five steps, once per box. Afterwards every command reads what it needs without you handing it a credential.
+
+## 1. Declare the administrator and the coordinates
+
+In `registry/clusters/<cluster>/values.yaml`:
+
+```yaml
+escrow:
+  url: https://app.infisical.com
+  projectId: <project>
+  organizationId: <org>
+platformAdminIdentity: <infisical user id>
+```
+
+`kakt escrow init` prints the project id when it creates the project, and `kakt whoami` prints the identity. These are names, not credentials — see [Core concepts](/documentation/escrow/core-concepts#coordinates-are-not-credentials).
+
+Commit them. The box is now declared; nothing has been written to the escrow yet.
+
+## 2. Authenticate
+
+```bash
+kakt login
+kakt whoami
+```
+
+Confirm the `identity` line matches what you declared. If it does not, every command in the next steps will refuse and tell you both values.
+
+## 3. Bind the box to its escrow
+
+```bash
+kakt escrow bind-destination --gitops-dir . --cluster acme-hub
+```
+
+Full flags: [`kakt escrow bind-destination`](/cli/escrow-and-encryption#kakt-escrow-bind-destination).
+
+This records the declared coordinates **inside the escrow they name**, so a declaration and its escrow can be checked against each other afterwards.
+
+<Warning>
+The binding is a consistency check, not an independent security pin. Both values come from the project your repository names, so someone who can edit the declaration **and** write to the project they redirect it to can place a matching record there.
+
+What it does catch: a project nobody established — a typo, a copied project id, another box's project — which fails closed rather than receiving your recovery material; and a declaration edited without a deliberate rebind.
+
+What actually protects the destination is **membership of the escrow project** and **review plus branch protection** on the repository carrying the declaration. The second is yours to set; the platform cannot enforce it from inside.
+</Warning>
+
+### Binding versus rebinding
+
+| Situation | Command | Result |
+|---|---|---|
+| Nothing bound | plain form | binds, reported as a first binding |
+| Already bound to these coordinates | plain form | nothing written |
+| Bound elsewhere | plain form | **refused**, naming both destinations |
+| Bound elsewhere, move intended | `--rebind` | rebinds, printing the old and new destination |
+| Nothing bound, `--rebind` passed | `--rebind` | **refused** — a first binding is the plain form |
+
+That last row is deliberate. Letting `--rebind` perform a first binding would make the two indistinguishable, and the point of the flag is that moving a bound box is visible.
+
+## 4. Enrol the provider credential
+
+```bash
+kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-hub < token
+```
+
+Full flags: [`kakt escrow enroll-provider-credential`](/cli/escrow-and-encryption#kakt-escrow-enroll-provider-credential).
+
+The credential is read from **stdin**, never a flag — so it reaches no process argument list and no shell history. This is the one place a credential is accepted from you; every command afterwards reads the escrowed copy.
+
+A first enrolment into a box with no binding **establishes the binding** as part of the same authorized act, so step 3 is optional if you are enrolling immediately. Keep it separate when you want the box bound before any credential exists.
+
+### Enrolment versus rotation
+
+| Situation | Result |
+|---|---|
+| Nothing escrowed | enrolled |
+| The same credential already escrowed | nothing written |
+| A **different** credential escrowed | **refused** — pass `--rotate` |
+| `--rotate` with a different credential | rotated |
+
+The refusal is what stops a changed secret from silently repointing a box at another cloud project. After rotating, revoke the old credential at your provider.
+
+## 5. Verify
+
+```bash
+kakt escrow verify --box acme-hub --cluster acme-hub --management
+```
+
+Reports each artifact by fingerprint, never by value. For each managed cluster, pass its name with `--workload` instead — see [`kakt escrow verify`](/cli/escrow-and-encryption#kakt-escrow-verify).
+
+## An existing box
+
+A box built before this was in place has coordinates but no administrator, no binding and no escrowed credential — so every escrow command fails closed until you do three things. There is no migration to run:
+
+1. **Declare** `platformAdminIdentity` and `escrow.organizationId` in the management cluster's `values.yaml`, and commit.
+2. **Log in** and check `kakt whoami` against what you declared.
+3. **Enrol the provider credential**, which also binds the destination:
+
+   ```bash
+   kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-hub < token
+   ```
+
+Then verify. Nothing already in the escrow is moved or rewritten by this, and no existing artifact changes path.
+
+<Note>
+Do this before you need it. The first command that will refuse without it is a teardown or a bootstrap — both at moments when you would rather not be fixing configuration.
+</Note>
+
+## Related topics
+
+- [Platform administrator and access](/documentation/escrow/platform-administrator)
+- [Artifacts and scopes](/documentation/escrow/artifacts-and-scopes)
+- [Bootstrap](/documentation/escrow/infrastructure-operations/bootstrap)
+- [Escrow and encryption CLI reference](/cli/escrow-and-encryption) — every flag of every command above

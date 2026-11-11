@@ -1,0 +1,77 @@
+---
+title: "Artifacts and scopes"
+description: "The exact allowlist of what a box escrows, grouped by identity scope, with the reason each one must survive losing the management cluster — and what is deliberately excluded."
+keywords: ["escrow artifacts", "allowlist", "master keys", "admin kubeconfig", "spoke PKI", "encryption key", "backup credential", "scopes"]
+---
+
+> A short list, and it stays short. Each entry is here because a box cannot be rebuilt without it.
+
+Escrow is an allowlist, not a mirror. Every artifact below answers one question — *is this readable when the management cluster is unavailable?* — and anything that answers "it doesn't need to be" is not here.
+
+## Box-scoped
+
+Path: `/hub-operator/<boxId>`. Permanent, shared by every management cluster the box ever has, because they belong to the box rather than to any cluster in it.
+
+| Artifact | What it protects | Why it must outlive the cluster |
+|---|---|---|
+| `infisical-master-keys` | the box's own secret store | the store is encrypted with them, and its database is restored from backups the store holds the credential for. Inside the box, that is a circle |
+| `zitadel-masterkey` | the box's identity provider | without it, a restored identity database is unreadable and nobody can log in to the box they just rebuilt |
+| `backup-ssec-key` | the management-state backups | the archive is encrypted with it. Kept outside the box because a key stored in what it protects protects nothing |
+| `backup-store-credential` | reaching the backup bucket | the credential that reaches the backups cannot live in the database those backups restore |
+| `provider-credential-hetzner` | your cloud account | first bootstrap has no cluster yet, and teardown and inventory must work when the cluster cannot be reached |
+| `escrow-destination` | the box's binding to this escrow | records which project this box was established in, so a declaration and its escrow can be checked against each other |
+
+## Cluster-incarnation-scoped
+
+Path: `/hub-operator/<boxId>/clusters/<clusterName>`. Kept for as long as that cluster's recovery point matters, then retired with it.
+
+| Artifact | What it protects | Why it is per cluster |
+|---|---|---|
+| `admin-kubeconfig` | reaching that cluster's API | it is one cluster's credential; a replacement issues its own, and a shared path would mean the successor overwriting the predecessor's at the moment both are needed |
+| `secret-encryption-key` | at-rest encryption in that cluster | the same reason, and a successor's key is its own |
+| `secret-encryption-key-previous` | the key before the current one | a rotation leaves data written under the old key; both are needed until re-encryption completes |
+
+## Workload-cluster-scoped
+
+Path: `/hub-operator/<boxId>/clusters/<cluster>`, under the **workload cluster's** own name — never under whichever management cluster currently manages it. That is what makes management transferable.
+
+| Artifact | What it protects |
+|---|---|
+| `spoke-pki-ca` | the cluster's certificate authority |
+| `spoke-pki-etcd` | its etcd trust root |
+| `spoke-pki-sa` | its service-account signing key |
+| `spoke-pki-proxy` | its front-proxy authority |
+
+These are the trust roots Cluster API generates for a cluster. They have no source but escrow: the provider's inventory can tell you which server is which machine, and the management-state backup can tell you what that machine's object must contain, but neither holds the cluster's private trust.
+
+## Deliberately not escrowed
+
+<Note>
+Most of your secrets are not here, and that is the design. Escrow holds a fixed handful of artifacts whether your box runs one application or forty.
+</Note>
+
+| Not escrowed | Where it lives | Why it does not belong in escrow |
+|---|---|---|
+| Application secrets, API keys, tokens | the box's self-hosted Infisical, delivered as Kubernetes Secrets | needed only while the box runs. Mirroring them would copy your whole secret estate to a second place for no recovery benefit |
+| Application database credentials | the same | recreated by their own authority when the application is redeployed |
+| The cloud credential the in-cluster controllers use | a Kubernetes Secret the platform maintains | an operational **projection** of the escrowed copy, not a second source |
+| Node encryption-key material | file content Cluster API reads at provisioning | a projection of the escrowed key |
+| Per-application backup credentials | the operational store | separate from the box's recovery authority on purpose: compromising one must not yield the other |
+| Certificate authorities of the **management** cluster | excluded from the management-state backup by label | a restore of them would make the backup tool a second writer of the fleet's trust |
+
+Nothing in this column authenticates to the hosted escrow. No tenant, application or workload cluster holds an escrow credential.
+
+## Checking what is actually there
+
+```bash
+kakt escrow verify --box acme-hub --cluster acme-hub --management
+```
+
+Reports each artifact by fingerprint, never by value. Pass `--management` for a management cluster, where every artifact applies, and `--workload` for a managed cluster, where the management-only artifacts do not — see [`kakt escrow verify`](/cli/escrow-and-encryption#kakt-escrow-verify).
+
+## Related topics
+
+- [Core concepts](/documentation/escrow/core-concepts) — why the three scopes exist
+- [Configure and bind escrow](/documentation/escrow/configure-escrow)
+- [Teardown and recovery](/documentation/escrow/infrastructure-operations/teardown-and-recovery)
+- [Escrow and encryption CLI reference](/cli/escrow-and-encryption)

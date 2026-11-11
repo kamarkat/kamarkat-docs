@@ -1,0 +1,103 @@
+---
+title: "Platform administrator and access"
+description: "One configured human reaches a box's escrow, authenticated with kakt login and identified by Infisical's account id. Project membership is what enforces it."
+keywords: ["platform administrator", "kakt login", "kakt whoami", "Infisical identity", "machine identity", "KAKT_IDENTITY", "authorization"]
+---
+
+> Your box declares one human. `kakt` refuses the others; Infisical decides what any of them can actually read.
+
+## Logging in
+
+```bash
+kakt login
+```
+
+A browser login against the Infisical your boxes escrow to — `https://app.infisical.com` unless you pass `--domain`. The session is proved before it is stored: `kakt` asks Infisical whose session it is and which organizations it can see, and refuses a token that answers neither.
+
+The session is kept in your operating system's credential store — the macOS keychain, or the login keyring on Linux. Nothing is written to a dotfile, and no box holds a copy.
+
+```bash
+kakt whoami
+```
+
+Reports the session against the server rather than from local storage, so it tells you whether the session still works and as whom. It prints the line you need next:
+
+```text
+you@acme.example at https://app.infisical.com
+  identity      3f9c1b7e-...-a21d
+  organization  org_abc123
+  session kept in macOS keychain
+```
+
+That `identity` is Infisical's own account id. It is what a box declares.
+
+## Declaring the administrator
+
+In `registry/clusters/<cluster>/values.yaml`:
+
+```yaml
+escrow:
+  url: https://app.infisical.com
+  projectId: <project>
+  organizationId: <org>
+platformAdminIdentity: <infisical user id>
+```
+
+**The id, never the address.** An email can be changed, and on some providers re-assigned — a box that named its administrator by email would hand that authority to whoever next holds the address, silently. The organization is declared too, because an account id is only meaningful inside the organization that issued it.
+
+A box that declares no administrator authorizes **no** human session. That is deliberate: the alternative is that every logged-in identity operates every box that forgot to declare one.
+
+## What is checked, and what enforces it
+
+<Warning>
+`kakt`'s administrator check is a guard rail, not the authorization boundary.
+
+It stops the CLI acting as an identity your box has not declared, which turns a wrong session into a refusal instead of a surprise. It cannot stop anyone from using Infisical directly: **another member of the escrow project, or an organization administrator, can read these artifacts through Infisical's own API** whatever your repository says.
+
+The boundary is **membership of the escrow project**. Keep the project to one human member plus the identities your automation needs, and treat the declaration as the statement of intent that makes a mistake visible.
+</Warning>
+
+Refusals name both ends, because the usual cause is holding the wrong session rather than lacking permission:
+
+```text
+you@acme.example is not the platform administrator this box declares.
+
+Box: acme-hub
+Declared: 3f9c1b7e-...-a21d
+This session: 88b2e04a-...-7c55
+```
+
+## Changing the administrator
+
+A handover, not an edit in passing. Change `platformAdminIdentity`, and **also** give the new identity membership of the escrow project — no commit can grant that, and without it the new administrator is declared but cannot read anything. Remove the previous member in Infisical when the handover is complete.
+
+## Human and machine identities
+
+Automation authenticates as itself and never borrows your session.
+
+| | Human | Machine |
+|---|---|---|
+| Credential | your `kakt login` session | `INFISICAL_ESCROW_CLIENT_ID` / `_CLIENT_SECRET` in the environment |
+| Selected | whenever a session exists | when there is no session, or with `KAKT_IDENTITY=machine` |
+| Administrator check | applies | does not apply |
+
+The human session wins whenever there is one. That matters on a workstation that also carries CI credentials: without it, the machine identity would quietly act on your behalf, your work would be attributed to the pipeline, and the administrator check would be skipped. `KAKT_IDENTITY=machine` selects the other way explicitly and fails if no machine identity is configured — it never falls back to your login.
+
+```bash
+KAKT_IDENTITY=machine kakt escrow verify --box acme-hub --cluster acme-hub --management
+```
+
+Your box's `hub-operator` uses a machine identity to escrow recovery material as it runs, and your bootstrap workflow uses one too. Those are the identities automation needs; how many you create is yours to decide, subject to the limit below.
+
+## Identity count
+
+Infisical's free plan allows **five identities per organization, human and machine combined** — a person who logs in consumes one, exactly like a machine identity does. Nothing in the platform creates an identity: none is made per box, per cluster, per tenant, per application or per login, so the count does not grow as your estate does.
+
+Because the free plan has no folder-level permissions, the unit of isolation is the **project**: one escrow project per box. A machine identity granted several projects therefore has access across those boxes, which is the cost of staying inside five identities and is worth deciding consciously. See [Operational limitations](/documentation/escrow/operational-limitations).
+
+## Related topics
+
+- [Configure and bind escrow](/documentation/escrow/configure-escrow)
+- [Core concepts](/documentation/escrow/core-concepts)
+- [Operational limitations](/documentation/escrow/operational-limitations)
+- [Signing in CLI reference](/cli/signing-in) — `kakt login`, `kakt whoami`, `kakt logout` and their flags

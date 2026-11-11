@@ -45,6 +45,26 @@ kakt escrow init \
 
 The project id is written where the rest of the tooling already reads it, so there is one fewer value to supply by hand.
 
+### kakt escrow bind-destination
+
+Records this box's escrow coordinates inside that escrow, so a declaration and its escrow can be checked against each other afterwards.
+
+```bash
+kakt escrow bind-destination --gitops-dir . --cluster acme-hub
+```
+
+| Flag | Meaning |
+| --- | --- |
+| `--cluster` | The cluster whose declaration to read. Required |
+| `--gitops-dir` | The box's repository. Defaults to the working directory |
+| `--rebind` | Replace an existing binding, authorizing a move to the declared coordinates |
+
+Run once per box, before any recovery material is written. A box already bound elsewhere is refused unless you pass `--rebind`, and `--rebind` with nothing bound is refused too — a first binding is the plain form, and the two must stay distinguishable.
+
+<Note>
+What the binding does and does not establish, who may reach an escrow, and why no command reads a local provider token are explained once, in [Escrow](/documentation/escrow/overview) — not repeated here. This page is the command surface.
+</Note>
+
 ## Check
 
 ### kakt escrow verify
@@ -102,7 +122,7 @@ Puts the cloud credential this box was built with into its escrow, so lifecycle 
 kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-hub < token
 ```
 
-A bootstrap enrols it for you, and refuses to create infrastructure if it cannot — a box whose provider credential is nowhere but the bootstrapping machine cannot be destroyed from anywhere else. This command is for initial enrolment on a box built before that, and for supplying a credential externally.
+This is the only place a provider credential is accepted from an operator. Bootstrap does not enrol one: it reads the escrowed copy and refuses to create infrastructure if there is none, because a credential that exists nowhere but the bootstrapping machine cannot destroy what it built. A first enrolment also establishes the box's escrow binding.
 
 The credential arrives on stdin, never an argument, and is never printed back. Re-running with the same credential writes nothing; a *different* one is refused unless you pass `--rotate`, because the escrowed copy may be the only one that reaches infrastructure the box already owns.
 

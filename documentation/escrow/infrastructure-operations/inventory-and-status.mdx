@@ -1,0 +1,83 @@
+---
+title: "Inventory and status"
+description: "How kakt finds a credential, which provider resources it counts as a cluster's, and how cluster state is reported — including when the provider or the cluster cannot be reached."
+keywords: ["kakt tenant cluster-status", "kakt cluster match-inventory", "CAPH ownership", "caph-cluster", "provider inventory", "owned"]
+---
+
+> The provider's inventory is the authority. A declaration says a cluster was wanted; only the provider says one exists.
+
+## Where the credential comes from
+
+Every command here resolves the box's provider credential from its escrow, with your own session — the same single path bootstrap and teardown use. Nothing reads a token from your shell or from a file, and the commands need `--gitops-dir` because the box's repository is what names its escrow.
+
+## The ownership contract
+
+A resource belongs to a cluster when it carries that cluster's label **exactly**:
+
+```text
+caph-cluster-<cluster-name>: owned
+```
+
+Three parts of that are load-bearing:
+
+- **The key names the cluster.** `caph-cluster-acme-stg-01` is one cluster's key. Nothing is matched by name prefix or substring, so a teardown of `acme-stg` can never reach `acme-stg-01`.
+- **The value must be `owned`.** `shared` means the resource is used by this cluster and belongs to something else. It is never deleted and never counted as this cluster's.
+- **The label is the infrastructure controller's, not the platform's.** It is written by Cluster API's Hetzner provider as it creates resources, which is why it answers without a kubeconfig, a database or a repository.
+
+Anything without an exact `owned` label for the cluster in question is reported as **unclaimed** rather than deleted. That is how a resource belonging to another box in the same cloud project stays untouched.
+
+## Cluster status
+
+```bash
+kakt tenant cluster-status --name acme-stg-01 --mgmt-cluster acme-hub
+```
+
+Both names are required, and `--gitops-dir` defaults to the working directory; full flags in [`kakt tenant cluster-status`](/cli/boxes-and-clusters#kakt-tenant-cluster-status).
+
+It prints the evidence before the verdict: what the repository declares, what the management cluster holds, the cluster's own conditions carried verbatim, and what the provider still has. Then one of five states:
+
+| State | Meaning |
+|---|---|
+| `declared` | the repository declares it; nothing has been built |
+| `deleting` | removal is under way |
+| `removed` | **the provider was asked**, and it owns nothing |
+| `failed` | nothing manages it any more and its resources are still running |
+| `unknown` | the state could not be established |
+
+<Note>
+`removed` is never inferred. It requires the provider to have been asked and to have answered that nothing is owned, so removing a declaration from Git is never reported as a destroyed cluster. The command exits non-zero only on `failed`.
+</Note>
+
+`failed` is the state worth understanding: it means the thing that could have deleted those resources is gone while the resources bill. That is not a transient condition and it will not resolve itself.
+
+## When something cannot be reached
+
+Inaccessible state is reported as inaccessible — never as empty:
+
+| Situation | Reported as |
+|---|---|
+| the provider's inventory cannot be read | an error naming what failed. **Not** an empty inventory |
+| the escrow cannot be reached | an error naming the credential or the binding |
+| the management cluster's API does not answer | the cluster-side evidence is reported as not collected; the provider's answer still stands |
+| the cluster exists but nothing manages it | `failed`, with the surviving resources listed |
+
+The rule behind all four: **an unreadable answer is the same evidence as an unasked question.** No command here treats silence as "nothing there", because that is precisely the reading that destroys or duplicates infrastructure.
+
+## Matching recovered objects against reality
+
+```bash
+kakt cluster match-inventory --cluster acme-stg-01
+```
+
+Full flags in [`kakt cluster match-inventory`](/cli/boxes-and-clusters#kakt-cluster-match-inventory).
+
+Used during a recovery, before anything is allowed to reconcile restored objects. It compares the Cluster API objects a restore produced against the servers that actually exist, correlating by the provider's labels — which is the one reference a lost management cluster cannot take with it.
+
+Pass `--box-cluster` when the cluster being matched is a workload cluster: the escrow coordinates come from the **management** cluster's declaration.
+
+## Related topics
+
+- [Bootstrap](/documentation/escrow/infrastructure-operations/bootstrap)
+- [Teardown and recovery](/documentation/escrow/infrastructure-operations/teardown-and-recovery)
+- [Core concepts](/documentation/core-concepts#the-provider-decides-what-exists)
+- [Boxes and clusters CLI reference](/cli/boxes-and-clusters) — every flag of both commands

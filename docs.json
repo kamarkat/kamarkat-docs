@@ -61,6 +61,25 @@
             "pages": [
               "documentation/core-concepts"
             ]
+          },
+          {
+            "group": "Escrow",
+            "pages": [
+              "documentation/escrow/overview",
+              "documentation/escrow/core-concepts",
+              "documentation/escrow/platform-administrator",
+              "documentation/escrow/artifacts-and-scopes",
+              "documentation/escrow/configure-escrow",
+              {
+                "group": "Infrastructure operations",
+                "pages": [
+                  "documentation/escrow/infrastructure-operations/bootstrap",
+                  "documentation/escrow/infrastructure-operations/inventory-and-status",
+                  "documentation/escrow/infrastructure-operations/teardown-and-recovery"
+                ]
+              },
+              "documentation/escrow/operational-limitations"
+            ]
           }
         ]
       },

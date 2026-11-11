@@ -1,0 +1,69 @@
+---
+title: "Core concepts"
+description: "Two secret stores with different jobs, three identity scopes, and the reason escrow is still readable when the cluster that wrote it is gone."
+keywords: ["escrow", "operational secret store", "box scope", "cluster scope", "recovery", "self-hosted Infisical"]
+---
+
+> One store is for running. The other is for rebuilding. Keeping them apart is the whole design.
+
+This page covers the ideas escrow rests on. Boxes, management clusters, `boxId` and `clusterName` are defined in [Core concepts](/documentation/core-concepts) and are not repeated here.
+
+## Two stores, two jobs
+
+| | Operational store | Recovery escrow |
+|---|---|---|
+| Where | self-hosted, inside your box | Infisical's hosted service, a project you own |
+| Holds | application secrets, database credentials, controller values | a short allowlist of recovery material |
+| Read by | the platform's controllers and your workloads, continuously | people and automation, rarely, and mostly during recovery |
+| Available when the cluster is down | no | **yes** |
+| Who authenticates | in-cluster service identities | the Platform Administrator, and your machine identities |
+
+The division follows one test: **an artifact is escrowed only if it must be readable when the management cluster is unavailable.** Everything that fails that test stays operational, which is most things.
+
+This is also why escrow is not a backup of your secret store. A backup would grow with your estate; escrow does not grow at all. It holds the same handful of artifacts whether your box runs one application or forty.
+
+## Why escrow survives the cluster
+
+Three properties, and all three are deliberate:
+
+- **It is elsewhere.** A different service, in a project the box does not host. Losing every server in your cloud account does not touch it.
+- **It is addressed by name, not by the cluster.** Your repository declares the url and the project id, so any authorized workstation can find the escrow without asking the box anything.
+- **It is authenticated by a person, not by the box.** You log in as yourself. No in-cluster identity is needed to read it, which matters because the cluster that held those identities is the thing you are recovering.
+
+## Three scopes
+
+Recovery material has three different lifetimes, so it lives at three different paths. The box outlives its clusters, and a workload cluster outlives whichever management cluster currently manages it.
+
+| Scope | Path | Lifetime |
+|---|---|---|
+| **Box** | `/hub-operator/<boxId>` | permanent, for the life of the box |
+| **Cluster incarnation** | `/hub-operator/<boxId>/clusters/<clusterName>` | as long as that cluster's recovery point matters |
+| **Workload cluster identity** | `/hub-operator/<boxId>/clusters/<cluster>` | outlives every management cluster |
+
+The split exists because of succession. When you replace a management cluster, `boxId` stays and `clusterName` changes — so the successor writes its own admin kubeconfig and encryption key under its own name and **cannot overwrite its predecessor's**, which is exactly the moment both are needed. The box-scoped artifacts are shared because they belong to the box, not to any cluster in it.
+
+A workload cluster's material is keyed to the workload cluster, never to its manager. That is what makes management transferable at all.
+
+[Artifacts and scopes](/documentation/escrow/artifacts-and-scopes) lists which artifact sits in which scope.
+
+## Identity and authorization
+
+Two separate things, and the distinction matters more than anything else on this page:
+
+- **The guard rail.** Your box declares one `platformAdminIdentity`. `kakt` refuses to act as any other human identity against that box, which turns a wrong session into a clear refusal instead of a surprising success.
+- **The boundary.** Membership of the escrow project, held and enforced by Infisical. Another member of that project, or an organization administrator, can read these artifacts through Infisical's own API whatever your repository says.
+
+So the control is **who is in the project**, and the declaration makes your intent explicit and auditable. [Platform administrator and access](/documentation/escrow/platform-administrator) covers both, and the machine-identity path for automation.
+
+## Coordinates are not credentials
+
+Your repository commits `escrow.url`, `escrow.projectId` and `escrow.organizationId`. None of them grants access; they say *where* to ask. Credentials never appear in the repository.
+
+Because those fields are editable, an authorized enrolment also records them inside the escrow they name, and later commands check that the two still agree. That catches a project nobody established and a declaration edited without a deliberate rebind — but it is a consistency check, not an immutable pin, and [Configure and bind](/documentation/escrow/configure-escrow) is precise about its limits.
+
+## Related topics
+
+- [Overview](/documentation/escrow/overview)
+- [Artifacts and scopes](/documentation/escrow/artifacts-and-scopes)
+- [Core concepts](/documentation/core-concepts) — boxes, incarnations and the cluster lifecycle
+- [Escrow and encryption CLI reference](/cli/escrow-and-encryption) — the commands these concepts describe

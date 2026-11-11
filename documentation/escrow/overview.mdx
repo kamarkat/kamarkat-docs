@@ -1,0 +1,70 @@
+---
+title: "Overview"
+description: "Escrow is the small, external store that lets you rebuild a box whose management cluster is gone. It holds recovery material only, and one configured administrator reaches it."
+keywords: ["escrow", "recovery", "Infisical", "platform administrator", "disaster recovery", "boxId"]
+---
+
+> Escrow is what makes a box recoverable. It is deliberately small, deliberately outside the box, and deliberately reachable by one person.
+
+Your box runs its own secret store. That store holds everything your applications need, it is reconciled by the platform, and it lives inside the cluster — which is exactly the problem when the cluster is what you have lost. Escrow is the separate, external store that holds the few things you cannot rebuild a box without.
+
+## Why the platform has escrow
+
+Because the alternative is a circle. The box's own Infisical is encrypted with keys the box holds; the database behind it is restored from backups whose credential the box holds; the cluster is reached with a kubeconfig the cluster issues. Lose the cluster and every one of those answers is inside the thing that is gone.
+
+Escrow breaks that circle by keeping a small number of artifacts somewhere the box does not control and does not host — Infisical's hosted service, in a project **you** own. Nothing in it is needed while the box is healthy. Everything in it is needed the day the box is not.
+
+## What belongs there
+
+Only what satisfies one test: **it must be readable when the management cluster is unavailable.** That is master keys, the identity provider's key, admin kubeconfigs, at-rest encryption keys, your workload clusters' certificate authorities, the key your management-state backups are encrypted with, and the credentials that reach your cloud account and your backup bucket.
+
+What does **not** belong there is everything else — and that is most things. Your applications' secrets, their database credentials, the values the platform's controllers read: those live in the box's own self-hosted Infisical and arrive in Kubernetes as ordinary Secrets. Mirroring them into escrow would copy your entire secret estate to a second place for no recovery benefit. See [Artifacts and scopes](/documentation/escrow/artifacts-and-scopes) for the exact list and the reasoning per artifact.
+
+## Who accesses it
+
+One configured human — the **Platform Administrator** — authenticating with `kakt login`, plus the machine identities your automation needs. The box declares which human it accepts, by Infisical's own account id.
+
+Two things are worth being precise about from the start, because they are easy to conflate: `kakt` refusing an undeclared identity is a **guard rail**, and **membership of the escrow project** is the authorization boundary. Infisical enforces the second. [Platform administrator and access](/documentation/escrow/platform-administrator) explains both and where the line between them falls.
+
+## How a box reaches its escrow
+
+```text
+   your repository                 Infisical (hosted)              your cloud account
+   ──────────────────              ──────────────────              ──────────────────
+   registry/clusters/<c>/
+     values.yaml
+       escrow.url          ───────▶  the escrow project
+       escrow.projectId              /hub-operator/<boxId>/
+       escrow.organizationId           provider-credential-hetzner ──▶ servers, LBs,
+       platformAdminIdentity           backup-store-credential          volumes, networks
+                                       zitadel-masterkey
+   kakt login  ──────────────────▶     infisical-master-keys
+   (your own session)                  clusters/<cluster>/
+                                         admin-kubeconfig
+                                         secret-encryption-key
+```
+
+The coordinates are committed to your repository because they are **names, not credentials** — a url and a project id grant nothing, and keeping them only on one laptop is what used to make a second workstation unable to operate the box. The credentials come from your own authenticated session.
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Core concepts" icon="sitemap" href="/documentation/escrow/core-concepts">
+    The ideas escrow rests on: two stores, three scopes, and why it survives losing the cluster.
+  </Card>
+  <Card title="Platform administrator" icon="user-shield" href="/documentation/escrow/platform-administrator">
+    Who may reach the escrow, how that is checked, and what actually enforces it.
+  </Card>
+  <Card title="Configure and bind" icon="key" href="/documentation/escrow/configure-escrow">
+    Declare the administrator, bind the box, enrol the provider credential, verify.
+  </Card>
+  <Card title="Infrastructure operations" icon="server" href="/documentation/escrow/infrastructure-operations/bootstrap">
+    What bootstrap, inventory and teardown read from escrow, and how they fail.
+  </Card>
+</CardGroup>
+
+## Related topics
+
+- [Core concepts](/documentation/core-concepts) — boxes, management clusters and the cluster lifecycle
+- [Operational limitations](/documentation/escrow/operational-limitations) — what this design does not do
+- [Escrow and encryption CLI reference](/cli/escrow-and-encryption)

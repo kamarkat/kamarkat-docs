@@ -1,0 +1,92 @@
+---
+title: "Teardown and recovery"
+description: "Ordered destruction through the platform, the infrastructure-only form for a box whose API is gone, what survives a teardown, and what recovery is and is not supported today."
+keywords: ["kakt teardown", "infrastructure-only", "destroy-managed", "ownership", "recovery", "disaster reconstruction"]
+---
+
+> Teardown destroys infrastructure, never declarations or recovery material. The management cluster goes last, and what it does not claim it does not touch.
+
+## Normal teardown
+
+```bash
+kakt teardown --name acme-hub --gitops-dir . --confirm
+```
+
+Full flags in [`kakt teardown`](/cli/boxes-and-clusters#kakt-teardown). Two matter for everything below: `--destroy-managed` names the workload clusters to destroy first, through the platform, and `--infrastructure-only` is the recovery form for a box whose API cannot be reached.
+
+`--gitops-dir` is not optional in practice: the repository is what names the escrow holding the kubeconfig and the provider credential, both read with your own identity rather than from this machine.
+
+### Ordering
+
+The management cluster goes last, and the command refuses while a cluster it manages is still there. It holds those clusters' Cluster API objects and is the only thing that can deprovision their load balancers — destroy it first and they keep running, unmanaged and billing.
+
+To empty a box in one run, name the managed clusters:
+
+```bash
+kakt teardown --name acme-hub --gitops-dir . --confirm \
+  --destroy-managed acme-stg-01
+```
+
+Each workload cluster is destroyed **through the platform** first, waited for, and the provider re-read; only then does the management cluster go. Deleting a workload cluster's servers at the provider is not a substitute while the management cluster is alive: its claim is still reconciled, so the platform rebuilds it on new servers.
+
+### Exact ownership
+
+Deletion is strictly by `caph-cluster-<name>: owned`, as described in [Inventory and status](/documentation/escrow/infrastructure-operations/inventory-and-status#the-ownership-contract). Resources it did not claim are **reported, not deleted** — a workload cluster belonging to another box in the same cloud project is listed and left alone.
+
+### Incomplete work is reported and fails
+
+The run re-reads the provider after deleting and exits non-zero while anything it was asked to destroy is still there, listing what remains. A teardown that "succeeded" with servers still billing is the failure this reporting exists to prevent. Re-running usually clears it: deletions that fail on dependencies succeed on a second pass once their dependents are gone.
+
+## Infrastructure-only: a box whose API is gone
+
+```bash
+kakt teardown --name acme-hub --gitops-dir . --confirm \
+  --infrastructure-only acme-hub,acme-stg-01
+```
+
+The recovery form, for a box whose Kubernetes API cannot be reached. It asks for no cluster access and acquires none — it reads the provider with the box's escrowed credential, deletes strictly by ownership label with the workload clusters first and the management cluster last, and reports Kubernetes-side cleanup as **not performed**, because it was not.
+
+Use it when a console-side deletion, a failed bootstrap or a lost cluster has left labelled resources behind. It is also what clears the orphans that would otherwise make a replacement refuse.
+
+<Note>
+`--infrastructure-only` and `--destroy-managed` both name the clusters to destroy, and passing both is refused: one goes through the platform, the other cannot. `--kubeconfig` is likewise refused alongside it — the recovery form has already been told the API is unreachable.
+</Note>
+
+## What a teardown preserves
+
+| Preserved | Why |
+|---|---|
+| the repository and every declaration | teardown destroys infrastructure, not declarations. Removing a cluster's declaration is a separate commit |
+| `boxId` and everything keyed on it | the box outlives its clusters |
+| every past incarnation's escrow artifacts | kept for as long as their recovery point matters |
+| database archives and management-state backups | under their own prefixes, in your object storage |
+| the escrow binding and the provider credential | box-scoped; the next cluster finds the same ones |
+
+So a teardown leaves a box that is empty and still recoverable, and a replacement reuses the same repository. See [Replace a management cluster](/guides/box/replace-a-management-cluster).
+
+## Recovery: what is supported
+
+| Situation | Supported today |
+|---|---|
+| labelled resources left after a failed or console-side deletion | **yes** — `--infrastructure-only` |
+| a box whose cluster is gone, rebuilt from the same repository | **yes** — declare a new incarnation, bootstrap it |
+| reaching a cluster whose own credentials are lost | **yes** — the escrowed admin kubeconfig, via `kakt kubeconfig` |
+| a lost provider or backup credential | **yes** — re-enrol it; the escrowed copy is the authority |
+| restoring a workload cluster's trust roots | **yes** — the escrowed spoke PKI is the only source |
+| correlating restored Cluster API objects with real servers | **yes** — `kakt cluster match-inventory` |
+| **re-adopting surviving workload clusters after losing their management cluster** | **no — not implemented** |
+
+<Warning>
+If a management cluster is lost while its workload clusters are still running and serving, the platform cannot currently re-establish management of them. Pointing a new management cluster at the same repository does not adopt existing clusters — it declares new ones, and would provision duplicates under names already taken.
+
+The supported path today is to destroy the surviving workload clusters and then build the replacement. That sacrifices running clusters, which is a real cost, and it is the reason this case is called out rather than buried.
+</Warning>
+
+This is not an upgrade procedure. Replacing a management cluster destroys every workload cluster of the box first; it is for cases that genuinely need the infrastructure recreated, not for routine change.
+
+## Related topics
+
+- [Inventory and status](/documentation/escrow/infrastructure-operations/inventory-and-status)
+- [Operational limitations](/documentation/escrow/operational-limitations)
+- [Delete a box](/guides/box/delete-a-box) and [Replace a management cluster](/guides/box/replace-a-management-cluster)
+- [Boxes and clusters CLI reference](/cli/boxes-and-clusters#kakt-teardown) — every teardown flag

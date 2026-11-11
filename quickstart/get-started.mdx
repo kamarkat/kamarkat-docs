@@ -1,0 +1,100 @@
+---
+title: "Get started"
+description: "Sign in, create the escrow your box's master keys and admin credential are kept in, and note the administrator identity your box will declare."
+keywords: ["escrow", "master keys", "machine identity", "kakt login", "platform administrator", "break-glass"]
+---
+
+This is the first thing you do, and all of it happens before any infrastructure exists: you sign in, you create the escrow your box will depend on, and you note the one identity the box will accept as its administrator.
+
+Your box's secret store is encrypted by master keys. The box cannot keep them itself: they are what decrypts it, so they would be unreachable exactly when you need them. The escrow keeps a copy outside the box, in a secret manager you control and Kamarkat does not.
+
+The escrow also holds each cluster's admin kubeconfig, which you use only for [break-glass access](/quickstart/access-your-box#break-glass-access), and the cloud credential your box's infrastructure is built and destroyed with.
+
+You reach it as **yourself**. Step 1 signs you in, and from then on every command that touches the escrow uses your own session rather than a credential copied onto your machine.
+
+<Warning>
+Without an escrow, losing the management cluster loses every secret the platform manages for it. You cannot add an escrow afterwards, so scaffolding refuses to continue without one.
+</Warning>
+
+## Step 1: Sign in and create your escrow account
+
+```bash
+kakt login
+```
+
+This opens the escrow secret manager in your browser — `https://app.infisical.com` unless you pass `--domain`. Create your account there if you do not have one, or sign in. You do not need to visit the site separately: `kakt login` takes you to it, and hands the session back to the CLI when you are done.
+
+Once you are signed in, Infisical offers an **Open Infisical Dashboard** button. That is how you reach the dashboard for the next step.
+
+The session is kept in your operating system's credential store, not in a file, and no box ever holds a copy.
+
+```bash
+kakt whoami
+```
+
+```text
+you@acme.example at https://app.infisical.com
+  identity      3f9c1b7e-...-a21d
+  organization  org_abc123
+  session kept in macOS keychain
+```
+
+**Keep that `identity` value, and the address you signed in with.** You need both: the address in Step 3, and the identity when you [scaffold your repository](/quickstart/scaffold-your-repository), which declares it as the box's platform administrator — the one human the box accepts for escrow-backed operations. An address is not used for that, because an address can be changed and re-assigned.
+
+## Step 2: Create a machine identity
+
+In the Infisical dashboard, create one **machine identity**, then note its **client ID** and **client secret**. Infisical's own guide covers it: [Machine identities](https://infisical.com/docs/documentation/platform/identities/machine-identities). New identities get Universal Auth, and the client secret is generated in that identity's Universal Auth settings.
+
+This is your box's **automation** credential, and it is used in three places:
+
+- `kakt escrow init` below authenticates as it to create the project.
+- Scaffolding passes it to your repository as secrets.
+- Your box's operator and your CI use it to escrow recovery material while the box runs.
+
+<Note>
+It is never a substitute for signing in. `kakt` prefers your own session whenever you have one, and the administrator check only applies to human identities — so automation acts as itself and your work is attributed to you. [Platform administrator and access](/documentation/escrow/platform-administrator) covers both.
+</Note>
+
+## Step 3: Create the escrow project
+
+```bash
+kakt escrow init \
+  --name acme-escrow \
+  --owner-email you@acme.example \
+  --client-id <machine-identity-client-id> \
+  --client-secret <machine-identity-client-secret>
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--name` | The project's name. Required |
+| `--owner-email` | The account that should own the project. Required — use the address you signed in with in Step 1 |
+| `--client-id` | The machine identity's client ID. Required |
+| `--client-secret` | Its client secret. Required |
+| `--url` | The escrow Infisical, if it is not at the default address |
+| `--out` | Where the `INFISICAL_ESCROW_*` files are written. Defaults to `k8-secrets/infisical` |
+
+<Warning>
+`--owner-email` must be the account you signed in with, and the one whose `identity` you pass to `scaffold --platform-admin`.
+
+Infisical adds only the *creating* actor to a project, and the creator here is the machine identity — so without `--owner-email` the project has no human members and does not appear in anyone's project list. Because **membership of the escrow project is what authorizes access**, your box would declare you as its administrator and Infisical would refuse you. An escrow only a machine can open is one more credential to lose.
+</Warning>
+
+It prints the project id, writes the four values to `--out`, and names the account that can open it.
+
+## Step 4: Export the escrow values
+
+```bash
+export INFISICAL_ESCROW_URL=https://app.infisical.com
+export INFISICAL_ESCROW_PROJECT_ID=<project-id>
+export INFISICAL_ESCROW_CLIENT_ID=<machine-identity-client-id>
+export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
+```
+
+Keep these values somewhere safe outside the box. They are what your box's automation authenticates with; your own access comes from `kakt login`, so you do not need them to operate the box day to day.
+
+## Next
+
+<Card title="Scaffold your repository" icon="code-branch" href="/quickstart/scaffold-your-repository">
+  Create your GitOps repository, declaring the administrator identity from Step 1.
+</Card>

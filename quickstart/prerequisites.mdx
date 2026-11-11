@@ -13,7 +13,7 @@ Everything below belongs to you. Kamarkat never receives any of it: the credenti
 | **Cloud account** | Where your clusters run, and what you are billed for. The `hetzner` provider is the default. |
 | **Git organization** | Holds your GitOps repository and your application repositories, runs Day-0 in its CI, and hosts your application charts and images in its package registry. |
 | **Domain** | Every hostname in your box sits under it. Its DNS zone must be hosted with your cloud provider's DNS service, because the box creates records and proves domain ownership there for its certificates. |
-| **Escrow secret manager** | Holds your box's master keys and admin credential outside the box. See [Prepare the escrow](/quickstart/prepare-escrow). |
+| **Escrow secret manager** | Holds your box's master keys and admin credential outside the box. See [Get started](/quickstart/get-started). |
 | **Object storage** (recommended) | Destination for database backups. A production box without it has no backups. |
 
 ## Step 2: Install the tools
@@ -32,7 +32,7 @@ kakt bundle-version
 
 `kakt bundle-version` prints the platform version the binary carries.
 
-You sign in with it on the next page, once your escrow account exists: `kakt login` is how every command that reaches an escrow authenticates, and it is the only credential you keep on your own machine.
+You sign in with it on the next page: `kakt login` opens your escrow secret manager in the browser, where you create the account if you do not have one. It is how every command that reaches an escrow authenticates, and the only credential you keep on your own machine.
 
 <Note>
 The example downloads `kakt-linux-amd64`. Each release also publishes `kakt-linux-arm64`, `kakt-darwin-amd64` and `kakt-darwin-arm64`: use the one for your machine. To build from source instead: `go install github.com/kamarkat/kamarkat/cmd/kakt@v<version>`.
@@ -46,9 +46,9 @@ Day-0 runs under secrets stored on your GitOps repository. Gather these now. You
 
 | Secret | What it is |
 | :- | :- |
-| `HCLOUD_TOKEN` | Your cloud API token, read and write. Your clusters are created with it. |
+| `HCLOUD_TOKEN` | Your cloud API token, read and write. Your clusters are created with it. It is enrolled into your box's escrow on the first bootstrap and read from there afterwards, so you supply it once. |
 | `GITOPS_TOKEN` | Write access to your git organization's repositories, plus that organization's **Secrets: write** permission. Day-0 commits what it generates with it, and your application builds inherit it. |
-| `INFISICAL_ESCROW_URL`, `INFISICAL_ESCROW_PROJECT_ID`, `INFISICAL_ESCROW_CLIENT_ID`, `INFISICAL_ESCROW_CLIENT_SECRET` | Your escrow. Scaffolding refuses without them, because an escrow cannot be added after the fact. |
+| `INFISICAL_ESCROW_URL`, `INFISICAL_ESCROW_PROJECT_ID`, `INFISICAL_ESCROW_CLIENT_ID`, `INFISICAL_ESCROW_CLIENT_SECRET` | Your escrow. You create these on the [next page](/quickstart/get-started) — nothing to gather in advance. Scaffolding refuses without them, because an escrow cannot be added after the fact. |
 
 ### Required for what your box runs
 
@@ -74,6 +74,6 @@ Export each value as an environment variable of the same name in the shell you w
 
 ## Next
 
-<Card title="Prepare the escrow" icon="vault" href="/quickstart/prepare-escrow">
+<Card title="Get started" icon="vault" href="/quickstart/get-started">
   Sign in, and create the project your box's master keys are escrowed to.
 </Card>

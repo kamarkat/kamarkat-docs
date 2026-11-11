@@ -36,7 +36,7 @@
           {
             "group": "Build your first cluster",
             "pages": [
-              "quickstart/prepare-escrow",
+              "quickstart/get-started",
               "quickstart/scaffold-your-repository",
               "quickstart/bootstrap-your-box",
               "quickstart/access-your-box",
@@ -278,6 +278,10 @@
     {
       "source": "/features/box/cluster-lifecycle",
       "destination": "/features/capabilities/cluster-lifecycle"
+    },
+    {
+      "source": "/quickstart/prepare-escrow",
+      "destination": "/quickstart/get-started"
     }
   ]
 }

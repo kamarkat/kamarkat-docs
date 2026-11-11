@@ -25,25 +25,28 @@ These commands report fingerprints and never values.
 
 ### kakt escrow init
 
-Creates the project your boxes escrow to. You create the account and one machine identity; this creates the project and the escrow adds that identity to it as an admin, so the access it needs comes with it.
+Creates the project your boxes escrow to, and the automation identity they authenticate with. Run it after `kakt login`, as an organisation admin.
 
 ```bash
-kakt escrow init \
-  --name acme-escrow \
-  --owner-email platform@acme.example \
-  --client-id <machine-identity-client-id> \
-  --client-secret <machine-identity-client-secret>
+kakt escrow init --name acme-escrow
 ```
 
 | Flag | Meaning |
 | :- | :- |
 | `--name` | The project name. Required |
-| `--owner-email` | The account that owns the project. Required |
-| `--client-id`, `--client-secret` | The machine identity. Required |
 | `--url` | The escrow's address. Defaults to `https://app.infisical.com` |
 | `--out` | Directory holding the `INFISICAL_ESCROW_*` files. Defaults to `k8-secrets/infisical` |
+| `--client-id`, `--client-secret` | Use an identity you manage yourself instead of the organisation's automation identity. Passed together |
 
-The project id is written where the rest of the tooling already reads it, so there is one fewer value to supply by hand.
+It creates the project **as you**, so you are its admin, then finds or creates your organisation's one automation identity, configures its authentication, issues a client secret if the identity is new, and gives it membership of the project. The four `INFISICAL_ESCROW_*` values are written to `--out`.
+
+No roles to choose: the identity gets the organisation role `no-access` and the project role `member`, which is what secret and folder operations need.
+
+<Note>
+**One automation identity per organisation.** A second box reuses it and is added to its own project — the free plan allows five identities in total, and the escrow paths are already box-scoped. Re-running finds what exists and writes nothing, and never issues a second client secret for an identity that has one.
+
+It needs an **organisation admin**: a member can create an identity but cannot give it an authentication method, so the command refuses rather than leaving an unusable one behind. [Get started](/quickstart/get-started) walks the whole sequence.
+</Note>
 
 ### kakt escrow bind-destination
 

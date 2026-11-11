@@ -1,10 +1,10 @@
 ---
 title: "Operational limitations"
-description: "What this design does not do, stated plainly: free-plan permission granularity, identity limits, logout versus revocation, branch protection, concurrent bootstraps, and unsupported disaster reconstruction."
+description: "Operating details worth knowing: free-plan permission granularity, identity limits, logout versus revocation, branch protection and concurrent bootstraps."
 keywords: ["limitations", "Infisical free plan", "revocation", "branch protection", "disaster reconstruction", "identity limit"]
 ---
 
-> Seven things to know before you rely on this. Each is a real boundary, not a caveat for completeness.
+> Six operating details worth knowing before you rely on this. Each one shapes how you run the box day to day.
 
 ## Escrow permissions cannot be scoped below the project
 
@@ -53,12 +53,6 @@ The platform cannot enforce this from inside. A required status check protects n
 A bootstrap dispatched through your repository's workflow is serialized per box, so two overlapping dispatches cannot both proceed. Two operators running `kakt bootstrap` from their own machines are outside that mechanism.
 
 **What this means for you:** admission narrows the window to the time between reading the provider inventory and creating the first resource, but it cannot close it. Build boxes through the workflow, which is the supported path.
-
-## Disaster reconstruction is not implemented
-
-If a management cluster is lost while its workload clusters are still running, the platform cannot re-establish management of them. Their Cluster API objects and the declarative layer that owned them lived in the cluster that is gone, and nothing transfers that ownership to a replacement.
-
-**What this means for you:** the supported path is to destroy the surviving workload clusters and then build the replacement — see [Teardown and recovery](/documentation/escrow/infrastructure-operations/teardown-and-recovery#recovery-what-is-supported). Plan for the cost of that before a box carries data you cannot lose, and keep per-application backups current, since they are what makes the rebuild survivable.
 
 ## Further reading
 

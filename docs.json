@@ -17,6 +17,8 @@
             "group": "Overview",
             "pages": [
               "introduction/welcome",
+              "introduction/the-problem",
+              "introduction/approach",
               "introduction/architecture",
               "introduction/responsibility-boundaries"
             ]

@@ -16,7 +16,7 @@ This page covers the ideas escrow rests on. Boxes, management clusters, `boxId` 
 | Holds | application secrets, database credentials, controller values | a short allowlist of recovery material |
 | Read by | the platform's controllers and your workloads, continuously | people and automation, rarely, and mostly during recovery |
 | Available when the cluster is down | no | **yes** |
-| Who authenticates | in-cluster service identities | the Platform Administrator, and your machine identities |
+| Who authenticates | in-cluster service identities | the Platform Administrator, and the organization's one automation identity |
 
 The division follows one test: **an artifact is escrowed only if it must be readable when the management cluster is unavailable.** Everything that fails that test stays operational, which is most things.
 

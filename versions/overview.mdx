@@ -63,15 +63,9 @@ A prerelease such as `0.1.16-rc.1` is built and published through the same path 
 
 A release that publishes anything uses up its version, even if it fails part-way. The next attempt takes the next number.
 
-### Supported environments and providers
+### Unsupported combinations are refused by the chart
 
-The bundle chart declares which combinations of environment and provider it supports. Any other combination is refused when the chart renders.
-
-| Environment | `hetzner` | `hybrid` |
-| :- | :- | :- |
-| `dev` | Supported | Supported |
-| `stg` | Supported | Not supported |
-| `prod` | Supported | Not supported |
+Each bundle declares which combinations of environment and provider it supports, and any other combination is refused when the chart renders — so a version cannot be reached by a cluster it does not support. Which combinations those are is in [Environments](/features/workloads/environments#providers-per-environment).
 
 ### Components move only with the bundle
 

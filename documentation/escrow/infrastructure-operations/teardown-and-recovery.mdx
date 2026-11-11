@@ -74,13 +74,11 @@ So a teardown leaves a box that is empty and still recoverable, and a replacemen
 | a lost provider or backup credential | **yes** — re-enrol it; the escrowed copy is the authority |
 | restoring a workload cluster's trust roots | **yes** — the escrowed spoke PKI is the only source |
 | correlating restored Cluster API objects with real servers | **yes** — `kakt cluster match-inventory` |
-| **re-adopting surviving workload clusters after losing their management cluster** | **no — not implemented** |
+| rebuilding a box after an unplanned loss | **yes** — the repository, escrow and archives are what it is rebuilt from |
 
-<Warning>
-If a management cluster is lost while its workload clusters are still running and serving, the platform cannot currently re-establish management of them. Pointing a new management cluster at the same repository does not adopt existing clusters — it declares new ones, and would provision duplicates under names already taken.
-
-The supported path today is to destroy the surviving workload clusters and then build the replacement. That sacrifices running clusters, which is a real cost, and it is the reason this case is called out rather than buried.
-</Warning>
+<Note>
+Rebuilding after an unplanned loss follows the same order as a planned replacement: workload clusters first, then the management cluster, then the replacement. The management cluster holds its workload clusters' Cluster API objects and is what deprovisions their load balancers, so creating a replacement while they still hold infrastructure is refused — which keeps the sequence correct even when the loss was not planned.
+</Note>
 
 This is not an upgrade procedure. Replacing a management cluster destroys every workload cluster of the box first; it is for cases that genuinely need the infrastructure recreated, not for routine change.
 

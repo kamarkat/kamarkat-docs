@@ -26,7 +26,7 @@ This is destructive and it is not a cutover. Every managed cluster of this box i
   ```
 
 <Note>
-If the management cluster was **lost** rather than deliberately replaced, and its managed clusters are still running and serving, this guide is not the procedure — and the platform cannot currently re-adopt those clusters. See [Disaster reconstruction](/documentation/core-concepts#disaster-reconstruction) for what is and is not supported.
+This guide also covers an unplanned loss. The order is the same either way — managed clusters first, then the management cluster, then the replacement — because the management cluster is what deprovisions their infrastructure. See [Rebuilding after an unplanned loss](/documentation/core-concepts#rebuilding-after-an-unplanned-loss).
 </Note>
 
 ## Step 1: Remove every managed cluster

@@ -22,7 +22,7 @@ What does **not** belong there is everything else — and that is most things. Y
 
 ## Who accesses it
 
-One configured human — the **Platform Administrator** — authenticating with `kakt login`, plus the machine identities your automation needs. The box declares which human it accepts, by Infisical's own account id.
+One configured human — the **Platform Administrator** — authenticating with `kakt login`, plus one automation identity for your organization, which `kakt escrow init` creates and every box reuses. The box declares which human it accepts, by Infisical's own account id.
 
 Two things are worth being precise about from the start, because they are easy to conflate: `kakt` refusing an undeclared identity is a **guard rail**, and **membership of the escrow project** is the authorization boundary. Infisical enforces the second. [Platform administrator and access](/documentation/escrow/platform-administrator) explains both and where the line between them falls.
 

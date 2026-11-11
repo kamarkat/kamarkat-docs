@@ -8,7 +8,9 @@ keywords: ["responsibility", "ownership", "shared responsibility", "gitops repos
 
 Kamarkat's part is the bundle: every platform component, its tested versions and defaults, the templates you start from, and the `kakt` CLI. Everything else is yours: your accounts, your GitOps repository, your clusters, your applications, and the use you make of every capability.
 
-There is no third party. Kamarkat is built for teams without a platform team, so there is no split between a platform team and engineering teams: everything outside the bundle is yours.
+Kamarkat is built for teams that have no platform team, so there is no split between a platform team and engineering teams: everything outside the bundle is yours to decide.
+
+You do hold accounts with other providers — your cloud, your git host, your container registry, the secret manager your escrow lives in, and an alert endpoint if you configure one. Each is yours, contracted by you and revocable by you. Kamarkat holds credentials to none of them.
 
 Each row links to the page that describes it in detail.
 
@@ -21,6 +23,17 @@ Each row links to the page that describes it in detail.
 | **[Upgrades](/versions/upgrades)** | Publishes new versions | Your automation proposes them; you merge |
 | **[Application repositories](/features/workloads/deploying-applications)** | Publishes the `platform-workload` library chart | Own your source, charts, images and CI |
 
+## Agentic operations layer
+
+| | Kamarkat | You |
+| :- | :- | :- |
+| **Platform agents** | Ships the agents and the platform model they operate against | Decide which run in your box, and remain accountable for what they do |
+| **MCP registry** | Publishes the tools and integrations agents may discover | Authorize what is available in your box |
+| **Skills registry** | Ships reusable skills carrying the platform's conventions | Add your own, and decide which apply |
+| **What an agent may reach** | Exposes capability through authorized, standardized platform contracts | Decide what is authorized in your box, and own the credentials and policy behind it |
+
+Agentic operations do not add a second authority. An agent works through the same platform contracts and within the same permissions as anyone else operating the box, so nothing in the table above moves a boundary that exists elsewhere on this page.
+
 ## Infrastructure layer
 
 | | Kamarkat | You |
@@ -29,7 +42,7 @@ Each row links to the page that describes it in detail.
 | **[Management cluster](/features/capabilities/cluster-lifecycle)** | Ships the platform services it runs | Create it with Day-0, from your own CI |
 | **[Managed clusters](/features/capabilities/cluster-lifecycle)** | Ships the cluster template and the platform services | Declare them; your management cluster provisions them |
 | **[Secrets](/features/capabilities/secret-management)** | Ships the secret store and delivery | Supply the secrets only you can choose |
-| **[Escrow](/features/admin/escrow)** | Writes the backup during scaffold, and ships the commands to verify and recover from it | Own the escrow, outside the box |
+| **[Escrow](/documentation/escrow/overview)** | Ships the commands that create the escrow project, enrol credentials, and verify and recover from it | Own the escrow and create it before scaffolding; recovery artefacts are written by Day-0 and by the box as it runs |
 
 ## Application layer
 

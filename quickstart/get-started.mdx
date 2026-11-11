@@ -24,7 +24,7 @@ kakt login
 
 This opens the escrow secret manager in your browser — `https://app.infisical.com` unless you pass `--domain`. Create your account there if you do not have one, or sign in. You do not need to visit the site separately: `kakt login` takes you to it, and hands the session back to the CLI when you are done.
 
-Once you are signed in, Infisical offers an **Open Infisical Dashboard** button. That is how you reach the dashboard for the next step.
+Once you are signed in, Infisical offers an **Open Infisical Dashboard** button if you want to look around. You do not need the dashboard for anything below.
 
 The session is kept in your operating system's credential store, not in a file, and no box ever holds a copy.
 
@@ -39,56 +39,45 @@ you@acme.example at https://app.infisical.com
   session kept in macOS keychain
 ```
 
-**Keep that `identity` value, and the address you signed in with.** You need both: the address in Step 3, and the identity when you [scaffold your repository](/quickstart/scaffold-your-repository), which declares it as the box's platform administrator — the one human the box accepts for escrow-backed operations. An address is not used for that, because an address can be changed and re-assigned.
+**Keep that `identity` value.** You need it when you [scaffold your repository](/quickstart/scaffold-your-repository), which declares it as the box's platform administrator — the one human the box accepts for escrow-backed operations. An address is not used for that, because an address can be changed and re-assigned.
 
-## Step 2: Create a machine identity
-
-In the Infisical dashboard, create one **machine identity**, then note its **client ID** and **client secret**. Infisical's own guide covers it: [Machine identities](https://infisical.com/docs/documentation/platform/identities/machine-identities). New identities get Universal Auth, and the client secret is generated in that identity's Universal Auth settings.
-
-This is your box's **automation** credential, and it is used in three places:
-
-- `kakt escrow init` below authenticates as it to create the project.
-- Scaffolding passes it to your repository as secrets.
-- Your box's operator and your CI use it to escrow recovery material while the box runs.
-
-<Note>
-It is never a substitute for signing in. `kakt` prefers your own session whenever you have one, and the administrator check only applies to human identities — so automation acts as itself and your work is attributed to you. [Platform administrator and access](/documentation/escrow/platform-administrator) covers both.
-</Note>
-
-## Step 3: Create the escrow project
+## Step 2: Create the escrow project
 
 ```bash
-kakt escrow init \
-  --name acme-escrow \
-  --owner-email you@acme.example \
-  --client-id <machine-identity-client-id> \
-  --client-secret <machine-identity-client-secret>
+kakt escrow init --name acme-escrow
 ```
 
-| Flag | Meaning |
-| :- | :- |
-| `--name` | The project's name. Required |
-| `--owner-email` | The account that should own the project. Required — use the address you signed in with in Step 1 |
-| `--client-id` | The machine identity's client ID. Required |
-| `--client-secret` | Its client secret. Required |
-| `--url` | The escrow Infisical, if it is not at the default address |
-| `--out` | Where the `INFISICAL_ESCROW_*` files are written. Defaults to `k8-secrets/infisical` |
+That is the whole step. It runs as you, and it:
+
+- creates the escrow project, **with you as its admin** — because you created it
+- creates your organisation's automation identity if it does not have one, configures its authentication, and issues one client secret
+- gives that identity access to this project
+- writes the four `INFISICAL_ESCROW_*` values to `k8-secrets/infisical/`
+
+Nothing to do in the Infisical dashboard, and no roles to choose. The identity gets the organisation role `no-access`, because it performs no organisation action, and the project role `member`, which is what reading and writing secrets and creating folders needs — not `admin`.
+
+<Note>
+**One automation identity per organisation, not per box.** A second box reuses it and is added to its own escrow project. Infisical's free plan allows five identities in total, humans and machines together, so an identity per box would exhaust it at the fifth — and the escrow paths are already box-scoped, so a second identity buys no isolation.
+
+A re-run finds everything that exists and writes nothing. It will not issue a second client secret for an identity that already has one.
+</Note>
 
 <Warning>
-`--owner-email` must be the account you signed in with, and the one whose `identity` you pass to `scaffold --platform-admin`.
+**This needs an organisation admin.** An organisation member can create an identity but cannot give it an authentication method or a client secret, so the identity would exist and be unusable. The command refuses with that explanation rather than leaving one behind.
 
-Infisical adds only the *creating* actor to a project, and the creator here is the machine identity — so without `--owner-email` the project has no human members and does not appear in anyone's project list. Because **membership of the escrow project is what authorizes access**, your box would declare you as its administrator and Infisical would refuse you. An escrow only a machine can open is one more credential to lose.
+If you are not an admin of your Infisical organisation, have one run this step.
 </Warning>
 
-It prints the project id, writes the four values to `--out`, and names the account that can open it.
+Pass `--client-id` and `--client-secret` if your organisation's policy is that the CLI creates no identities: the project is still created by you, and the identity you name is added to it.
 
-## Step 4: Export the escrow values
+## Step 3: Export the escrow values
+
+Step 2 wrote them to `k8-secrets/infisical/`. Export them for the scaffold that follows:
 
 ```bash
-export INFISICAL_ESCROW_URL=https://app.infisical.com
-export INFISICAL_ESCROW_PROJECT_ID=<project-id>
-export INFISICAL_ESCROW_CLIENT_ID=<machine-identity-client-id>
-export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
+for v in URL PROJECT_ID CLIENT_ID CLIENT_SECRET; do
+  export INFISICAL_ESCROW_$v="$(cat k8-secrets/infisical/INFISICAL_ESCROW_$v)"
+done
 ```
 
 Keep these values somewhere safe outside the box. They are what your box's automation authenticates with; your own access comes from `kakt login`, so you do not need them to operate the box day to day.

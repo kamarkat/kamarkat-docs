@@ -12,6 +12,27 @@ A Kamarkat deployment lives entirely in accounts you own: a git organization tha
 
 Kamarkat's side is small: a release pipeline publishes bundle versions to a registry, and your box pulls them.
 
+## Three layers, one product
+
+```text
+┌─ Agentic operations ──────────────────────────────────────────────────┐
+│  Agents · MCP registry · Skills registry                             │
+│  Engineers and AI agents, working through the same contracts         │
+└───────────────────────────────────────────────────────────────────────┘
+┌─ Integrated cloud-native platform OS ─────────────────────────────────┐
+│  GitOps · Identity · Secrets · Databases · Gateway · Networking       │
+│  Observability · Application delivery · Cluster lifecycle             │
+└───────────────────────────────────────────────────────────────────────┘
+┌─ Business-owned infrastructure ───────────────────────────────────────┐
+│  Management cluster · Workload clusters · Cloud infrastructure        │
+│  Storage · Networking                                                 │
+└───────────────────────────────────────────────────────────────────────┘
+```
+
+The layers are one product, and the model is an operating one rather than a deployment diagram — it says how the parts relate, not where each component is scheduled.
+
+The agentic layer is **not** a controller beside the platform with its own path to infrastructure. Agents read the same platform state engineers do, and changes to declarative desired state go through the same declarations and the same reconciliation — so GitOps stays authoritative for what the infrastructure and applications should be, and ownership is unchanged.
+
 A box is two kinds of cluster, and every cluster has two kinds of node.
 
 <div className="arch-sys not-prose">
@@ -92,9 +113,9 @@ A box is two kinds of cluster, and every cluster has two kinds of node.
 
 Select any part to read about it.
 
-- **Control plane nodes** run Kubernetes on every cluster. Nothing of yours runs on them.
-- **The management cluster's workers** run the platform's services, grouped into [capabilities](/features/capabilities/overview). Your applications never run there.
-- **A managed cluster's workers** run your applications: see [Deploying applications](/features/workloads/deploying-applications). The management cluster creates each managed cluster, then delivers its platform and your apps to it; the managed cluster reads its secrets and identities from the management cluster and reports its telemetry back.
+- **Control plane nodes** run Kubernetes on every cluster. On a box with cloud workers they carry nothing else; a box declared with no cloud workers — `--workers 0`, where capacity comes from your own machines — runs with a schedulable control plane instead, and the platform's workloads do run there.
+- **The management cluster's workers** run the platform's services, grouped into [capabilities](/features/capabilities/overview). Your applications are delivered to managed clusters rather than to the management cluster.
+- **A managed cluster's workers** run your applications. A box may have **none** — scaffolding creates the management cluster, and workload clusters are added when you declare them — in which case the box is complete with one cluster: see [Deploying applications](/features/workloads/deploying-applications). The management cluster creates each managed cluster, then delivers its platform and your apps to it; the managed cluster reads its secrets and identities from the management cluster and reports its telemetry back.
 
 To see every component on each node type, open any version under [Releases](/versions/lines/0-1).
 
@@ -111,6 +132,16 @@ A selectable capability is part of its boundary only when you select it in your 
 ## Components
 
 The platform's services are grouped into capabilities. What each one gives you, and the open-source projects it is built on, is on its page under [Capabilities](/features/capabilities/overview). Your git organization's part is described in [Git connection](/features/admin/git-connection), and the break-glass escrow in [Escrow](/features/admin/escrow).
+
+## Supported topology
+
+| Environment | `hetzner` | `hybrid` |
+| :- | :- | :- |
+| `dev` | Supported | Supported |
+| `stg` | Supported | Not supported |
+| `prod` | Supported | Not supported |
+
+`hybrid` runs cloud control-plane nodes with worker nodes on your own machines, joining over your Tailscale tailnet, and it is supported for `dev` only. Staging rehearses production, and production runs on `hetzner`. Unsupported combinations are refused when the cluster is declared and again when the chart renders — see [Providers per environment](/features/workloads/environments#providers-per-environment).
 
 ## Connectivity model
 
@@ -133,6 +164,16 @@ See [The Bundle](/features/box/bundle), [Upgrades](/versions/upgrades) and [Depl
 
 ## Data residency
 
-Everything your box stores stays in your cloud account: application data, databases, secrets, identities and telemetry. Telemetry is never copied between clusters.
+Nothing your box stores is sent to Kamarkat. Workload data, application logs, database contents, secret material and end-user identifiers stay in accounts you control.
 
-Nothing your box stores is sent to Kamarkat. Workload data, application logs, database contents, secret material and end-user identifiers stay in your accounts.
+Within the box, a managed cluster **reports its telemetry to the management cluster**, which is where metrics, logs and dashboards are aggregated — that is the hub-and-spoke design, not an exception to it.
+
+Three destinations are outside the clusters, and all three are yours:
+
+| Destination | What goes there | Who owns it |
+|---|---|---|
+| Object storage | database backups and management-state archives | your storage account |
+| Escrow secret manager | the recovery artefacts a box cannot keep itself ([Escrow](/documentation/escrow/overview)) | your Infisical organization |
+| Alert endpoint, if you configure one | alert notifications and a heartbeat | the provider you point it at |
+
+So data residency is a property of where **you** put those destinations. The platform sends nothing anywhere you have not configured, and never to Kamarkat.

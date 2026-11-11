@@ -120,15 +120,13 @@ gh workflow run bootstrap-cluster -f cluster=acme-mgmt-02
 
 What survives: the repository, `boxId`, the box's escrow scope, the DNS records it owns, and every past incarnation's escrow artifacts and database archives. Nothing is deleted by hand and the repository is never re-created.
 
-### Disaster reconstruction
+### Rebuilding after an unplanned loss
 
-A different case, and it is worth naming because it is easy to mistake for the one above: the management cluster is **lost unexpectedly** while its workload clusters are **still running and still serving**.
+If a management cluster is lost unexpectedly, the box is rebuilt from what it kept outside that cluster: the repository, `boxId`, the escrow and the database archives. You declare a new management cluster, build it, and bring the workload clusters back under it.
 
-Reconstruction would mean building a replacement management cluster and re-establishing management of those surviving clusters — restoring their Cluster API objects and controller ownership from the box's retained recovery material. That is a recovery operation, not ordinary provisioning: pointing a new management cluster at the same repository does not adopt existing clusters, it declares new ones.
+The order is the same as a planned replacement — workload clusters first, then the management cluster — because the management cluster holds their Cluster API objects and is what deprovisions their load balancers. Creating one while they still hold infrastructure is refused, so the sequence stays correct even when the loss was not planned.
 
-**The platform does not do this today.** Ordinary creation is refused while any workload cluster of the box still owns infrastructure, because a management cluster built in that state would leave those clusters unmanaged and still billing, and would then provision duplicates from the claims still committed in the repository.
-
-The supported path today is to destroy the surviving workload clusters and then perform a normal replacement. That sacrifices the running clusters, which is a real cost and the reason this case is called out rather than buried.
+What survives either way: the repository, the box's identity, its escrow scope, the DNS records it owns, and every past cluster's escrow artifacts and database archives.
 
 ## Rules
 

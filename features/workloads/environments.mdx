@@ -51,7 +51,19 @@ To roll back, commit the previous version. Every published version stays in your
 
 ### Providers per environment
 
-`hybrid` is supported for `dev` only; `stg` and `prod` run on `hetzner`. A box whose `dev` runs on `hybrid` therefore has environments on different providers: its higher environments have cloud nodes and their cost, and do not join your tailnet. Decide this before you [add an environment](/guides/environments/add-an-environment).
+Not every provider serves every environment:
+
+| Environment | `hetzner` | `hybrid` |
+| :- | :- | :- |
+| `dev` | Supported | Supported |
+| `stg` | Supported | Not supported |
+| `prod` | Supported | Not supported |
+
+`hybrid` puts worker nodes on your own machines, joining over your tailnet, and it is supported for `dev` only. Staging rehearses production, and production runs on `hetzner`.
+
+Two things refuse an unsupported combination, so it cannot reach a cluster: the CLI when you declare the cluster, and the bundle chart when it renders.
+
+A box whose `dev` runs on `hybrid` therefore has environments on different providers: its higher environments have cloud nodes and their cost, and do not join your tailnet. Decide this before you [add an environment](/guides/environments/add-an-environment).
 
 ### An environment needs its cluster first
 

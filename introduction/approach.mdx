@@ -1,0 +1,87 @@
+---
+title: "How and why Kamarkat's approach works"
+description: "Six properties make Kamarkat an operating system rather than a toolchain: one foundation, one distribution, one source of truth, one golden path, one agentic experience, one ownership model."
+keywords: ["platform OS", "gitops", "bundle", "golden path", "agentic operations", "MCP registry", "skills registry", "ownership"]
+---
+
+"Platform OS" is an architectural claim, not a label. An operating system is what gives everything above it one way to run, one way to be addressed and one way to be operated. Six properties make Kamarkat one.
+
+## One operating foundation
+
+Infrastructure, platform services, applications and operational tooling are delivered through a single operating model. A cluster, a capability, an application and an agent's workflow are not four different kinds of thing managed four different ways — they are declared, reconciled and observed the same way.
+
+## One integrated distribution
+
+Components are versioned, configured and delivered as a coordinated platform. A release is a **bundle**: every component at a version tested with the others, published as one artefact and adopted as one change.
+
+Nothing is upgraded on its own, because the failures that cost the most happen *between* components rather than inside them.
+
+## One declarative source of truth
+
+Your GitOps repository expresses infrastructure and application intent. Platform controllers reconcile to it. There is no second place where state is configured and only that place knows it.
+
+This is what the agentic layer works against too. Inspecting state, investigating an issue or running a diagnostic reads the platform; **changing declared desired state changes a declaration**, and the platform reconciles it like any other. GitOps is authoritative for what the platform should be, not a log that every operational action has to pass through.
+
+## One standardized application golden path
+
+An application declaration connects to routing, identity, secrets, databases, networking and observability through platform conventions rather than per-application wiring.
+
+Applications are defined **by environment**. A workload cluster declares the stage it serves, and every application in that environment is delivered to every cluster serving it — so adding a cluster deploys the environment to it, and no application names a destination.
+
+## One agentic operating experience
+
+Three elements, and the combination is the point.
+
+**Platform agents** operate against Kamarkat's standardized infrastructure, application and operational model. They inspect platform state, investigate issues, trace dependencies and carry out authorized platform workflows — against the same contracts an engineer uses.
+
+**The MCP registry** organizes and exposes the tools and integrations available to agents, so capability is discovered in one place rather than rediscovered per component. An agent asks the platform what it is authorized to use, and the answer is the platform's, not an assumption.
+
+**The skills registry** holds reusable operational skills: repeatable workflows and the platform's own conventions, so an agent works in Kamarkat's terms rather than from generic Kubernetes instructions.
+
+What an agent may do is authorized by the platform, not inferred from how it was asked. Capability is something an agent discovers and is granted, so its reach is a property of the platform rather than of a prompt.
+
+> Kamarkat does not simply give AI agents access to infrastructure tools. It provides an integrated platform whose operations and capabilities agents can understand.
+
+Engineers and agents work through one authoritative model. There is no second control system with its own view of the world.
+
+## One ownership model
+
+The business controls its infrastructure, platform configuration, applications, credentials and data. The platform's management layer runs **inside** the box, not in a Kamarkat-hosted control plane, so your applications keep serving whether or not Kamarkat is reachable.
+
+## How they fit
+
+<Steps>
+  <Step title="You own the account and the repository">
+    Your cloud account, your git organization. The platform holds no credential to either beyond what you give it.
+  </Step>
+  <Step title="Kamarkat builds a management cluster">
+    Day-0 runs in your own CI and creates the cluster that runs the platform's services. That cluster plus the clusters it manages is your **box**.
+  </Step>
+  <Step title="The box manages its own clusters and capabilities">
+    Declare a workload cluster and the management cluster provisions it, with its networking, storage, delivery and registration already configured.
+  </Step>
+  <Step title="Applications deploy by environment">
+    Your build publishes a chart and pins it. The platform renders the namespace, gateway, login, database, secrets and network policy around it, on every cluster serving that environment.
+  </Step>
+  <Step title="Engineers and agents operate the same platform">
+    Through the same declarations, the same registered tools and the same reusable skills.
+  </Step>
+</Steps>
+
+**Box**, **bundle** and **capabilities** are the three words worth knowing; [Core concepts](/documentation/core-concepts) defines them and the rest.
+
+## What this does not claim
+
+- Infrastructure still needs operating. The platform reduces how much of it you assemble and maintain; it does not remove the work, and agents do not remove accountability for it.
+- Git is the desired state, not an undo history. Reverting a declaration stops the platform wanting something; it does not recreate infrastructure or data that has already been destroyed.
+- Accepting a release is a decision you control. It is not a guarantee that every upgrade completes without attention.
+- Owning your infrastructure and running open-source components keeps you independent. Replacing a platform is still a project.
+
+<CardGroup cols={2}>
+  <Card title="Architecture" icon="sitemap" href="/introduction/architecture">
+    The three layers, the clusters, and what runs where.
+  </Card>
+  <Card title="Get started" icon="rocket" href="/quickstart/overview">
+    From an empty cloud account to an application serving on your domain.
+  </Card>
+</CardGroup>

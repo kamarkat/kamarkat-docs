@@ -87,7 +87,7 @@ The human session wins whenever there is one. That matters on a workstation that
 KAKT_IDENTITY=machine kakt escrow verify --box acme-hub --cluster acme-hub --management
 ```
 
-Your box's `hub-operator` uses a machine identity to escrow recovery material as it runs, and your bootstrap workflow uses one too. Those are the identities automation needs; how many you create is yours to decide, subject to the limit below.
+Your box's `hub-operator` uses a machine identity to escrow recovery material as it runs, and your bootstrap workflow uses the same one. There is **one per organization**, created by `kakt escrow init` and reused by every later box — you do not create or choose it.
 
 ### Operating the machine identity
 
@@ -97,6 +97,7 @@ One identity, and these are the facts your box depends on:
 |---|---|
 | Auth method | **Universal Auth** — client ID and client secret. It is the only method the platform uses |
 | Role on the escrow project | **admin**, granted when it creates the project (`kakt escrow init` authenticates as it) |
+| Created by | `kakt escrow init`, once per organization, named `kamarkat-automation` |
 | Where its secret lives | your repository's secrets, and the Secret `hub-operator` reads in the box |
 | Token lifetime | a short-lived access token per login. Nothing renews one, because every consumer is a short run |
 
@@ -120,7 +121,9 @@ If you do set one, add a **Credential Expiration** alert on the identity. Infisi
 
 ## Identity count
 
-Infisical's free plan allows **five identities per organization, human and machine combined** — a person who logs in consumes one, exactly like a machine identity does. Nothing in the platform creates an identity: none is made per box, per cluster, per tenant, per application or per login, so the count does not grow as your estate does.
+Infisical's free plan allows **five identities per organization, human and machine combined** — a person who logs in consumes one, exactly like a machine identity does.
+
+The platform creates exactly **one** identity, the automation identity, the first time you run `kakt escrow init` in an organization. Every later box reuses it. Nothing is created per box, per cluster, per tenant, per application or per login, so the count does not grow as your estate does.
 
 Because the free plan has no folder-level permissions, the unit of isolation is the **project**: one escrow project per box. A machine identity granted several projects therefore has access across those boxes, which is the cost of staying inside five identities and is worth deciding consciously. See [Operational limitations](/documentation/escrow/operational-limitations).
 

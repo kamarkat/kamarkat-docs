@@ -34,7 +34,7 @@ kakt box init \
 Two values are easy to mix up, because `--box` means something different here than it does on the escrow commands.
 
 - `--box acme-inc` is your **git organization** — where the repository is created.
-- The **box's own name is generated**, not passed: one timestamp gives the box id, the repository and the first management cluster's name (`acme-1794447136`, `acme-gitops-1794447136`, `acme-hub-1794447136`). The box id is the value `kakt escrow verify --box`, `kakt kubeconfig --box` and the other escrow commands take, and the command prints it when the box is created.
+- The **box's own name is generated**, not passed: one timestamp gives the box id, the repository and the first management cluster's name (`acme-1794447136`, `acme-gitops-1794447136`, `acme-mgmt-1794447136`). The box id is the value `kakt escrow verify --box`, `kakt kubeconfig --box` and the other escrow commands take, and the command prints it when the box is created.
 
 The one human this box accepts for escrow-backed operations is taken from your `kakt login` session and printed as it is used. Pass `--platform-admin` only to name somebody else.
 </Note>

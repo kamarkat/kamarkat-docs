@@ -17,22 +17,22 @@ cd acme-gitops-1794447136
 kakt tenant add-management
 ```
 
-It renders `registry/clusters/acme-hub-1794447136/` from the box's own declaration — your domain, your escrow, your provider and region — so there is nothing to retype and nothing that can disagree with the box.
+It renders `registry/clusters/acme-mgmt-1794447136/` from the box's own declaration — your domain, your escrow, your provider and region — so there is nothing to retype and nothing that can disagree with the box.
 
 It also creates the one credential you are never asked for: this box's own Infisical administrator. The password is generated, written to your escrow, and set on the repository, in that order. A later run reads the escrowed one back rather than minting a second over the live instance.
 
 ```text
 box acme-1794447136
-declared management cluster acme-hub-1794447136:
-  registry/clusters/acme-hub-1794447136/bundle.yaml
-  registry/clusters/acme-hub-1794447136/values.yaml
+declared management cluster acme-mgmt-1794447136:
+  registry/clusters/acme-mgmt-1794447136/bundle.yaml
+  registry/clusters/acme-mgmt-1794447136/values.yaml
   …
 [box] generated this box's Infisical administrator (you@acme.example) and escrowed it
 [box] ✓ INFISICAL_ADMIN_EMAIL set on acme-inc/acme-gitops-1794447136
 [box] ✓ INFISICAL_ADMIN_PASSWORD set on acme-inc/acme-gitops-1794447136
 
 Commit and push, then create it:
-  gh workflow run bootstrap-cluster -f cluster=acme-hub-1794447136
+  gh workflow run bootstrap-cluster -f cluster=acme-mgmt-1794447136
 ```
 
 `--provider`, `--region`, `--bundle-version` and `--workers` override what the box declares, for this cluster only. Everything else — the domain, the escrow, the administrator — belongs to the box and is not a per-cluster choice.
@@ -41,7 +41,7 @@ Commit and push, then create it:
 
 ```bash
 git add registry/clusters
-git commit -m "Declare management cluster acme-hub-1794447136"
+git commit -m "Declare management cluster acme-mgmt-1794447136"
 git push
 ```
 
@@ -55,7 +55,7 @@ Day-0 runs as the **Bootstrap cluster** workflow in your GitOps repository, on y
 
 ```bash
 gh workflow run bootstrap-cluster.yml --repo acme-inc/acme-gitops-1794447136 \
-  -f cluster=acme-hub-1794447136
+  -f cluster=acme-mgmt-1794447136
 ```
 
 You can also start it from **Actions** › **Bootstrap cluster** › **Run workflow**.
@@ -103,7 +103,7 @@ Day-0 commits the facts it discovers, such as the control-plane address, back to
 If the run ends before the cluster converges, it prints the command to wait for it:
 
 ```bash
-kakt verify --cluster acme-hub-1794447136 --timeout 15m
+kakt verify --cluster acme-mgmt-1794447136 --timeout 15m
 ```
 
 `kakt verify` reports what is still outstanding if the budget runs out.

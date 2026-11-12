@@ -12,7 +12,7 @@ kakt box init --tenant acme --box acme-inc --domain acme.example --region hel1
 
 `kakt box init` initializes the box: it creates the box's repository in your git organization and renders it from the platform template, with **no clusters**. It writes only the facts unique to you: your tenant, that git organization, your domain, your region, and the identity it mints for the box. This happens once; every change after it is a commit or a pull request.
 
-The box names itself. One timestamp, taken when it is initialized, gives the box id, the repository and the name its first management cluster will take — `acme-1794447136`, `acme-gitops-1794447136`, `acme-hub-1794447136` — so one tenant can hold more than one box without the two colliding. The full contract is in [`kakt box init`](/cli/boxes-and-clusters#kakt-box-init); you do not choose or type any of the three.
+The box names itself. One timestamp, taken when it is initialized, gives the box id, the repository and the name its first management cluster will take — `acme-1794447136`, `acme-gitops-1794447136`, `acme-mgmt-1794447136` — so one tenant can hold more than one box without the two colliding. The full contract is in [`kakt box init`](/cli/boxes-and-clusters#kakt-box-init); you do not choose or type any of the three.
 
 ## Step 1: What the box is built with
 
@@ -72,7 +72,7 @@ acme-inc/acme-gitops-1794447136 is a box, with no clusters.
 
   box id             acme-1794447136
   repository         acme-inc/acme-gitops-1794447136
-  management cluster acme-hub-1794447136   (declared next, not yet created)
+  management cluster acme-mgmt-1794447136   (declared next, not yet created)
   checkout           acme-gitops-1794447136
 ```
 

@@ -44,7 +44,7 @@ A new box **mints its own identity**, once, from the Unix second it was initiali
 | :- | :- | :- |
 | Box id | `acme-1794447136` | keys the escrow path holding this box's master keys and the DNS owner id its records carry. Two boxes sharing it delete each other's TXT records |
 | Repository | `acme-inc/acme-gitops-1794447136` | a box is declared in its own repository, and a replacement box needs its own |
-| First management cluster | `acme-hub-1794447136` | the cluster's name keys its objects and its database's archive prefix, which collides between two boxes sharing one object store |
+| First management cluster | `acme-mgmt-1794447136` | the cluster's name keys its objects and its database's archive prefix, which collides between two boxes sharing one object store |
 
 Your git organization and your tenant are **not** renamed: `--box acme-inc` names an organization that exists, and `acme` stays the tenant. There is no flag that sets the three generated names — a chosen suffix would be a second naming scheme, and two boxes could then be given one identity on purpose. All three are written to `registry/box.yaml`, and every later command reads them from there.
 

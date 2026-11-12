@@ -35,7 +35,7 @@ kubectl get secrets --all-namespaces -o json | kubectl replace -f -
 
 ## Step 4: Verify the key decrypts
 
-See [Verify your escrow](/guides/escrow/verify-your-escrow#step-2-check-the-encryption-key-decrypts).
+See [Verify an escrow](/guides/escrow/verify-your-escrow#step-2-check-the-encryption-key-decrypts).
 
 <Warning>
 Only after step 4, and only once every Secret is verified encrypted, may you re-run step 1 with `--no-plaintext-fallback`. Any Secret still in plaintext then becomes unreadable.

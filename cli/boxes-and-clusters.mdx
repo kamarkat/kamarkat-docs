@@ -24,7 +24,7 @@ kakt box init
 
 Values are read without echo and staged under `~/.kamarkat/` with mode `0600`, and the same run then creates the box with them. Re-running is normal: anything already present is skipped, and an answer left empty is reported as outstanding — in which case **nothing is created** and the next run asks only for what is missing. In automation, set the variables and pass `--no-prompt`.
 
-It does not create the escrow, which is [`kakt escrow init`](/cli/escrow-and-encryption#kakt-escrow-init), and it never asks for the box Infisical administrator, which is generated and escrowed when the management cluster is declared. See [Create your box](/quickstart/create-your-box).
+It does not create the escrow, which is [`kakt escrow init`](/cli/escrow-and-encryption#kakt-escrow-init), and it never asks for the box Infisical administrator, which is generated and escrowed when the management cluster is declared. See [Initialize a box](/quickstart/initialize-your-box).
 
 Once the credential set is complete, the same command creates the box's repository, renders it from the platform template **with no clusters**, and stores your credentials on it as repository secrets.
 
@@ -78,7 +78,7 @@ The hub's secret scope is created for the box during bootstrap, so there is
 nothing to set up in Infisical beforehand.
 </Note>
 
-Creating a box happens once. Every change after it is a commit or a pull request. See [Create your box](/quickstart/create-your-box) for the credentials it expects and what the repository contains.
+Initializing a box happens once. Every change after it is a commit or a pull request. See [Initialize a box](/quickstart/initialize-your-box) for the credentials it expects and what the repository contains.
 
 | Flag | Meaning |
 | :- | :- |
@@ -112,7 +112,7 @@ The box id is minted once and never changes. Your escrow is keyed by it, so ever
 </Warning>
 
 <Note>
-`--private` interacts with your git plan. On GitHub's free plan, git organization secrets reach public repositories only, so a private repository's builds receive an empty credential. [Deploy your app](/quickstart/deploy-your-app#step-1-give-your-builds-write-access-to-the-gitops-repository) covers the per-repository alternative.
+`--private` interacts with your git plan. On GitHub's free plan, git organization secrets reach public repositories only, so a private repository's builds receive an empty credential. [Deploy an app](/quickstart/deploy-your-app#step-1-give-your-builds-write-access-to-the-gitops-repository) covers the per-repository alternative.
 </Note>
 
 ### kakt tenant add-cluster

@@ -39,8 +39,8 @@
             "group": "Build your first cluster",
             "pages": [
               "quickstart/get-started",
-              "quickstart/create-your-box",
-              "quickstart/bootstrap-your-box",
+              "quickstart/initialize-your-box",
+              "quickstart/build-your-management-cluster",
               "quickstart/access-your-box",
               "quickstart/add-your-managed-cluster"
             ]
@@ -275,12 +275,20 @@
   },
   "redirects": [
     {
+      "source": "/quickstart/bootstrap-your-box",
+      "destination": "/quickstart/build-your-management-cluster"
+    },
+    {
+      "source": "/quickstart/create-your-box",
+      "destination": "/quickstart/initialize-your-box"
+    },
+    {
       "source": "/quickstart/scaffold-your-repository",
-      "destination": "/quickstart/create-your-box"
+      "destination": "/quickstart/initialize-your-box"
     },
     {
       "source": "/quickstart/collect-your-credentials",
-      "destination": "/quickstart/create-your-box"
+      "destination": "/quickstart/initialize-your-box"
     },
     {
       "source": "/features/capabilities/workloads",

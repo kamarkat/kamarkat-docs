@@ -1,5 +1,5 @@
 ---
-title: "Declare your app"
+title: "Declare an app"
 description: "An application becomes real when its values file exists in your GitOps repository. It then gets a namespace, a database, a login client and its hostnames."
 keywords: ["application", "declare", "values file", "hostnames", "appId"]
 ---
@@ -52,7 +52,7 @@ resourceQuota:
 ownerEmail: platform@acme.example
 
 config: {}              # non-secret values your workloads read
-secrets: []             # secrets you supply; see "Supply your secrets"
+secrets: []             # secrets you supply; see "Supply secrets"
 ```
 
 | Field | Meaning |
@@ -102,6 +102,6 @@ A preflight check fails review if the aggregate does not match the declarations,
 
 ## Next
 
-<Card title="Supply your secrets" icon="key" href="/quickstart/supply-secrets">
+<Card title="Supply secrets" icon="key" href="/quickstart/supply-secrets">
   Give the app the secrets only you can choose.
 </Card>

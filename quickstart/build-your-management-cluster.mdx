@@ -1,0 +1,124 @@
+---
+title: "Build the management cluster"
+description: "Declare the management cluster in your box's repository, commit it, and your own CI builds it. Declaring is free; building is what costs money and hours."
+keywords: ["management cluster", "kakt tenant add-management", "day-0", "bootstrap", "kakt verify"]
+---
+
+> A cluster exists because your repository says so. Declaring it is a commit; building it is a workflow run in your own CI, under your own secrets.
+
+Your box has no clusters yet. This page adds the first one — the **management cluster**, which runs the platform and provisions every managed cluster you declare later.
+
+## Step 1: Declare it
+
+Run this inside the checkout `kakt box init` left behind. No name: the box's first management cluster takes the name the box already declared for it.
+
+```bash
+cd acme-gitops-1794447136
+kakt tenant add-management
+```
+
+It renders `registry/clusters/acme-hub-1794447136/` from the box's own declaration — your domain, your escrow, your provider and region — so there is nothing to retype and nothing that can disagree with the box.
+
+It also creates the one credential you are never asked for: this box's own Infisical administrator. The password is generated, written to your escrow, and set on the repository, in that order. A later run reads the escrowed one back rather than minting a second over the live instance.
+
+```text
+box acme-1794447136
+declared management cluster acme-hub-1794447136:
+  registry/clusters/acme-hub-1794447136/bundle.yaml
+  registry/clusters/acme-hub-1794447136/values.yaml
+  …
+[box] generated this box's Infisical administrator (you@acme.example) and escrowed it
+[box] ✓ INFISICAL_ADMIN_EMAIL set on acme-inc/acme-gitops-1794447136
+[box] ✓ INFISICAL_ADMIN_PASSWORD set on acme-inc/acme-gitops-1794447136
+
+Commit and push, then create it:
+  gh workflow run bootstrap-cluster -f cluster=acme-hub-1794447136
+```
+
+`--provider`, `--region`, `--bundle-version` and `--workers` override what the box declares, for this cluster only. Everything else — the domain, the escrow, the administrator — belongs to the box and is not a per-cluster choice.
+
+## Step 2: Commit it
+
+```bash
+git add registry/clusters
+git commit -m "Declare management cluster acme-hub-1794447136"
+git push
+```
+
+<Note>
+**Committing declares the cluster. It does not build one.** Nothing provisions a server until you dispatch the workflow below, which costs money and takes hours — so a declaration is safe to review, amend and re-push first.
+</Note>
+
+## Step 3: Let Day-0 build it
+
+Day-0 runs as the **Bootstrap cluster** workflow in your GitOps repository, on your git organization's runners, under the [secrets stored there](/features/admin/git-connection#where-the-secrets-live). It is pinned to the platform version your box was initialized on, so a later change to the platform cannot change how your repository bootstraps.
+
+```bash
+gh workflow run bootstrap-cluster.yml --repo acme-inc/acme-gitops-1794447136 \
+  -f cluster=acme-hub-1794447136
+```
+
+You can also start it from **Actions** › **Bootstrap cluster** › **Run workflow**.
+
+| Input | Meaning |
+| :- | :- |
+| `cluster` | The cluster to build, as named under `registry/clusters/`. Required — a box holds several clusters over its life, so this is never assumed |
+| `provider`, `region` | Where it runs. Default to what your box declares |
+| `workers` | Cloud worker nodes; defaults to the cluster's `values.yaml` |
+| `on-prem`, `tailnet` | Accept nodes on your own premises, joining over your tailnet |
+
+## Step 4: Follow the run
+
+```bash
+gh run watch --repo acme-inc/acme-gitops-1794447136
+```
+
+The run takes a few hours. It works through these stages, and each must succeed before the next starts:
+
+<Steps>
+  <Step title="Fetch the platform CLI">
+    Downloads the `kakt` release for your version and checks that it reports that version.
+  </Step>
+  <Step title="Check the declaration">
+    Validates your repository before anything is created.
+  </Step>
+  <Step title="Build the management cluster">
+    Creates the cluster and builds its foundation in phases: secret store, PKI, bootstrap secrets, GitOps engine, platform. Each phase records its state, so a re-run resumes rather than starting over.
+  </Step>
+  <Step title="Verify it converges">
+    Waits for every platform boundary to become healthy, within a fixed budget.
+  </Step>
+  <Step title="Bring up declared managed clusters">
+    The management cluster provisions any managed cluster your repository already declares. A new box declares none, so this finds nothing and moves on: you add your first in [Add a managed cluster](/quickstart/add-your-managed-cluster).
+  </Step>
+  <Step title="Validate the platform">
+    Runs the platform's validation and publishes the record as a run artefact.
+  </Step>
+</Steps>
+
+Day-0 commits the facts it discovers, such as the control-plane address, back to your repository. That is the only write it makes outside a pull request.
+
+## Step 5: Confirm convergence
+
+If the run ends before the cluster converges, it prints the command to wait for it:
+
+```bash
+kakt verify --cluster acme-hub-1794447136 --timeout 15m
+```
+
+`kakt verify` reports what is still outstanding if the budget runs out.
+
+<Tip>
+If a run fails part-way, fix the cause and start the workflow again. Phases that completed are not repeated, and a phase that is not safe to repeat refuses to resume rather than running twice.
+</Tip>
+
+## What this does and does not cover
+
+- **Managed clusters are not built this way.** Every managed cluster, including your first, is a declaration you commit; your management cluster provisions it, with no workflow run and no Day-0. See [Add a managed cluster](/quickstart/add-your-managed-cluster).
+- **You run this again only to replace the management cluster.** A box has at most one holding infrastructure at a time, and a replacement is declared with `kakt tenant add-management --name <new>` and built by the same workflow. See [Management cluster upgrade](/documentation/upgrades/management-cluster-upgrade).
+
+## Next
+
+<Card title="Access the box" icon="right-to-bracket" href="/quickstart/access-your-box">
+  Sign in, and know where break-glass access is.
+</Card>

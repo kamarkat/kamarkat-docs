@@ -39,7 +39,7 @@ Two values are easy to mix up, because `--box` means something different here th
 The one human this box accepts for escrow-backed operations is taken from your `kakt login` session and printed as it is used. Pass `--platform-admin` only to name somebody else.
 </Note>
 
-Add `--dry-run` first to see the repository without creating anything. Its management cluster is declared separately, with `kakt tenant add-management`. A released CLI starts the box on the version it carries; an unreleased build has none to offer and refuses, so pass `--bundle-version` with a published version, or `development` to read charts from your current branch. Every flag, and the escrow and credential flags a real run needs, are in [Create your box](/quickstart/create-your-box).
+Add `--dry-run` first to see the repository without creating anything. Its management cluster is declared separately, with `kakt tenant add-management`. A released CLI starts the box on the version it carries; an unreleased build has none to offer and refuses, so pass `--bundle-version` with a published version, or `development` to read charts from your current branch. Every flag, and the escrow and credential flags a real run needs, are in [Initialize a box](/quickstart/initialize-your-box).
 
 It creates the repository with no clusters and stores your credentials on it as GitHub Actions secrets, which is what the workflow that creates a management cluster runs under — [Where the secrets live](/features/admin/git-connection#where-the-secrets-live). Declare the management cluster next — `kakt tenant add-management`, with no name, which takes the one the box declared — then commit it and dispatch the repository's bootstrap workflow. If the run stops part-way, continue it with `kakt box init --resume <checkout>`, which reuses the identity already written.
 
@@ -51,7 +51,7 @@ Day-0 is the **Bootstrap cluster** workflow in your repository, running on your 
 gh run watch --repo acme-inc/acme-gitops
 ```
 
-It creates the management cluster, builds its foundation, waits for its platform services to become healthy, then brings up any managed cluster your repository already declares. With none declared, it finishes after the management cluster. If a run fails part-way, fix the cause and start it again: completed phases are not repeated. See [Bootstrap your box](/quickstart/bootstrap-your-box) for each stage.
+It creates the management cluster, builds its foundation, waits for its platform services to become healthy, then brings up any managed cluster your repository already declares. With none declared, it finishes after the management cluster. If a run fails part-way, fix the cause and start it again: completed phases are not repeated. See [Build the management cluster](/quickstart/build-your-management-cluster) for each stage.
 
 ## Step 3: Verify
 
@@ -66,7 +66,7 @@ It waits for the management cluster to converge and reports anything outstanding
 You never run Day-0 again for this box. Every further cluster, environment, app and platform upgrade is a commit to your repository, which the management cluster applies.
 
 <CardGroup cols={2}>
-  <Card title="Access your box" icon="right-to-bracket" href="/quickstart/access-your-box">
+  <Card title="Access the box" icon="right-to-bracket" href="/quickstart/access-your-box">
     Sign in, and know where break-glass access is.
   </Card>
   <Card title="Add a managed cluster" icon="server" href="/guides/clusters/add-a-managed-cluster">

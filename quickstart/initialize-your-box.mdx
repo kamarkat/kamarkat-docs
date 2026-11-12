@@ -1,18 +1,16 @@
 ---
-title: "Create your box"
-description: "One command collects the credentials your box is built with and creates your GitOps repository; a second declares its management cluster."
-keywords: ["kakt box init", "kakt tenant add-management", "gitops repository", "box", "repository secrets"]
+title: "Initialize a box"
+description: "One command collects the credentials your box is built with and initializes its GitOps repository; a second declares its management cluster."
+keywords: ["kakt box init", "initialize a box", "gitops repository", "box identity", "repository secrets"]
 ---
 
-A box outlives every cluster in it, so the box is what you create and a cluster is a declaration you add to it. Two commands, in this order:
+A box outlives every cluster in it, so the box is what you initialize and a cluster is a declaration you add to it afterwards. This page is the first half: the box, with no clusters.
 
 ```bash
 kakt box init --tenant acme --box acme-inc --domain acme.example --region hel1
-cd acme-gitops-1794447136
-kakt tenant add-management
 ```
 
-`kakt box init` creates the box's repository in your git organization and renders it from the platform template, with **no clusters**. It writes only the facts unique to you: your tenant, that git organization, your domain, your region, and the identity it mints for the box. This happens once; every change after it is a commit or a pull request.
+`kakt box init` initializes the box: it creates the box's repository in your git organization and renders it from the platform template, with **no clusters**. It writes only the facts unique to you: your tenant, that git organization, your domain, your region, and the identity it mints for the box. This happens once; every change after it is a commit or a pull request.
 
 The box names itself. One timestamp, taken when it is initialized, gives the box id, the repository and the name its first management cluster will take — `acme-1794447136`, `acme-gitops-1794447136`, `acme-hub-1794447136` — so one tenant can hold more than one box without the two colliding. The full contract is in [`kakt box init`](/cli/boxes-and-clusters#kakt-box-init); you do not choose or type any of the three.
 
@@ -46,7 +44,13 @@ What is already set -- in the environment, or from a previous run -- is skipped.
 
 Nothing is echoed as you type it, and each value is written with mode `0600`. The last three are destinations rather than credentials — where this box sends its alerts and its mail — and you can press enter to skip one; the box then runs without that capability and says so.
 
-**Nothing is created until the set is complete.** A run that stops leaves what you have already given staged under `~/.kamarkat/`, and re-running asks only for what is still missing. Re-running is the normal way to use this command.
+**Nothing is initialized until the set is complete.** A run that stops leaves what you have already given staged under `~/.kamarkat/`, and re-running asks only for what is still missing. Re-running is the normal way to use this command.
+
+If a run stops *after* the box is initialized — the push failed, a secret did not land — continue that same box rather than starting another:
+
+```bash
+kakt box init --resume ./acme-gitops-1794447136
+```
 
 <Note>
 Two credentials are never asked for. The administrator of your box's own Infisical takes its address from the session you created in [Get started](/quickstart/get-started#step-1-sign-in-and-create-your-escrow-account), and its password is generated and written to your escrow in step 3 — there is nothing to invent or remember.
@@ -54,7 +58,7 @@ Two credentials are never asked for. The administrator of your box's own Infisic
 
 ## Step 2: The box
 
-Once the set is complete, the same run creates the repository:
+Once the set is complete, the same run initializes the box:
 
 ```text
 [box] platform administrator: you@acme.example (6e1f…)
@@ -89,40 +93,11 @@ Each `✓` line is a **GitHub Actions secret set on the new repository** — `Se
 | `--region` | The cloud region your clusters run in. |
 | `--workers` | Cloud worker nodes a cluster of this box starts with. Defaults to 2. |
 | `--bundle-version` | The platform version the box starts on. A released CLI defaults to the version it carries; an unreleased build refuses rather than guess. |
-| `--dry-run` | Render locally and create nothing, which is how to see what you will receive. |
+| `--dry-run` | Render locally and initialize nothing, which is how to see what you will receive. |
 | `--no-prompt` | Never ask: every credential comes from the environment or `~/.kamarkat/`. For automation. |
 | `--out` | The checkout to leave behind. Defaults to `./<repository>`. |
 
-Pass `--escrow-url`, `--escrow-project-id`, `--escrow-client-id` and `--escrow-client-secret` only to use an escrow this machine did not create, or the credential flags to create a box whose secrets are not staged on this machine.
-
-## Step 3: Its management cluster
-
-Run the second command inside the checkout. No name: the box's first management cluster takes the name the box declared for it.
-
-```bash
-cd acme-gitops-1794447136
-kakt tenant add-management
-```
-
-It renders `registry/clusters/acme-hub-1794447136/` from the box's own declaration — your domain, your escrow, your provider and region — then generates this box's Infisical administrator password, writes it to your escrow, and sets it on the repository. A later run reads the escrowed one back rather than minting a second over the live instance.
-
-```text
-box acme-1794447136
-declared management cluster acme-hub-1794447136:
-  registry/clusters/acme-hub-1794447136/bundle.yaml
-  registry/clusters/acme-hub-1794447136/values.yaml
-  …
-[box] generated this box's Infisical administrator (you@acme.example) and escrowed it
-[box] ✓ INFISICAL_ADMIN_EMAIL set on acme-inc/acme-gitops-1794447136
-[box] ✓ INFISICAL_ADMIN_PASSWORD set on acme-inc/acme-gitops-1794447136
-
-Commit and push, then create it:
-  gh workflow run bootstrap-cluster -f cluster=acme-hub-1794447136
-```
-
-`--provider`, `--region`, `--bundle-version` and `--workers` override what the box declares, for this cluster only. Everything else — the domain, the escrow, the administrator — is the box's and is not a per-cluster choice.
-
-Committing declares the cluster. Nothing builds it until you dispatch that workflow, which costs money and takes hours.
+Pass `--escrow-url`, `--escrow-project-id`, `--escrow-client-id` and `--escrow-client-secret` only to use an escrow this machine did not create, or the credential flags to initialize a box whose secrets are not staged on this machine.
 
 ## What is in your repository
 
@@ -140,6 +115,8 @@ The platform version in `bundle.yaml` changes only through upgrade proposals. It
 
 ## Next
 
-<Card title="Bootstrap your box" icon="play" href="/quickstart/bootstrap-your-box">
-  Follow Day-0 as it builds your clusters.
+Your box exists and has no clusters. Its management cluster is the next step: you declare it, commit it, and your repository's own CI builds it.
+
+<Card title="Build the management cluster" icon="play" href="/quickstart/build-your-management-cluster">
+  Declare it, then let Day-0 build it.
 </Card>

@@ -8,7 +8,7 @@ keywords: ["kakt escrow", "kakt kubeconfig", "kakt encryption", "break-glass", "
 
 ## Conventions
 
-Every command here reads the escrow with the same four values:
+Every command here reads the escrow with the same four values. `kakt escrow init` writes them to this operator's own store, `~/.kamarkat/infisical/` — read from any directory, so nothing is exported on the machine that created the escrow. The environment wins where it is set, which is how CI supplies them:
 
 ```bash
 export INFISICAL_ESCROW_URL=https://app.infisical.com
@@ -16,6 +16,8 @@ export INFISICAL_ESCROW_PROJECT_ID=<project-id>
 export INFISICAL_ESCROW_CLIENT_ID=<machine-identity-client-id>
 export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
 ```
+
+Where a command takes `--gitops-dir`, it needs none of them: the box's repository names its escrow, and the read is performed with your own [`kakt login`](/cli/signing-in) session.
 
 `--box` names the logical box the escrow is keyed by — the value `kakt tenant scaffold --box-id` pinned, which defaults to the management cluster's name. `--cluster` names the cluster within it. A box keeps its `--box` value across a rebuild, which is how a replacement management cluster finds the keys the old one escrowed.
 
@@ -35,7 +37,7 @@ kakt escrow init --name acme-escrow
 | :- | :- |
 | `--name` | The project name. Required |
 | `--url` | The escrow's address. Defaults to `https://app.infisical.com` |
-| `--out` | Directory holding the `INFISICAL_ESCROW_*` files. Defaults to `k8-secrets/infisical` |
+| `--out` | Write the `INFISICAL_ESCROW_*` files here instead of this operator's own store (`~/.kamarkat/infisical`, or `$KAMARKAT_HOME/infisical`) |
 | `--client-id`, `--client-secret` | Use an identity you manage yourself instead of the organisation's automation identity. Passed together |
 
 It creates the project **as you**, so you are its admin, then finds or creates your organisation's one automation identity, configures its authentication, issues a client secret if the identity is new, and gives it membership of the project. The four `INFISICAL_ESCROW_*` values are written to `--out`.

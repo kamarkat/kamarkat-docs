@@ -10,14 +10,15 @@ Normal access is through your box's identity provider, where each person signs i
 
 ## Step 1: Retrieve it
 
-```bash
-export INFISICAL_ESCROW_URL=https://app.infisical.com
-export INFISICAL_ESCROW_PROJECT_ID=<project-id>
-export INFISICAL_ESCROW_CLIENT_ID=<machine-identity-client-id>
-export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
+Run it from your box's GitOps repository:
 
-kakt kubeconfig --box acme-hub --cluster acme-hub --out acme-hub.kubeconfig
+```bash
+kakt kubeconfig --cluster acme-hub --gitops-dir . --out acme-hub.kubeconfig
 ```
+
+The repository declares which escrow holds the box, and the read is performed with your own [`kakt login`](/cli/signing-in) session — attributed to you in the escrow's audit log, and authorized by your access to the escrow project rather than by a shared credential on your machine.
+
+Without a checkout, pass `--box acme-hub` and the four `INFISICAL_ESCROW_*` values in the environment instead. That is the automation path.
 
 The escrow holds one kubeconfig per cluster. Pass the cluster you need.
 

@@ -52,9 +52,13 @@ That is the whole step. It runs as you, and it:
 - creates the escrow project, **with you as its admin** — because you created it
 - creates your organisation's automation identity if it does not have one, configures its authentication, and issues one client secret
 - gives that identity access to this project
-- writes the four `INFISICAL_ESCROW_*` values to `k8-secrets/infisical/`
+- writes the four `INFISICAL_ESCROW_*` values to `~/.kamarkat/infisical/`, once for this machine
 
 Nothing to do in the Infisical dashboard, and no roles to choose. The identity gets the organisation role `no-access`, because it performs no organisation action, and the project role `member`, which is what reading and writing secrets and creating folders needs — not `admin`.
+
+The identity it creates for you is an Infisical **machine identity**: an account that belongs to a program rather than a person, authenticating with **Universal Auth** — a client ID and a client secret — instead of a password and a browser. Infisical's own [Machine identities](https://infisical.com/docs/documentation/platform/identities/machine-identities) page describes the mechanism in full; what the platform configures is exactly the part described here, and it is yours afterwards. [Operating the machine identity](/documentation/escrow/platform-administrator#operating-the-machine-identity) covers what that means — what holds its credential, how rotation works, and what the one-per-organisation choice costs.
+
+The client secret is the part to notice: Infisical returns it **once**, at the moment it is issued, and no dashboard and no API can show it again.
 
 <Note>
 **One automation identity per organisation, not per box.** A second box reuses it and is added to its own escrow project. Infisical's free plan allows five identities in total, humans and machines together, so an identity per box would exhaust it at the fifth — and the escrow paths are already box-scoped, so a second identity buys no isolation.
@@ -70,17 +74,20 @@ If you are not an admin of your Infisical organisation, have one run this step.
 
 Pass `--client-id` and `--client-secret` if your organisation's policy is that the CLI creates no identities: the project is still created by you, and the identity you name is added to it.
 
-## Step 3: Export the escrow values
-
-Step 2 wrote them to `k8-secrets/infisical/`. Export them for the scaffold that follows:
+## Step 3: Check what was written
 
 ```bash
-for v in URL PROJECT_ID CLIENT_ID CLIENT_SECRET; do
-  export INFISICAL_ESCROW_$v="$(cat k8-secrets/infisical/INFISICAL_ESCROW_$v)"
-done
+ls ~/.kamarkat/infisical/
 ```
 
-Keep these values somewhere safe outside the box. They are what your box's automation authenticates with; your own access comes from `kakt login`, so you do not need them to operate the box day to day.
+```text
+INFISICAL_ESCROW_URL        INFISICAL_ESCROW_CLIENT_ID
+INFISICAL_ESCROW_PROJECT_ID INFISICAL_ESCROW_CLIENT_SECRET
+```
+
+There is nothing to export. The store belongs to you rather than to a checkout, so every command reads it from any directory — the scaffold that follows picks these up without flags. Set `KAMARKAT_HOME` if this machine keeps state somewhere other than your home directory, and the environment still wins where it is set, which is how CI supplies the same four values.
+
+**Back up `INFISICAL_ESCROW_CLIENT_SECRET` somewhere outside this machine.** It was issued once and cannot be read back, so the copy in that directory is the only one; losing the directory means issuing a new secret. It is what your box's automation authenticates with — your own access comes from `kakt login`, so you do not need it to operate the box day to day.
 
 ## Next
 

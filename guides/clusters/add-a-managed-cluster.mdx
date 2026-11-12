@@ -48,7 +48,7 @@ The management cluster provisions the cluster from this commit, then installs th
 kakt verify --cluster acme-stg-01
 ```
 
-It waits for the cluster to converge and reports what is outstanding. It reads the cluster's kubeconfig from `k8-secrets/kubeconfig/acme-stg-01.kubeconfig`; pass `--kubeconfig` to point elsewhere.
+It waits for the cluster to converge and reports what is outstanding. It reads the cluster's kubeconfig from the box's escrow, using your own `kakt login` session; pass `--kubeconfig` to point elsewhere.
 
 ## Next
 

@@ -16,12 +16,11 @@ kakt tenant scaffold \
   --box acme-inc \
   --domain acme.example \
   --region hel1 \
-  --platform-admin <your-infisical-id> \
   --dry-run
 ```
 
 <Note>
-`--platform-admin` is the one human this box accepts for escrow-backed operations, by Infisical's account id — the `identity` value from [Get started, Step 1](/quickstart/get-started#step-1-sign-in-and-create-your-escrow-account), or `kakt whoami` again. Omit it and the box authorizes no human session at all: every escrow command refuses until you declare one. See [Platform administrator and access](/documentation/escrow/platform-administrator).
+The box accepts one human for escrow-backed operations, and that is **you** — taken from the session you created in [Get started](/quickstart/get-started#step-1-sign-in-and-create-your-escrow-account), and printed as it is used. Pass `--platform-admin <infisical account id>` only to name somebody else. See [Platform administrator and access](/documentation/escrow/platform-administrator).
 </Note>
 
 | Flag | Meaning |
@@ -29,7 +28,7 @@ kakt tenant scaffold \
 | `--tenant` | Your tenant identifier, lower-case. It names the repository and your box. |
 | `--box` | The git organization the repository is created in — `github.com/<box>/<tenant>-gitops`. Not the box's name; that is `--box-id`. |
 | `--domain` | Your base domain. |
-| `--platform-admin` | Infisical's account id for the one human this box accepts for escrow-backed operations. `kakt whoami` prints yours. |
+| `--platform-admin` | The one human this box accepts for escrow-backed operations. Defaults to the signed-in session; pass it only to name somebody else. |
 | `--subdomain` | Optional. A DNS label every hostname sits under; empty publishes on the apex. |
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines. |
 | `--region` | The cloud region your clusters run in. |
@@ -39,20 +38,17 @@ kakt tenant scaffold \
 
 ## Step 2: Scaffold and store your credentials
 
-Run the same command without `--dry-run`, from a shell where you exported your [credentials](/quickstart/prerequisites#step-3-gather-your-credentials):
+Run the same command without `--dry-run`:
 
 ```bash
 kakt tenant scaffold \
   --tenant acme \
   --box acme-inc \
   --domain acme.example \
-  --region hel1 \
-  --platform-admin <your-infisical-id> \
-  --escrow-url "$INFISICAL_ESCROW_URL" \
-  --escrow-project-id "$INFISICAL_ESCROW_PROJECT_ID" \
-  --escrow-client-id "$INFISICAL_ESCROW_CLIENT_ID" \
-  --escrow-client-secret "$INFISICAL_ESCROW_CLIENT_SECRET"
+  --region hel1
 ```
+
+The escrow is not passed. `kakt escrow init` recorded it in `~/.kamarkat/infisical/`, which belongs to you rather than to this checkout, and the scaffold reads it from there. Pass `--escrow-url`, `--escrow-project-id`, `--escrow-client-id` and `--escrow-client-secret` only to use an escrow this machine did not create. The other [credentials](/quickstart/prerequisites#step-3-gather-your-credentials) are prompted for, as below.
 
 The scaffold then:
 

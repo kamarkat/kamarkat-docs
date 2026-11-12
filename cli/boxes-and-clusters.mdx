@@ -17,8 +17,7 @@ kakt tenant scaffold \
   --tenant acme \
   --box acme-inc \
   --domain acme.example \
-  --region hel1 \
-  --platform-admin <your-infisical-id>
+  --region hel1
 ```
 
 <Note>
@@ -40,7 +39,7 @@ Scaffolding happens once. Every change after it is a commit or a pull request. S
 | `--tenant` | Your tenant identifier, lower-case. Required. It names the repository and your box |
 | `--box` | The git organization the repository is created in — `github.com/<box>/<tenant>-gitops`. Required. It is **not** the box's name: that is `--box-id` |
 | `--domain` | Your base domain. Required |
-| `--platform-admin` | Infisical's account id for the one human this box accepts for escrow-backed operations. `kakt whoami` prints yours |
+| `--platform-admin` | The one human this box accepts for escrow-backed operations, by Infisical's account id. Defaults to the signed-in session; pass it only to name somebody else |
 | `--subdomain` | A DNS label every hostname sits under; empty publishes on the apex |
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines |
 | `--region` | The cloud region your clusters run in. Defaults to `hel1` |
@@ -59,7 +58,7 @@ Scaffolding happens once. Every change after it is a commit or a pull request. S
 </Warning>
 
 <Warning>
-**Pass `--platform-admin`.** Without it the repository is rendered with no `platformAdminIdentity`, and a box that declares none authorizes **no** human session — every escrow command against it refuses until you declare one. [Platform administrator and access](/documentation/escrow/platform-administrator) explains why it is an account id rather than an address.
+**The administrator comes from your session.** `kakt login` first, and the box is declared with your account id — printed as it is used. Scaffolding with no session renders a repository that declares none, and a box that declares none authorizes **no** human session until one is added. [Platform administrator and access](/documentation/escrow/platform-administrator) explains why it is an account id rather than an address.
 </Warning>
 
 <Warning>
@@ -282,7 +281,7 @@ Supplies the auth key and hostname a control plane uses to join your tailnet, fo
 kakt configure-tailscale
 ```
 
-Values default to `k8-secrets/tailscale/authkey` and `k8-secrets/tailscale/hostname`, which stay out of git.
+Values default to `~/.kamarkat/tailscale/authkey` and `~/.kamarkat/tailscale/hostname` — this operator's own store, outside every checkout. `TS_AUTHKEY` overrides the first.
 
 ## Check
 
@@ -296,7 +295,7 @@ kakt verify --cluster acme-hub --timeout 15m
 
 | Flag | Meaning |
 | :- | :- |
-| `--cluster` | The cluster to verify. Its kubeconfig is read from `k8-secrets/kubeconfig/<cluster>.kubeconfig` |
+| `--cluster` | The cluster to verify. Its kubeconfig comes from the box's escrow, read with your own `kakt login` session |
 | `--kubeconfig` | Where to reach it, when that is not where Day-0 put it |
 | `--timeout` | How long to wait before reporting what is outstanding. Defaults to 15m |
 

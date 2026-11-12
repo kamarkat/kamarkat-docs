@@ -8,7 +8,7 @@ keywords: ["escrow verify", "verify-recovery", "recovery", "rebuild", "break-gla
 
 Your escrow holds what your box cannot be rebuilt without: master keys, trust roots, and each cluster's break-glass kubeconfig. An escrow cannot be added to a box afterwards, so find out now if it is incomplete.
 
-Every command here reads the escrow from four values:
+Every command here reads the escrow from four values. On the machine that ran `kakt escrow init` they are already in `~/.kamarkat/infisical/` and nothing needs exporting. Anywhere else — another workstation, or CI — supply them:
 
 ```bash
 export INFISICAL_ESCROW_URL=https://app.infisical.com

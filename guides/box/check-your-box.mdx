@@ -17,7 +17,7 @@ kakt verify --cluster acme-01
 
 It checks that nodes are Ready, secret stores valid, secrets synced, Applications Synced and Healthy, and pods Running, and waits up to `--timeout` (15 minutes by default) for them all to hold. It then reports which invariant is outstanding and what it is waiting on, so a cluster still settling reads differently from one that is stuck.
 
-It reads the cluster's kubeconfig from `k8-secrets/kubeconfig/<cluster>.kubeconfig`. Pass `--kubeconfig` to point elsewhere.
+It reads the cluster's kubeconfig from the box's escrow, using your own `kakt login` session — or the working copy at `~/.kamarkat/run/kubeconfig/<cluster>.kubeconfig` while a bootstrap is still in progress. Pass `--kubeconfig` to point elsewhere.
 
 ## Check what a rebuild needs
 

@@ -101,4 +101,4 @@ Once the replacement is serving, you may remove the predecessor's `registry/clus
 
 ## What this does not change
 
-`boxId`, and everything keyed on it: the escrow path holding this box's master keys, the DNS records it owns, and your public hostnames. The repository is reused as it is and is never re-created or re-scaffolded. `environments/` is untouched — an environment belongs to your applications, not to a cluster, so replacing the cluster underneath is not a promotion and no application version moves. Every past cluster's escrow artifacts and database archives stay under their own names.
+`boxId`, and everything keyed on it: the escrow path holding this box's master keys, the DNS records it owns, and your public hostnames. The repository is reused as it is and is never re-created. `environments/` is untouched — an environment belongs to your applications, not to a cluster, so replacing the cluster underneath is not a promotion and no application version moves. Every past cluster's escrow artifacts and database archives stay under their own names.

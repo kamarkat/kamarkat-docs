@@ -1,0 +1,59 @@
+---
+title: "Overview"
+description: "A platform upgrade is a change to the bundle version a cluster declares. The platform publishes a version; your box reconciles it; nothing reaches your infrastructure except through your repository."
+keywords: ["platform upgrade", "bundle version", "promotion", "declaration", "reconcile"]
+---
+
+> Kamarkat publishes a version. Your cluster declares which one it runs. Those are two separate acts, and the second is yours.
+
+The platform is distributed as one versioned artifact — the **bundle**. A cluster consumes it by naming a version and supplying its own values, so what a cluster runs is a line in your repository rather than something applied to it from outside.
+
+## What an upgrade is
+
+Changing the bundle version a cluster declares. That is the whole operation: the declaration changes, your management cluster reconciles the new version, and the cluster converges on it.
+
+What an upgrade is **not**:
+
+- It is not content arriving in your repository. The change is a version, and the bundle's content stays where it is published.
+- It is not a write to your `values.yaml`. Values are yours; defaults belong to the chart.
+- It is not a component bump. The bundle moves as one artifact, and components are declared once inside it.
+- It is not something the platform performs. The platform publishes and may propose; it holds no credential that changes anything running in your box.
+
+## Who does what
+
+| | Platform | You |
+|---|---|---|
+| Publish a bundle version | ✅ | |
+| Record what taking it means — the versions it spans, its security fixes, its declared minimum, whether it is reversible | ✅ | |
+| Decide which clusters take it, and when | | ✅ |
+| Change the version a cluster declares | | ✅ |
+| Reconcile the change | | your management cluster |
+
+## The four pages that follow
+
+<CardGroup cols={2}>
+  <Card title="Core concepts" icon="book" href="/documentation/upgrades/core-concepts">
+    Bundle, bundle version, promotion, and where each kind of cluster declares the version it runs.
+  </Card>
+  <Card title="Promotion" icon="arrow-up-right" href="/documentation/upgrades/promotion">
+    Advancing one cluster from one version to the next, and why each cluster moves on its own.
+  </Card>
+  <Card title="Pre-flight" icon="list-check" href="/documentation/upgrades/pre-flight">
+    The verdict produced inside your box, against the cluster a version targets.
+  </Card>
+  <Card title="Rollback and reversibility" icon="rotate-left" href="/documentation/upgrades/rollback-and-reversibility">
+    Reverting restores a declaration. Whether it restores the cluster depends on the version, which says so beforehand.
+  </Card>
+</CardGroup>
+
+## Three kinds of upgrade
+
+Not every version change is the same size. Which page applies depends on what has to move.
+
+| What moves | Page |
+|---|---|
+| A managed cluster's own platform version | [Managed cluster upgrade](/documentation/upgrades/managed-cluster-upgrade) |
+| The management cluster itself, within one Cluster API contract | [Management cluster upgrade](/documentation/upgrades/management-cluster-upgrade) |
+| The supported Kubernetes and provider versions, including the contract | [Major upgrade](/documentation/upgrades/major-upgrade) |
+
+What the platform does not support is listed once, in [Operational limitations](/documentation/upgrades/operational-limitations).

@@ -27,7 +27,7 @@ Your box creates DNS records and proves domain ownership for its certificates th
 
 ### 3. Store the token on your GitOps repository
 
-`kakt tenant scaffold` stores it for you, prompting with echo disabled if you did not export it. To set it yourself:
+`kakt box init` stores it for you, prompting with echo disabled if you did not export it. To set it yourself:
 
 ```bash
 gh secret set HCLOUD_TOKEN --repo acme-inc/acme-gitops
@@ -37,7 +37,7 @@ gh secret set HCLOUD_TOKEN --repo acme-inc/acme-gitops
 
 ### Region and size
 
-You choose the region when you scaffold (`--region`) and when you add a managed cluster. A managed cluster starts with 2 cloud worker nodes unless you pass `--workers`.
+You choose the region when you create the box (`--region`) and when you add a managed cluster. A managed cluster starts with 2 cloud worker nodes unless you pass `--workers`.
 
 ### Nodes on your own machines
 

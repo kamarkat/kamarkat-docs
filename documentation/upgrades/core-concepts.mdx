@@ -1,0 +1,55 @@
+---
+title: "Core concepts"
+description: "The bundle is one versioned artifact. Each cluster declares the version it runs, in its own file, and an upgrade moves the version and nothing else."
+keywords: ["bundle", "bundle version", "promotion", "bundle.yaml", "environmentRevision", "minimum version"]
+---
+
+> One version names the whole platform. A cluster declares one, and that declaration is the record of what it runs.
+
+Boxes, management clusters, managed clusters, `boxId` and `clusterName` are defined in [Core concepts](/documentation/core-concepts) and are not repeated here.
+
+## The words
+
+| Term | Meaning |
+|---|---|
+| **Bundle** | The complete set of platform content at one revision — the types, the charts, the controllers, the policy |
+| **Bundle version** | The tag naming one bundle. It is published as a chart, and a published version stays resolvable |
+| **Promotion** | Advancing one cluster from one bundle version to the next |
+| **Declaration** | The file in your repository that says what a cluster is and which version it runs |
+
+A cluster consumes the bundle by **naming a version and supplying values**. So a declaration is a version and the values beside it, never a copy of the bundle's content — which is what lets the platform keep maintaining that content while your values stay yours.
+
+## Where the version is declared
+
+The two kinds of cluster declare it in different files, because they are reconciled by different things.
+
+| Cluster | File | Field |
+|---|---|---|
+| Management cluster | `registry/clusters/<cluster>/bundle.yaml` | `targetRevision`, and `bundleVersion` beside it — the same value in both |
+| Managed cluster | `registry/clusters/<cluster>/values.yaml` | `environmentRevision` |
+
+<Note>
+**Two fields, one value, on the management cluster.** `targetRevision` decides which chart is pulled; `bundleVersion` tells that chart which version it is. They must agree, and a promotion changes both together.
+</Note>
+
+## What an upgrade moves
+
+The bundle, as one artifact. Not a component inside it: component versions are declared once, within the bundle, and a cluster cannot advance one of them on its own. This is deliberate — a platform where each component moved independently would have as many supported combinations as it had components.
+
+A promotion never writes a values file. A version that needed a values change to be usable would be a version nobody could take without negotiating it first.
+
+## What a version records about itself
+
+Taking a version is a decision, so the version carries what the decision needs:
+
+- **The versions it spans** from its predecessor, and the security fixes among them.
+- **The minimum version it may be taken from.** A cluster below that takes an intermediate version first.
+- **Whether its predecessor is operationally restorable from it** — see [Rollback and reversibility](/documentation/upgrades/rollback-and-reversibility).
+
+<Tip>
+`latest` is not a target. A cluster names a version; nothing resolves "the newest" on its behalf, which is why a cluster's declaration is a complete answer to what it runs.
+</Tip>
+
+## The version a new cluster starts on
+
+A box records the bundle version it was created on, and a cluster declared in that box starts there unless its declaration says otherwise. The CLI carries the version it was built for, and that is where the box's first value comes from.

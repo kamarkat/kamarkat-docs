@@ -1,6 +1,6 @@
 ---
 title: "Prerequisites"
-description: "The accounts, tools and credentials you need before you scaffold a box."
+description: "The accounts, tools and credentials you need before you create a box."
 keywords: ["prerequisites", "kakt cli", "install", "credentials", "domain"]
 ---
 
@@ -40,14 +40,22 @@ The example downloads `kakt-linux-amd64`. Each release also publishes `kakt-linu
 
 ## Step 3: Gather your credentials
 
-Day-0 runs under secrets stored on your GitOps repository. Gather these now. You pass them to `kakt tenant scaffold`, which stores them on the repository it creates.
+Day-0 runs under secrets stored on your GitOps repository. [`kakt box init`](/quickstart/create-your-box) collects them for you — one step each, opening the page that issues the credential and waiting while you create it — and stores them on the repository it creates. So this is what to expect to be asked for, not a list to assemble in advance.
+
+One exception is worth doing first, because it is needed before the repository exists.
+
+### Before you create the box
+
+| Credential | What it is |
+| :- | :- |
+| `GITHUB_ORG_SETUP_TOKEN` | **Yours, not the box's.** The credential that creates the repository in your git organization, so it is needed before any repository secret can be set. Either an App installation token, which is preferred because the access stays yours to revoke, or a personal access token with the `repo` scope — supply whichever you have and nothing else changes. `kakt box init` asks for it and keeps it on this machine, so you supply it once per machine rather than once per box. |
 
 ### Required
 
 | Secret | What it is |
 | :- | :- |
 | `HCLOUD_TOKEN` | Your cloud API token, read and write. Your clusters are created with it. It is enrolled into your box's escrow on the first bootstrap and read from there afterwards, so you supply it once. |
-| `GITOPS_TOKEN` | Write access to your git organization's repositories, plus that organization's **Secrets: write** permission. Day-0 commits what it generates with it, and your application builds inherit it. |
+| `GITOPS_REPO_WRITE_TOKEN` | Write access to your git organization's repositories, plus that organization's **Secrets: write** permission. Day-0 commits what it generates with it, and your application builds inherit it. |
 | `INFISICAL_ESCROW_URL`, `INFISICAL_ESCROW_PROJECT_ID`, `INFISICAL_ESCROW_CLIENT_ID`, `INFISICAL_ESCROW_CLIENT_SECRET` | Your escrow. You create these on the [next page](/quickstart/get-started) — nothing to gather in advance. Scaffolding refuses without them, because an escrow cannot be added after the fact. |
 
 ### Required for what your box runs
@@ -56,9 +64,17 @@ Scaffolding refuses if a capability your box selects has no credential.
 
 | Secret | What it is for |
 | :- | :- |
-| `INFISICAL_ADMIN_EMAIL`, `INFISICAL_ADMIN_PASSWORD` | Administering your box's own secret store. There is no default. |
 | `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Backups of the platform database. |
 | `GHCR_USERNAME`, `GHCR_TOKEN` | Pulling your own private images. The platform's images are public. |
+
+### Supplied for you
+
+You are not asked for these, and you do not need to invent them.
+
+| Secret | Where it comes from |
+| :- | :- |
+| `INFISICAL_ADMIN_EMAIL` | The account you signed in with. Your box runs its own Infisical, separate from your escrow, and this is the address its administrator account is created for. Set `INFISICAL_ADMIN_EMAIL` only to name somebody else. |
+| `INFISICAL_ADMIN_PASSWORD` | Generated, written to your escrow, and set on your repository in one step. It is recovered from the escrow rather than from memory, which is also what lets a second run re-enter an Infisical the first one created. |
 
 ### Optional
 
@@ -69,7 +85,7 @@ Scaffolding refuses if a capability your box selects has no credential.
 | `TS_AUTHKEY` | Only if the box accepts nodes on your own premises, which join over your tailnet. |
 
 <Tip>
-Export each value as an environment variable of the same name in the shell you will scaffold from. The scaffold reads them from there and stores them on your repository. It never prints or keeps them.
+Export each value as an environment variable of the same name in the shell you will run `kakt box init` in. It reads them from there and stores them on your repository. It never prints or keeps them.
 </Tip>
 
 ## Next

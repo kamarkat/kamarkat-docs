@@ -1,0 +1,135 @@
+---
+title: "Create your box"
+description: "One command collects the credentials your box is built with and creates your GitOps repository; a second declares its management cluster."
+keywords: ["kakt box init", "kakt tenant add-management", "gitops repository", "box", "repository secrets"]
+---
+
+A box outlives every cluster in it, so the box is what you create and a cluster is a declaration you add to it. Two commands, in this order:
+
+```bash
+kakt box init --tenant acme --box acme-inc --domain acme.example --region hel1
+cd acme-gitops
+kakt tenant add-management --name acme-hub
+```
+
+`kakt box init` creates `<org>/<tenant>-gitops` in your git organization and renders it from the platform template, with **no clusters**. It writes only the facts unique to you: your tenant, that git organization, your domain, your region, and your box's permanent identity. This happens once; every change after it is a commit or a pull request.
+
+## Step 1: What the box is built with
+
+Before anything is created, the command shows you every credential your box needs and asks for the ones it does not have. Each one gets a numbered step: what it is for, the page that issues it, a browser opened on that page, and a prompt that waits while you create it.
+
+```text
+What this box is built with. Present values are left alone.
+  ✓ GITHUB_ORG_SETUP_TOKEN         present    yours, creates the repository in the tenant's organisation
+  · HCLOUD_TOKEN                   to obtain  creates this box's clusters, in your own cloud account
+  · GITOPS_REPO_WRITE_TOKEN        to obtain  Day-0 commits what it generates with it, and builds inherit it
+  · S3_ACCESS_KEY_ID               to obtain  backups of the platform database
+  · S3_SECRET_ACCESS_KEY           to obtain  backups of the platform database
+  · GRAFANA_IRM_ALERTMANAGER_URL   to obtain  paging on this box's critical and warning alerts through your IRM
+  · GRAFANA_IRM_HEARTBEAT_URL      to obtain  being paged when this box's hub stops reporting (ADR-078 add.5 §5)
+  · ZITADEL_SMTP_URL               to obtain  the identity provider sending verification and password-reset mail
+  ✓ INFISICAL_ESCROW_* (4)         present    where this box's master keys are kept (4/4)
+
+7 credential(s) to obtain. Each one opens the page that issues it.
+What is already set -- in the environment, or from a previous run -- is skipped.
+
+[1/7] HCLOUD_TOKEN -- creates this box's clusters, in your own cloud account
+        https://console.hetzner.cloud/
+        Open the project this box's servers belong in
+        Security > API tokens > Generate API token
+        Permissions: Read & Write -- it creates and destroys servers
+        HCLOUD_TOKEN:
+        kept in /Users/you/.kamarkat/hetzner/token (mode 0600), so this is asked once per machine
+```
+
+Nothing is echoed as you type it, and each value is written with mode `0600`. The last three are destinations rather than credentials — where this box sends its alerts and its mail — and you can press enter to skip one; the box then runs without that capability and says so.
+
+**Nothing is created until the set is complete.** A run that stops leaves what you have already given staged under `~/.kamarkat/`, and re-running asks only for what is still missing. Re-running is the normal way to use this command.
+
+<Note>
+Two credentials are never asked for. The administrator of your box's own Infisical takes its address from the session you created in [Get started](/quickstart/get-started#step-1-sign-in-and-create-your-escrow-account), and its password is generated and written to your escrow in step 3 — there is nothing to invent or remember.
+</Note>
+
+## Step 2: The box
+
+Once the set is complete, the same run creates the repository:
+
+```text
+[box] platform administrator: you@acme.example (6e1f…)
+[box] rendered acme-gitops into acme-gitops
+[box] authenticating as the platform (personal access token)
+[box] created acme-inc/acme-gitops
+[box] pushed to https://github.com/acme-inc/acme-gitops
+[box] ✓ HCLOUD_TOKEN set on acme-inc/acme-gitops
+…
+acme-inc/acme-gitops is a box, with no clusters.
+  registry/box.yaml declares it: boxId acme-hub, domain acme.example.
+  A checkout is at acme-gitops.
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--tenant` | Your tenant identifier, lower-case. It names the repository and your box. |
+| `--box` | The git organization the repository is created in — `github.com/<box>/<tenant>-gitops`. Not the box's name; that is `--box-id`. |
+| `--domain` | Your base domain. |
+| `--box-id` | Your box's permanent identity, pinned forever. Defaults to `<tenant>-hub`. |
+| `--platform-admin` | The one human this box accepts for escrow-backed operations. Defaults to the signed-in session; pass it only to name somebody else. |
+| `--subdomain` | Optional. A DNS label every hostname sits under; empty publishes on the apex. |
+| `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines. |
+| `--region` | The cloud region your clusters run in. |
+| `--workers` | Cloud worker nodes a cluster of this box starts with. Defaults to 2. |
+| `--bundle-version` | The platform version the box starts on. A released CLI defaults to the version it carries; an unreleased build refuses rather than guess. |
+| `--dry-run` | Render locally and create nothing, which is how to see what you will receive. |
+| `--no-prompt` | Never ask: every credential comes from the environment or `~/.kamarkat/`. For automation. |
+| `--out` | The checkout to leave behind. Defaults to `./<tenant>-gitops`. |
+
+Pass `--escrow-url`, `--escrow-project-id`, `--escrow-client-id` and `--escrow-client-secret` only to use an escrow this machine did not create, or the credential flags to create a box whose secrets are not staged on this machine.
+
+## Step 3: Its management cluster
+
+Run the second command inside the checkout:
+
+```bash
+cd acme-gitops
+kakt tenant add-management --name acme-hub
+```
+
+It renders `registry/clusters/acme-hub/` from the box's own declaration — your domain, your escrow, your provider and region — then generates this box's Infisical administrator password, writes it to your escrow, and sets it on the repository. A later run reads the escrowed one back rather than minting a second over the live instance.
+
+```text
+box acme-hub
+declared management cluster acme-hub:
+  registry/clusters/acme-hub/bundle.yaml
+  registry/clusters/acme-hub/values.yaml
+  …
+[box] generated this box's Infisical administrator (you@acme.example) and escrowed it
+[box] ✓ INFISICAL_ADMIN_EMAIL set on acme-inc/acme-gitops
+[box] ✓ INFISICAL_ADMIN_PASSWORD set on acme-inc/acme-gitops
+
+Commit and push, then create it:
+  gh workflow run bootstrap-cluster -f cluster=acme-hub
+```
+
+`--provider`, `--region`, `--bundle-version` and `--workers` override what the box declares, for this cluster only. Everything else — the domain, the escrow, the administrator — is the box's and is not a per-cluster choice.
+
+Committing declares the cluster. Nothing builds it until you dispatch that workflow, which costs money and takes hours.
+
+## What is in your repository
+
+```text
+acme-gitops/
+├── registry/box.yaml              what this box IS: boxId, domain, escrow, and the defaults its clusters start from
+├── registry/clusters/<cluster>/   one directory per cluster: bundle.yaml (version), values.yaml (yours)
+├── environments/<env>/<app>/      one directory per application, added in "Run your first app"
+└── templates/                     what you copy to add a cluster, an app or a workload
+```
+
+Two workflows come with it. **Bundle pre-flight** judges an upgrade proposal against the cluster it targets. **Cluster removal** reviews a commit that removes a managed cluster's declaration — which is what destroys that cluster — so the branch your management cluster reconciles should require review and that check.
+
+The platform version in `bundle.yaml` changes only through upgrade proposals. Its `repoURL` names the registry the platform's charts are pulled from, and changes if that registry moves. `values.yaml` holds only what you change from the defaults.
+
+## Next
+
+<Card title="Bootstrap your box" icon="play" href="/quickstart/bootstrap-your-box">
+  Follow Day-0 as it builds your clusters.
+</Card>

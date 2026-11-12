@@ -19,8 +19,8 @@ Each row links to the page that describes it in detail.
 | | Kamarkat | You |
 | :- | :- | :- |
 | **[Platform content](/features/box/bundle)** | Publishes each bundle version with its defaults | Choose the version each cluster runs |
-| **[GitOps repository](/features/admin/git-connection)** | Provides the template it is scaffolded from | Own it: your values, cluster declarations and app declarations |
-| **[Upgrades](/versions/upgrades)** | Publishes new versions | Your automation proposes them; you merge |
+| **[GitOps repository](/features/admin/git-connection)** | Provides the template it is created from | Own it: your values, cluster declarations and app declarations |
+| **[Upgrades](/versions/overview)** | Publishes new versions | Take them by changing the version your cluster pins |
 | **[Application repositories](/features/workloads/deploying-applications)** | Publishes the `platform-workload` library chart | Own your source, charts, images and CI |
 
 ## Agentic operations layer
@@ -42,7 +42,7 @@ Agentic operations do not add a second authority. An agent works through the sam
 | **[Management cluster](/features/capabilities/cluster-lifecycle)** | Ships the platform services it runs | Create it with Day-0, from your own CI |
 | **[Managed clusters](/features/capabilities/cluster-lifecycle)** | Ships the cluster template and the platform services | Declare them; your management cluster provisions them |
 | **[Secrets](/features/capabilities/secret-management)** | Ships the secret store and delivery | Supply the secrets only you can choose |
-| **[Escrow](/documentation/escrow/overview)** | Ships the commands that create the escrow project, enrol credentials, and verify and recover from it | Own the escrow and create it before scaffolding; recovery artefacts are written by Day-0 and by the box as it runs |
+| **[Escrow](/documentation/escrow/overview)** | Ships the commands that create the escrow project, enrol credentials, and verify and recover from it | Own the escrow and create it before the box; recovery artefacts are written by Day-0 and by the box as it runs |
 
 ## Application layer
 

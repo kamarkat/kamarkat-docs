@@ -1,10 +1,10 @@
 ---
 title: "Upgrade your box"
-description: "Merge the pull request your Renovate opens, or set the version in a cluster's bundle.yaml yourself. Each cluster upgrades on its own."
-keywords: ["upgrade", "platform version", "bundle.yaml", "renovate", "preflight"]
+description: "Set the version in a cluster's bundle.yaml and push. Each cluster upgrades on its own."
+keywords: ["upgrade", "platform version", "bundle.yaml", "preflight", "rollback"]
 ---
 
-> A platform upgrade is a change to one cluster's `bundle.yaml`. Nothing changes until you merge it.
+> A platform upgrade is a change to one cluster's `bundle.yaml`. Nothing changes until that change is in the branch your management cluster reconciles.
 
 Each cluster pins its platform version in `registry/clusters/<cluster>/bundle.yaml`, on two fields: `targetRevision` and `bundleVersion`. Upgrading a cluster is changing both. Each cluster is upgraded on its own, so you can take a version on `dev` before `prod`.
 
@@ -27,9 +27,7 @@ It checks the version's minimum permits the step, that the version is published 
 
 ## Step 3: Change the version
 
-Your Renovate opens a pull request for each new version, changing those two fields and nothing else. Merge it.
-
-To take a version Renovate did not propose, make the same change yourself:
+Set both fields to the version you are taking, and nothing else:
 
 ```yaml registry/clusters/acme-hub/bundle.yaml
 targetRevision: <version>
@@ -40,10 +38,14 @@ bundleVersion: <version>
 git commit -am "Upgrade acme-hub to <version>" && git push
 ```
 
+The upgrade carries none of the bundle's content and never touches your
+`values.yaml`. Your management cluster pulls the bundle chart at the new version
+and reconciles from it.
+
 ## Step 4: Verify
 
 ```bash
 kakt verify --cluster acme-hub
 ```
 
-To decline a version, close its pull request. The cluster stays on the version it pins.
+To decline a version, change nothing. The cluster stays on the version it pins, and a version you did not take is not a version you have to take later: any version may be taken from any earlier one at or above its declared minimum.

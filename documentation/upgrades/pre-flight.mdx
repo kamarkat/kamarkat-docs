@@ -1,0 +1,43 @@
+---
+title: "Pre-flight"
+description: "The judgement about whether a version is safe for one cluster is made inside your box, against that cluster. Three outcomes, and the third is the point."
+keywords: ["pre-flight", "verdict", "unverified", "kakt proposal preflight", "minimum version"]
+---
+
+> Whether a version is safe for **this** cluster is a question only something standing next to the cluster can answer. That is what pre-flight is.
+
+Release notes say what a version contains. They cannot say whether the cluster in front of you can take it. The platform cannot say either — it holds no access to your cluster and under the platform boundary never will.
+
+## What it checks
+
+```bash
+kakt proposal preflight --candidate <version> --cluster acme-hub
+```
+
+Three things, all about this cluster and this candidate:
+
+1. **The declared minimum permits the step this cluster is taking.** The version records the minimum it may be taken from; the cluster's current version either satisfies it or does not.
+2. **The candidate is actually published where this box pulls from.** A version that resolves for the platform and not for your box is a declaration that cannot reconcile.
+3. **The cluster is reconciling now.** A cluster that is not converging on what it already declares is not a cluster to give a new declaration to.
+
+## Three outcomes
+
+| Outcome | Meaning |
+|---|---|
+| **pass** | The checks ran and the cluster can take the candidate |
+| **fail** | The checks ran and it cannot. Exits non-zero, so your own branch protection can act on it |
+| **unverified** | The check could not run |
+
+<Warning>
+**Unverified is not a pass.** A verdict that quietly became "fine" when it could see nothing would be indistinguishable, to whoever accepts it, from one that actually looked. A run with no access to the cluster returns unverified and says what that means — which is the honest answer, and not a failure.
+</Warning>
+
+## Where it runs
+
+Inside your box, in your own CI, under your own secrets. The verdict is the only thing that leaves. The repository created with your box carries the **Bundle pre-flight** workflow, which produces the verdict for a proposed version and fails the check when the verdict says not to take it.
+
+## What it does not do
+
+- It does not apply anything. It produces a verdict; the promotion is still a change to a declaration.
+- It does not judge your applications. It judges a cluster against a candidate platform version.
+- It does not replace the version's own record of what it means to take it. Read that too — see [Core concepts](/documentation/upgrades/core-concepts#what-a-version-records-about-itself).

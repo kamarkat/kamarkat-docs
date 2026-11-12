@@ -69,7 +69,7 @@ An environment is a workload concern — `dev`, `stg`, `prod` — and it belongs
 
 ### The repository is the box's record
 
-One GitOps repository is one box, and it is reused for the life of the box. It is created once, by `kakt tenant scaffold`, and never scaffolded again — a replacement cluster is an edit to the repository that already exists.
+One GitOps repository is one box, and it is reused for the life of the box. It is created once, by `kakt box init`, and never created again — a replacement cluster is an edit to the repository that already exists.
 
 ### A declaration is not an existence
 
@@ -91,10 +91,10 @@ The management cluster watches that path and generates two Applications per clus
 
 ### Normal creation
 
-The box has no management cluster holding infrastructure. You scaffold the repository, declare the cluster, and build it:
+The box has no management cluster holding infrastructure. You create the box, declare the cluster, and build it:
 
 ```bash
-kakt tenant scaffold --tenant acme --box acme-inc --domain acme.example
+kakt box init --tenant acme --box acme-inc --domain acme.example
 gh workflow run bootstrap-cluster -f cluster=acme-hub
 ```
 

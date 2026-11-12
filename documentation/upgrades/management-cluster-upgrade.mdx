@@ -1,0 +1,47 @@
+---
+title: "Management cluster upgrade"
+description: "A management cluster is replaced, not upgraded in place. The box keeps its identity, the replacement takes a new name, and only one of them holds infrastructure at a time."
+keywords: ["management cluster", "succession", "boxId", "clusterName", "clusterctl move", "replacement"]
+---
+
+> A hub is replaced, not upgraded. The box outlives it, which is what makes the replacement safe.
+
+Some upgrades cannot be reconciled into the management cluster that is running. When the cluster itself has to change, the box stays and the cluster is succeeded.
+
+## What stays and what changes
+
+| | |
+|---|---|
+| **`boxId` stays** | It keys the escrow path holding this box's master keys and the DNS records it owns. Nothing already written under it is orphaned |
+| **`clusterName` changes** | The replacement takes a name the box has never used. That name keys the cluster's own objects, its nodes and its database's archive prefix |
+| **The repository is reused** | As it is. It is not re-created, and no past cluster's escrow artifacts or archives are deleted by the replacement |
+
+The replacement is a new declaration beside the old one rather than an edit of it. During a planned succession both declarations exist at once, which is what makes the change reversible up to the switchover: the predecessor keeps serving while the successor is verified against real restored data.
+
+## One holds infrastructure at a time
+
+A box may have many management clusters across its life. **Two of them owning management infrastructure simultaneously is not a succession** — it is two control planes reconciling one repository, each provisioning the other's clusters under names already taken and each archiving its database to a prefix the other is writing.
+
+So the bootstrap of a replacement is admitted only when no other incarnation of the box still owns provider resources, and the **provider's inventory is the authority** that decides. Not the repository, which outlives every incarnation by design and proves only that a cluster was wanted. Not the escrow, which holds a predecessor's artifacts deliberately. Not the Kubernetes API, which answers only while the cluster is healthy — and an unreachable API is also the state of a cluster whose servers are running and whose control plane is wedged.
+
+<Note>
+**Declaring is not building.** You may declare the replacement at any time; what is refused is standing it up while the predecessor still owns servers. Infrastructure owned by the cluster *being* created is an earlier attempt at the same one, so continuing is a retry and is allowed — and reported.
+</Note>
+
+## Ordering
+
+The management cluster goes last, and it does not cascade. A replacement is refused while any managed cluster the box declares still owns provider resources: built anyway, it would leave those clusters unmanaged and still billing, then rebuild them from the claims still in the repository under the names they already hold.
+
+So the order is: retire or move the managed clusters, then the management cluster.
+
+## What the platform transfers, and what it does not
+
+`clusterctl move` is the supported transfer for a planned succession, and it is supported only there: it needs a reachable source. It relocates the management objects together with the Secrets labelled for move, which is why a planned succession needs no reconstruction of the cluster's PKI.
+
+Both incarnations share the box's escrow scope and write their own incarnation-scoped artifacts; neither overwrites the other's. DNS record ownership belongs to `boxId`, so the successor adopts the zone's records rather than re-keying them, and the handover is sequenced — the predecessor withdraws before the successor publishes.
+
+<Warning>
+**The overlapping sequence is a contract, not a workflow.** The declaration is a command and the one-owner rule is enforced, but nothing drives two live clusters through a switchover for you. A succession today is declared, then performed under that rule.
+</Warning>
+
+For the task, see [Replace a management cluster](/guides/box/replace-a-management-cluster).

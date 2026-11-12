@@ -16,6 +16,7 @@ Path: `/hub-operator/<boxId>`. Permanent, shared by every management cluster the
 |---|---|---|
 | `infisical-master-keys` | the box's own secret store | the store is encrypted with them, and its database is restored from backups the store holds the credential for. Inside the box, that is a circle |
 | `zitadel-masterkey` | the box's identity provider | without it, a restored identity database is unreadable and nobody can log in to the box they just rebuilt |
+| `infisical-admin-credential` | the administrator of the box's own secret store | it is generated once, and a rebuilt box restores a database that already holds that account — a successor needs the password its predecessor was created with |
 | `backup-ssec-key` | the management-state backups | the archive is encrypted with it. Kept outside the box because a key stored in what it protects protects nothing |
 | `backup-store-credential` | reaching the backup bucket | the credential that reaches the backups cannot live in the database those backups restore |
 | `provider-credential-hetzner` | your cloud account | first bootstrap has no cluster yet, and teardown and inventory must work when the cluster cannot be reached |

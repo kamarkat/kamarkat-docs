@@ -22,7 +22,7 @@ You supply both. Cloud credentials stay in your box and are never given to Kamar
 
 ### 2. Scaffold your GitOps repository
 
-`kakt tenant scaffold` creates `<tenant>-gitops` in your git organization. It writes only the facts unique to you: your tenant, that git organization, your domain, region and cluster names.
+`kakt box init` creates `<tenant>-gitops` in your git organization, with no clusters. It writes only the facts unique to you: your tenant, that git organization, your domain, your region and your box's permanent identity. Its management cluster is declared next, with `kakt tenant add-management`.
 
 ### 3. Run Day-0
 

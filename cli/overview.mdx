@@ -4,13 +4,13 @@ description: "The kakt CLI: every command it supports, and the conventions they 
 keywords: ["kakt", "cli", "commands", "reference"]
 ---
 
-> `kakt` is the one tool you run against your box. It scaffolds your GitOps repository, creates your management cluster, supplies your applications' secrets, and reaches your escrow when nothing else can.
+> `kakt` is the one tool you run against your box. It creates your box and its GitOps repository, declares your management cluster, supplies your applications' secrets, and reaches your escrow when nothing else can.
 
 ## What it is
 
 Every command runs under your own credentials, from your machine or your own CI. The CLI holds no state of its own: it reads your GitOps repository and your clusters, and writes to them. Nothing it does reaches Kamarkat.
 
-The binary carries the platform version it was built for. A box starts on the version the CLI that scaffolded it carried, and moves only through an upgrade proposal you accept.
+The binary carries the platform version it was built for. A box starts on the version the CLI that created it carried, and moves only through an upgrade proposal you accept.
 
 ## Install it
 
@@ -50,7 +50,8 @@ Reading the escrowed kubeconfig gives you **cluster-admin**, because that is wha
 
 | Command | What it does |
 | :- | :- |
-| `kakt tenant scaffold` | Create your GitOps repository and start Day-0 |
+| `kakt box init` | Collect the credentials a box is built with, one guided step each |
+| `kakt box init` | Create your box: its GitOps repository, with no clusters |
 | `kakt tenant add-cluster` | Declare an additional managed cluster |
 | `kakt tenant set-gitops-token` | Publish the credential your application builds use |
 | `kakt bootstrap-mgmt` | Create the management cluster, as one step rather than a whole box |
@@ -165,7 +166,7 @@ No command takes a secret value as a flag. Values arrive on a prompt with echo d
 | Flag | What it names |
 | :- | :- |
 | `--cluster` | The cluster the command acts on |
-| `--box` | The logical box the escrow is keyed by. It is pinned at scaffold and never changes, so escrow artefacts stay findable across a rebuild |
+| `--box` | The logical box the escrow is keyed by. It is pinned when the box is created and never changes, so escrow artefacts stay findable across a rebuild |
 | `--kubeconfig` | Where to reach the cluster, when it is not where Day-0 put it |
 | `--repo` | The root of your GitOps repository, which defaults to the current directory |
 

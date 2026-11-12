@@ -1,0 +1,47 @@
+---
+title: "Major upgrade"
+description: "When a release moves the supported Kubernetes and provider versions, the box is replaced rather than upgraded: a new box prepared beside the old one, and a deliberate cutover."
+keywords: ["major upgrade", "box replacement", "boxId", "cutover", "contract", "teardown"]
+---
+
+> A major release replaces the box. The predecessor keeps serving while the replacement is built, and you move to it deliberately.
+
+A bundle version normally moves within one Cluster API contract, and is reconciled into the clusters you already have. A release that moves the supported Kubernetes and provider versions — including that contract — is different: what the predecessor recorded cannot be carried into it, so there is nothing to upgrade in place.
+
+## Why it is a replacement
+
+A cluster's recovery material is restorable only into a successor serving the **same** contract. Restoring objects written under one contract into a platform whose providers have moved to another is a conversion, not a restore, and the platform does not do it.
+
+That closes both of the other routes: the version cannot be reconciled into the existing clusters, and it cannot be reached by a succession that depends on transferring the predecessor's object graph. What remains is a new box.
+
+## The shape of it
+
+1. **The predecessor keeps running.** Its applications and databases keep serving while the replacement is prepared.
+2. **A new box is created on the target version**, with a **distinct `boxId`**, its own repository, and its own cluster names.
+3. **Desired state is reconstructed**, not copied: the new bundle supplies the platform's content and your own declarations supply everything that is yours.
+4. **Durable state is transferred by the authority that owns it** — database replication or backups for application data, the escrow for what cannot be regenerated.
+5. **The cutover is explicit.** Which box serves production traffic is a decision you take, after the replacement has been verified.
+6. **The predecessor is retired** through the ordinary teardown contract, once the cutover is done and any retention obligation is satisfied.
+
+<Warning>
+**The predecessor's management object graph is never transplanted.** What another authority recreates is not carried across, and under a changed contract the predecessor's cluster and provider objects are exactly that.
+</Warning>
+
+## What a distinct `boxId` does and does not isolate
+
+A distinct `boxId` separates what is keyed **by the box**: the escrow paths holding its master keys, and the DNS owner id its records carry. That is what makes preparing a replacement beside a serving box safe at all.
+
+It separates nothing else, and the limit matters more than the guarantee:
+
+| Must be independent | Keyed by |
+|---|---|
+| Escrow scope and recovery material | `boxId` |
+| DNS record ownership | `boxId` |
+| Infrastructure ownership | the repository's own cluster declarations — a replacement pointed at the predecessor's repository would provision the predecessor's clusters |
+| Cluster and archive identities | `clusterName` — a name the other box has used is a collision |
+
+Shared production data and public hostnames are **not** isolated by identity. One database serving both boxes, or one hostname pointing at one of them, is a single resource whichever box is asking. So the cutover has to state, for each of those, when the old writer stops and the new one begins — and once the new box has taken a durable write, going back is a data decision rather than a routing one.
+
+## What is out of scope
+
+Preserving the predecessor's running managed clusters. A replacement box provisions its own from your declarations; adopting live clusters that serve a different contract is the conversion this page began by ruling out. The rest of what the platform does not do here is in [Operational limitations](/documentation/upgrades/operational-limitations).

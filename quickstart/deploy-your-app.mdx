@@ -46,14 +46,14 @@ Add a job to your application's CI that:
 1. Builds and pushes the image.
 2. Packages the chart with the image **digest** as its `appVersion`.
 3. Pushes the chart to `oci://ghcr.io/acme-inc/charts`.
-4. Clones the GitOps repository with `GITOPS_TOKEN` and sets the new version in `environments/dev/shop/frontend/Chart.yaml`.
+4. Clones the GitOps repository with `GITOPS_REPO_WRITE_TOKEN` and sets the new version in `environments/dev/shop/frontend/Chart.yaml`.
 5. Commits and pushes.
 
 ```bash
 helm package charts/frontend --version "$VERSION" --app-version "$IMAGE_DIGEST"
 helm push "frontend-${VERSION}.tgz" oci://ghcr.io/acme-inc/charts
 
-git clone "https://x-access-token:${GITOPS_TOKEN}@github.com/acme-inc/acme-gitops.git" gitops
+git clone "https://x-access-token:${GITOPS_REPO_WRITE_TOKEN}@github.com/acme-inc/acme-gitops.git" gitops
 yq -i ".dependencies[0].version = \"${VERSION}\"" gitops/environments/dev/shop/frontend/Chart.yaml
 git -C gitops commit -am "shop/frontend ${VERSION}" && git -C gitops push
 ```

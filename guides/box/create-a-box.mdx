@@ -1,7 +1,7 @@
 ---
 title: "Create a box"
 description: "A box has one management cluster, built once by Day-0 from your own CI. Every cluster after it is a commit."
-keywords: ["box", "management cluster", "day-0", "scaffold", "bootstrap", "kakt tenant scaffold"]
+keywords: ["box", "management cluster", "day-0", "bootstrap", "kakt box init", "kakt tenant add-management"]
 ---
 
 > One management cluster per box, built once by Day-0. Everything after it is a commit.
@@ -23,7 +23,7 @@ Day-0 creates cloud servers, billed to your account, and runs for a few hours. I
 ## Step 1: Scaffold your GitOps repository
 
 ```bash
-kakt tenant scaffold \
+kakt box init \
   --tenant acme \
   --box acme-inc \
   --domain acme.example \
@@ -39,9 +39,9 @@ Two values are easy to mix up, because `--box` means something different here th
 The one human this box accepts for escrow-backed operations is taken from your `kakt login` session and printed as it is used. Pass `--platform-admin` only to name somebody else.
 </Note>
 
-Add `--dry-run` first to see the repository without creating anything. The management cluster is named `<tenant>-hub` unless you pass `--cluster`. A released CLI starts the box on the version it carries; an unreleased build has none to offer and refuses, so pass `--bundle-version` with a published version, or `development` to read charts from your current branch. Every flag, and the escrow and credential flags a real run needs, are in [Scaffold your repository](/quickstart/scaffold-your-repository).
+Add `--dry-run` first to see the repository without creating anything. The box's identity is `<tenant>-hub` unless you pass `--box-id`, and its management cluster is declared separately with `kakt tenant add-management`. A released CLI starts the box on the version it carries; an unreleased build has none to offer and refuses, so pass `--bundle-version` with a published version, or `development` to read charts from your current branch. Every flag, and the escrow and credential flags a real run needs, are in [Create your box](/quickstart/create-your-box).
 
-The scaffold creates the repository, stores your credentials on it as secrets, and starts Day-0.
+It creates the repository with no clusters and stores your credentials on it as secrets. Declare the management cluster next, with `kakt tenant add-management --name <cluster>`, then commit it and dispatch the repository's bootstrap workflow.
 
 ## Step 2: Let Day-0 run
 

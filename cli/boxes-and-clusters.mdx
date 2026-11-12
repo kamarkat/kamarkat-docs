@@ -1,19 +1,35 @@
 ---
 title: "Boxes and clusters"
 description: "Scaffold a box, create its clusters, check that they converge, and take them down."
-keywords: ["kakt tenant", "scaffold", "verify", "teardown", "reseed", "proposal"]
+keywords: ["kakt box init", "kakt tenant", "verify", "teardown", "reseed", "proposal"]
 ---
 
 > These commands create a box and the clusters in it, confirm they converged, and destroy them. Everything they write lands in your GitOps repository or your own cloud account.
 
 ## Create
 
-### kakt tenant scaffold
+### kakt box init
 
-Creates `<box>/<tenant>-gitops`, renders it from the platform template, stores your credentials on it as repository secrets, and starts Day-0.
+Collects the credentials a box is built with, before anything exists to hold them. Each one that is missing gets a numbered step: what it is for, the page that issues it, the browser opened on that page, and a prompt that waits while you create it.
 
 ```bash
-kakt tenant scaffold \
+kakt box init
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--provider` | Which credentials this box needs: `hetzner` (default), or `hybrid`, which also needs a tailnet key |
+| `--private-registry` | This box runs your own private images, which needs a registry credential |
+| `--no-browser` | Print the address of each page instead of opening it. Also `KAKT_NO_BROWSER` |
+
+Values are read without echo and staged under `~/.kamarkat/` with mode `0600`, and the same run then creates the box with them. Re-running is normal: anything already present is skipped, and an answer left empty is reported as outstanding — in which case **nothing is created** and the next run asks only for what is missing. In automation, set the variables and pass `--no-prompt`.
+
+It does not create the escrow, which is [`kakt escrow init`](/cli/escrow-and-encryption#kakt-escrow-init), and it never asks for the box Infisical administrator, which is generated and escrowed when the management cluster is declared. See [Create your box](/quickstart/create-your-box).
+
+Once the credential set is complete, the same command creates `<box>/<tenant>-gitops`, renders it from the platform template **with no clusters**, and stores your credentials on it as repository secrets.
+
+```bash
+kakt box init \
   --tenant acme \
   --box acme-inc \
   --domain acme.example \
@@ -32,7 +48,7 @@ The hub's secret scope is created for the box during bootstrap, so there is
 nothing to set up in Infisical beforehand.
 </Note>
 
-Scaffolding happens once. Every change after it is a commit or a pull request. See [Scaffold your repository](/quickstart/scaffold-your-repository) for the credentials it expects and what the repository contains.
+Creating a box happens once. Every change after it is a commit or a pull request. See [Create your box](/quickstart/create-your-box) for the credentials it expects and what the repository contains.
 
 | Flag | Meaning |
 | :- | :- |
@@ -43,22 +59,26 @@ Scaffolding happens once. Every change after it is a commit or a pull request. S
 | `--subdomain` | A DNS label every hostname sits under; empty publishes on the apex |
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines |
 | `--region` | The cloud region your clusters run in. Defaults to `hel1` |
-| `--cluster` | The management cluster's name. Defaults to `<tenant>-hub` |
-| `--box-id` | The box's own permanent identity, **pinned forever**. Defaults to the cluster name. Different from `--box` above |
-| `--workers` | Cloud worker nodes the box starts with. Defaults to 2. Pass `0` to run on nodes on your own premises alone, which then have to be there |
+| `--box-id` | The box's own permanent identity, **pinned forever**. Defaults to `<tenant>-hub`, which is also the name its first management cluster usually takes. Different from `--box` above |
+| `--workers` | Cloud worker nodes a cluster of this box starts with. Defaults to 2. Pass `0` to run on nodes on your own premises alone, which then have to be there |
 | `--private` | Create the repository private. Default `true` |
 | `--private-registry` | Your applications run private images, which makes a registry credential required |
 | `--bundle-version` | The platform version the box starts on. A released CLI defaults to the version it carries; an unreleased build has none and refuses rather than guess. `development` reads charts from your current branch |
 | `--dry-run` | Render only; create and push nothing |
-| `--out` | Render to this directory instead of a temporary one |
-| `--no-prompt` | Never prompt. Stops after creating the repository if a credential is missing |
+| `--out` | The checkout to leave behind. Defaults to `./<tenant>-gitops`, and the next command runs inside it |
+| `--no-prompt` | Never prompt: every credential comes from the environment or `~/.kamarkat/`, and a missing one stops the run before anything is created |
+| `--no-browser` | Do not open the page that issues each credential; print the address instead. Also `KAKT_NO_BROWSER` |
 
 <Warning>
 **`--box` and `--box-id` are different values.** `--box` is your git organization — where the repository is created. `--box-id` is the box's permanent identity, which keys its escrow path and its DNS records. For `acme-inc/acme-gitops` holding a box called `acme-hub`, that is `--box acme-inc --box-id acme-hub`. One org can hold several boxes.
 </Warning>
 
+<Note>
+**Credentials are collected one step at a time.** Anything missing is asked for in a numbered step that opens the page issuing it and waits while you create it; input is never echoed, and what is already in your environment or kept in `~/.kamarkat/` is skipped. Two are not asked for at all: the box Infisical administrator's address comes from your session, and its password is generated and escrowed. [Prerequisites](/quickstart/prerequisites#step-3-gather-your-credentials) lists what to expect.
+</Note>
+
 <Warning>
-**The administrator comes from your session.** `kakt login` first, and the box is declared with your account id — printed as it is used. Scaffolding with no session renders a repository that declares none, and a box that declares none authorizes **no** human session until one is added. [Platform administrator and access](/documentation/escrow/platform-administrator) explains why it is an account id rather than an address.
+**The administrator comes from your session.** `kakt login` first, and the box is declared with your account id — printed as it is used. Creating a box with no session renders a repository that declares none, and a box that declares none authorizes **no** human session until one is added. [Platform administrator and access](/documentation/escrow/platform-administrator) explains why it is an account id rather than an address.
 </Warning>
 
 <Warning>
@@ -105,7 +125,7 @@ kakt tenant add-cluster \
 
 ### kakt tenant set-gitops-token
 
-Publishes the credential your application builds use to pin a chart version. Scaffolding does this already; re-run it when the scaffold-time token lacked your git organization's **Secrets: write** permission.
+Publishes the credential your application builds use to pin a chart version. Creating the box does this already; re-run it when the token used then lacked your git organization's **Secrets: write** permission.
 
 ```bash
 kakt tenant set-gitops-token --org acme-inc
@@ -115,31 +135,39 @@ The token is read from stdin when `--token` is omitted, which keeps it out of yo
 
 ### kakt tenant add-management
 
-Declares a new management cluster for the box this repository is. A box outlives
-its clusters: the box keeps its `boxId` and the management cluster's own name
-changes, because that name keys the cluster's objects, its nodes and its
-database's WAL archive prefix.
+Declares a management cluster for the box this repository is — **its first, or a
+replacement for the one it has.** A box outlives its clusters: the box keeps its
+`boxId` and the management cluster's own name changes, because that name keys the
+cluster's objects, its nodes and its database's WAL archive prefix.
 
 ```bash
-kakt tenant add-management --name acme-mgmt-02
+kakt tenant add-management --name acme-hub          # the box's first
+kakt tenant add-management --name acme-mgmt-02      # its replacement
 ```
 
 | Flag | Meaning |
 | --- | --- |
-| `--name` | The new management cluster's name. Required, and never a name this box has used |
-| `--from` | The cluster this one succeeds. Needed only when the box already declares more than one |
+| `--name` | The cluster's name. Required. For a replacement, never a name this box has used |
+| `--from` | The cluster this one succeeds. Needed only when the box already declares more than one, and meaningless for a first cluster |
 | `--gitops-dir` | The box's repository. Defaults to the working directory |
+| `--provider`, `--region`, `--bundle-version`, `--workers` | What this cluster differs from its box in. Each defaults to what `registry/box.yaml` declares |
 
-The box is not a flag. It is read from the repository you run this in, because
-`boxId` is already written there and a mistyped one does not fail — it addresses
-another box's escrow, or claims another box's DNS records. A directory that
-declares no box says so.
+The box is not a flag. It is read from `registry/box.yaml` in the repository you
+run this in, because `boxId` is already written there and a mistyped one does not
+fail — it addresses another box's escrow, or claims another box's DNS records. A
+directory that declares no box says so.
 
-It renders from the management cluster already declared here, so the new one
-inherits this box's domain, provider, region and escrow coordinates. Day-0's
-output is not carried over: `generated/` holds the previous cluster's CAPI
-Cluster, its PKI and its load balancer address, and the new cluster's Day-0
-writes its own.
+**The first cluster** is rendered from `templates/mgmt` using what the box
+declared: your domain, your escrow, your provider and region. It is also the
+moment this box's own Infisical administrator is created — the password is
+generated, written to your escrow, and set on the repository, and a later run
+reads the escrowed one back rather than minting a second over the live instance.
+
+**A replacement** is rendered from the management cluster already declared here,
+so it inherits this box's domain, provider, region and escrow coordinates along
+with every later edit. Day-0's output is not carried over: `generated/` holds the
+previous cluster's CAPI Cluster, its PKI and its load balancer address, and the
+new cluster's Day-0 writes its own.
 
 Committing declares it. Create it by dispatching the repository's own workflow
 with the new name:
@@ -150,7 +178,8 @@ gh workflow run bootstrap-cluster -f cluster=acme-mgmt-02
 
 Both declarations can exist at once, which is what makes a replacement
 reversible: the predecessor keeps serving and stays demotable until the
-switchover.
+switchover. Declaring is not building — the bootstrap refuses a second cluster
+while the first still owns infrastructure, which is the invariant below.
 
 ### One management cluster at a time
 
@@ -315,7 +344,7 @@ Produces the verdict for a proposed version against the cluster it targets: that
 kakt proposal preflight --candidate <version> --cluster acme-hub
 ```
 
-A check that cannot run returns unverified rather than passing. `--fail-on-unverified` exits non-zero on that, `--out` writes the markdown verdict to a file and `--json` writes it as JSON. See [Upgrades](/versions/upgrades) for how proposals reach you.
+A check that cannot run returns unverified rather than passing. `--fail-on-unverified` exits non-zero on that, `--out` writes the markdown verdict to a file and `--json` writes it as JSON. See [Versioning](/versions/overview) for what a version is.
 
 ### kakt cluster match-inventory
 

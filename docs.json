@@ -39,7 +39,7 @@
             "group": "Build your first cluster",
             "pages": [
               "quickstart/get-started",
-              "quickstart/scaffold-your-repository",
+              "quickstart/create-your-box",
               "quickstart/bootstrap-your-box",
               "quickstart/access-your-box",
               "quickstart/add-your-managed-cluster"
@@ -81,6 +81,20 @@
                 ]
               },
               "documentation/escrow/operational-limitations"
+            ]
+          },
+          {
+            "group": "Platform upgrades",
+            "pages": [
+              "documentation/upgrades/overview",
+              "documentation/upgrades/core-concepts",
+              "documentation/upgrades/promotion",
+              "documentation/upgrades/pre-flight",
+              "documentation/upgrades/managed-cluster-upgrade",
+              "documentation/upgrades/management-cluster-upgrade",
+              "documentation/upgrades/major-upgrade",
+              "documentation/upgrades/rollback-and-reversibility",
+              "documentation/upgrades/operational-limitations"
             ]
           }
         ]
@@ -229,8 +243,7 @@
           {
             "group": "Versions",
             "pages": [
-              "versions/overview",
-              "versions/upgrades"
+              "versions/overview"
             ]
           },
           {
@@ -261,6 +274,14 @@
     }
   },
   "redirects": [
+    {
+      "source": "/quickstart/scaffold-your-repository",
+      "destination": "/quickstart/create-your-box"
+    },
+    {
+      "source": "/quickstart/collect-your-credentials",
+      "destination": "/quickstart/create-your-box"
+    },
     {
       "source": "/features/capabilities/workloads",
       "destination": "/features/workloads/deploying-applications"

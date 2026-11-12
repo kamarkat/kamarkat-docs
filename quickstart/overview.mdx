@@ -15,7 +15,7 @@ This quickstart takes you from empty accounts to an application served on your o
 
 ## Choose your path
 
-You choose where your nodes run when you scaffold, with `--provider`.
+You choose where your nodes run when you create the box, with `--provider`.
 
 | Path | Nodes | Choose it when |
 | :- | :- | :- |
@@ -31,7 +31,7 @@ This quickstart follows the cloud path. The hybrid path adds a `TS_AUTHKEY` secr
     Prepare a cloud account, a git organization, a domain and an escrow, and install the `kakt` CLI.
   </Step>
   <Step title="Build your first cluster">
-    Sign in with `kakt login`, create the escrow project, scaffold your GitOps repository, and run Day-0 from that repository's own CI. Day-0 creates the management cluster. You then declare a managed cluster with a commit, and the management cluster provisions it.
+    Sign in with `kakt login`, create the escrow project, create your box and declare its management cluster, and run Day-0 from that repository's own CI. Day-0 builds that cluster. You then declare a managed cluster with a commit, and the management cluster provisions it.
   </Step>
   <Step title="Run your first app">
     Declare the application in your GitOps repository, supply its secrets, and let its build publish and pin its chart.
@@ -47,5 +47,5 @@ Creating clusters costs money in your cloud account. Day-0 runs only when you st
 </Note>
 
 <Card title="Start with the prerequisites" icon="list-check" href="/quickstart/prerequisites">
-  What you need before you scaffold anything.
+  What you need before you create anything.
 </Card>

@@ -26,10 +26,9 @@ Because no Kamarkat component serves more than one tenant, a compromise of Kamar
 ## How a change reaches your box
 
 1. Kamarkat **publishes** a new platform version.
-2. Your repository's own dependency-update automation **proposes** it as a pull request that changes one version field.
-3. A **pre-flight check** runs inside your box against the target cluster and attaches its verdict to the proposal.
-4. You **merge** it, or configure your repository to merge qualifying proposals automatically.
-5. Your management cluster **reconciles** the new version.
+2. You **take** it by changing the version a cluster pins, in that cluster's `bundle.yaml`.
+3. A **pre-flight check** judges that version against the cluster it targets, and reports a verdict rather than applying anything.
+4. Your management cluster **reconciles** the new version from your repository.
 
 Kamarkat does step 1 and nothing else. Every change reaches running infrastructure through your repository and your management cluster.
 

@@ -1,0 +1,38 @@
+---
+title: "Rollback and reversibility"
+description: "Reverting the version a cluster declares restores what it asks for, not what it had. Whether the two are the same is a property of the version, declared before you take it."
+keywords: ["rollback", "reversibility", "revert", "declaration", "one-way upgrade"]
+---
+
+> Reverting a declaration restores what the cluster asks for. It does not restore what the cluster had.
+
+## The two are not the same
+
+Changing the version back is a commit, and it always works. What it means is a different question.
+
+The declaration and the operational state coincide only when nothing the upgrade did was one-way — and a bundle carries CRDs, controllers, admission policy and cluster machinery, where one-way changes are routine. A controller that migrates stored resources to a new API version leaves them migrated. Declaring its predecessor again does not make that predecessor able to read them.
+
+So the platform promises **declaration rollback** and does not promise operational recovery.
+
+## Reversibility is a property of the version
+
+Each published version states its predecessor and whether that predecessor can be operationally restored from it. The statement is made when the version is published, is immutable afterwards, and is derived from what the upgrade actually does rather than asserted.
+
+<Warning>
+**A version that is not reversible says so before you take it.** That is the point of declaring it at publication: you learn it at the moment of deciding, not at the moment of needing to undo it. If you need the option to return, take it before you promote — that is the only point at which it exists.
+</Warning>
+
+## Before a one-way promotion
+
+Everything that protects you here is something you do first:
+
+- Read the version's own statement of reversibility, and its declared minimum.
+- Run the [pre-flight](/documentation/upgrades/pre-flight) for the cluster you are promoting.
+- Promote a lower environment's cluster first, and let it run. A one-way change is reversible in the only sense that matters while another cluster has not taken it yet.
+- Make sure the recovery material you would need is where you expect it, in your escrow.
+
+## Rolling back
+
+Revert the change to the cluster's declaration and let your management cluster reconcile it. For the commands, see [Roll back a platform version](/guides/platform/roll-back-a-version).
+
+What that gives you is a cluster asking for the earlier version. Whether it is the cluster you had depends on the version you came from, which said so.

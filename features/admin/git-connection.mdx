@@ -1,7 +1,7 @@
 ---
 title: "Git connection"
 description: "Your git organization holds your GitOps repository and your application repositories, runs Day-0, and hosts your charts and images."
-keywords: ["git", "GITOPS_TOKEN", "kakt tenant set-gitops-token", "renovate", "ghcr"]
+keywords: ["git", "GITOPS_REPO_WRITE_TOKEN", "kakt tenant set-gitops-token", "ghcr"]
 ---
 
 > Your git organization is where your box's desired state lives, and where everything that changes it starts.
@@ -12,7 +12,7 @@ Kamarkat uses your git organization for four things:
 
 | Use | What it needs |
 | :- | :- |
-| **GitOps repository** | `<tenant>-gitops`, created once by `kakt tenant scaffold` |
+| **GitOps repository** | `<tenant>-gitops`, created once by `kakt box init` |
 | **Day-0** | The **Bootstrap cluster** workflow, running in your git organization's CI |
 | **Application builds** | Write access to your GitOps repository, to pin each new version |
 | **Charts and images** | Your git organization's package registry, at `oci://ghcr.io/<org>/charts` |
@@ -25,10 +25,10 @@ Create a token with write access to your git organization's repositories and tha
 
 ### 2. Store it on your GitOps repository
 
-`kakt tenant scaffold` stores it as `GITOPS_TOKEN`. To set it yourself:
+`kakt box init` stores it as `GITOPS_REPO_WRITE_TOKEN`. To set it yourself:
 
 ```bash
-gh secret set GITOPS_TOKEN --repo acme-inc/acme-gitops
+gh secret set GITOPS_REPO_WRITE_TOKEN --repo acme-inc/acme-gitops
 ```
 
 ### 3. Publish it to your application builds
@@ -56,10 +56,6 @@ kakt tenant set-gitops-token --discover --gitops-repo acme-inc/acme-gitops
 
 `--discover` finds the repositories whose workflows write to your GitOps repository.
 
-### Upgrade proposals come from your own automation
-
-Your GitOps repository carries a `renovate.json`. Your git organization's dependency-update automation reads it, watches for new platform versions and opens pull requests. Kamarkat holds no access to your repository.
-
 ### Protect what matters
 
 Your GitOps repository is administered by your git organization. Use its review rules to require reviewers on production clusters and environments, and enable automatic merges where you want them.
@@ -68,7 +64,7 @@ Your GitOps repository is administered by your git organization. Use its review 
 
 <AccordionGroup>
   <Accordion title="Can I use a different git provider?">
-    The Day-0 workflow, the scaffold and `set-gitops-token` are built for GitHub today.
+    The Day-0 workflow, `kakt box init` and `set-gitops-token` are built for GitHub today.
   </Accordion>
   <Accordion title="What happens if the GitOps token expires?">
     Your box keeps running. Application builds stop pinning new versions, and Day-0 cannot commit, until you set a new token with the same commands.

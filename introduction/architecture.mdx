@@ -43,7 +43,6 @@ A box is two kinds of cluster, and every cluster has two kinds of node.
       <div className="arch-caps">
         <a className="arch-cap" href="/features/box/bundle"><span className="arch-icon arch-icon-neutral"><Icon icon="code-branch" /></span>GitOps repository</a>
         <a className="arch-cap" href="/features/workloads/deploying-applications"><span className="arch-icon arch-icon-neutral"><Icon icon="folder-open" /></span>Application repositories</a>
-        <a className="arch-cap" href="/versions/upgrades"><span className="arch-icon arch-icon-neutral"><Icon icon="robot" /></span>Upgrade proposals (Renovate)</a>
         <a className="arch-cap" href="/features/capabilities/cluster-lifecycle"><span className="arch-icon arch-icon-neutral"><Icon icon="terminal" /></span>Day-0 runner (your CI)</a>
       </div>
     </div>
@@ -115,7 +114,7 @@ Select any part to read about it.
 
 - **Control plane nodes** run Kubernetes on every cluster. On a box with cloud workers they carry nothing else; a box declared with no cloud workers — `--workers 0`, where capacity comes from your own machines — runs with a schedulable control plane instead, and the platform's workloads do run there.
 - **The management cluster's workers** run the platform's services, grouped into [capabilities](/features/capabilities/overview). Your applications are delivered to managed clusters rather than to the management cluster.
-- **A managed cluster's workers** run your applications. A box may have **none** — scaffolding creates the management cluster, and workload clusters are added when you declare them — in which case the box is complete with one cluster: see [Deploying applications](/features/workloads/deploying-applications). The management cluster creates each managed cluster, then delivers its platform and your apps to it; the managed cluster reads its secrets and identities from the management cluster and reports its telemetry back.
+- **A managed cluster's workers** run your applications. A box may have **none** — a box is created with no clusters at all, its management cluster is declared next, and workload clusters are added when you declare them — in which case the box is complete with one cluster: see [Deploying applications](/features/workloads/deploying-applications). The management cluster creates each managed cluster, then delivers its platform and your apps to it; the managed cluster reads its secrets and identities from the management cluster and reports its telemetry back.
 
 To see every component on each node type, open any version under [Releases](/versions/lines/0-1).
 
@@ -156,11 +155,11 @@ Stopping using Kamarkat stops nothing running: your box holds everything it need
 
 **Day-0** runs once, from your CI, under your credentials. It creates the management cluster, brings up any managed cluster your repository already declares, and commits the facts it discovers to your GitOps repository. After that, **the repository is the only authority** for the box.
 
-**Platform upgrades** arrive as pull requests from your own upgrade automation, each changing one version field. A pre-flight check runs inside your box against the target cluster and reports its verdict. Nothing changes until you merge.
+**Platform upgrades** are a change to one version field in the cluster's own declaration. A pre-flight check runs inside your box against the target cluster and reports its verdict. Nothing changes until that change reaches the branch your management cluster reconciles.
 
 **Application releases** follow the same shape. Your application's build publishes its chart and commits the new version to your GitOps repository, and the GitOps engine deploys it.
 
-See [The Bundle](/features/box/bundle), [Upgrades](/versions/upgrades) and [Deploying Applications](/features/workloads/deploying-applications) for details.
+See [The Bundle](/features/box/bundle), [Versioning](/versions/overview) and [Deploying Applications](/features/workloads/deploying-applications) for details.
 
 ## Data residency
 

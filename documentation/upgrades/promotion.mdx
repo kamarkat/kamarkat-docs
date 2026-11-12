@@ -1,0 +1,40 @@
+---
+title: "Promotion"
+description: "Promotion is advancing one cluster from one bundle version to the next. The version is pinned per cluster, so every cluster moves on its own."
+keywords: ["promotion", "bundle version", "environments", "minimum version", "per cluster"]
+---
+
+> Promotion is advancing one cluster from one bundle version to the next. There is no fleet-wide upgrade, because there is no fleet-wide pin.
+
+## The version is pinned per cluster
+
+Each cluster declares the version it runs. That declaration is the record of what the cluster is running, and nothing else holds a copy of it.
+
+Two consequences, both intended:
+
+- **Clusters legitimately run different versions.** A box whose `dev` cluster is two versions ahead of its `prod` cluster is in a normal state, not a drifted one.
+- **A promotion names one cluster.** Promoting a box means promoting its clusters, one declaration at a time.
+
+## Environments in order
+
+A version advances through your environments in order: it reconciles and passes validation on a lower environment's cluster before it is taken on the next. Production carries your repository's own protection rules, and who may change the declarations under `environments/prod` and a production cluster's directory is set there.
+
+The ordering is enforced by your repository, not by which cluster can reach which directory.
+
+## Being behind is not a backlog
+
+A cluster that has not been promoted has not fallen off anything, and does not have to walk back up.
+
+Every version is independently installable from any earlier one at or above its declared minimum. A cluster eight versions behind takes the current version and arrives exactly where a cluster that took each one on the day it was published already is. **Taking one version is not skipping the versions between it and the one you were on — it is one promotion that spans them.**
+
+What you are owed before crossing several versions at once is disclosure, and that is a property of the version: the versions it spans, the security fixes among them, its declared minimum, and whether it is reversible.
+
+<Warning>
+**A cluster's version is changed in its declaration, and nowhere else.** Do not edit the platform's resources in a cluster to move a version, and do not upgrade a management cluster's Kubernetes in place — see [Management cluster upgrade](/documentation/upgrades/management-cluster-upgrade). A change made anywhere but the declaration is reconciled away or leaves the cluster in a state its declaration does not describe.
+</Warning>
+
+## Before you promote
+
+Run the [pre-flight](/documentation/upgrades/pre-flight) for the cluster you are promoting. It answers whether this cluster can take this version, which the release notes alone cannot.
+
+For the commands, see [Upgrade your box](/guides/platform/upgrade-your-box).

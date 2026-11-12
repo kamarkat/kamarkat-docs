@@ -13,7 +13,7 @@ The escrow also holds each cluster's admin kubeconfig, which you use only for [b
 You reach it as **yourself**. Step 1 signs you in, and from then on every command that touches the escrow uses your own session rather than a credential copied onto your machine.
 
 <Warning>
-Without an escrow, losing the management cluster loses every secret the platform manages for it. You cannot add an escrow afterwards, so scaffolding refuses to continue without one.
+Without an escrow, losing the management cluster loses every secret the platform manages for it. You cannot add an escrow afterwards, so creating a box refuses to continue without one.
 </Warning>
 
 ## Step 1: Sign in and create your escrow account
@@ -39,7 +39,7 @@ you@acme.example at https://app.infisical.com
   session kept in macOS keychain
 ```
 
-**Keep that `identity` value.** You need it when you [scaffold your repository](/quickstart/scaffold-your-repository), which declares it as the box's platform administrator — the one human the box accepts for escrow-backed operations. An address is not used for that, because an address can be changed and re-assigned.
+**Keep that `identity` value.** You need it when you [create your box](/quickstart/create-your-box), which declares it as the box's platform administrator — the one human the box accepts for escrow-backed operations. An address is not used for that, because an address can be changed and re-assigned.
 
 ## Step 2: Create the escrow project
 
@@ -63,7 +63,7 @@ The client secret is the part to notice: Infisical returns it **once**, at the m
 <Note>
 **One automation identity per organisation, not per box.** A second box reuses it and is added to its own escrow project. Infisical's free plan allows five identities in total, humans and machines together, so an identity per box would exhaust it at the fifth — and the escrow paths are already box-scoped, so a second identity buys no isolation.
 
-A re-run finds everything that exists and writes nothing. It will not issue a second client secret for an identity that already has one.
+A re-run finds the identity, its authentication and its project membership and leaves them as they are. It does issue a client secret each time, because Infisical shows one only at the moment it is created and there is no way to read back the one you have — so a re-run is also how you recover from losing it. Each secret is separate and separately revocable, and your other boxes keep using theirs.
 </Note>
 
 <Warning>
@@ -85,12 +85,12 @@ INFISICAL_ESCROW_URL        INFISICAL_ESCROW_CLIENT_ID
 INFISICAL_ESCROW_PROJECT_ID INFISICAL_ESCROW_CLIENT_SECRET
 ```
 
-There is nothing to export. The store belongs to you rather than to a checkout, so every command reads it from any directory — the scaffold that follows picks these up without flags. Set `KAMARKAT_HOME` if this machine keeps state somewhere other than your home directory, and the environment still wins where it is set, which is how CI supplies the same four values.
+There is nothing to export. The store belongs to you rather than to a checkout, so every command reads it from any directory — `kakt box init` picks these up without flags. Set `KAMARKAT_HOME` if this machine keeps state somewhere other than your home directory, and the environment still wins where it is set, which is how CI supplies the same four values.
 
 **Back up `INFISICAL_ESCROW_CLIENT_SECRET` somewhere outside this machine.** It was issued once and cannot be read back, so the copy in that directory is the only one; losing the directory means issuing a new secret. It is what your box's automation authenticates with — your own access comes from `kakt login`, so you do not need it to operate the box day to day.
 
 ## Next
 
-<Card title="Scaffold your repository" icon="code-branch" href="/quickstart/scaffold-your-repository">
-  Create your GitOps repository, declaring the administrator identity from Step 1.
+<Card title="Create your box" icon="key" href="/quickstart/create-your-box">
+  One command walks you through everything else your box is built with.
 </Card>

@@ -1,0 +1,43 @@
+---
+title: "Managed cluster upgrade"
+description: "A managed cluster declares its own platform version and is reconciled into it. No Day-0 run, no workflow — the declaration is the whole mechanism."
+keywords: ["managed cluster", "environmentRevision", "promotion", "declaration", "remove a cluster"]
+---
+
+> A managed cluster is a declaration, not a workflow. Upgrading one is changing the version that declaration names.
+
+This is the ordinary case, and the one you will do most often.
+
+## What moves
+
+The version in the cluster's own declaration — `environmentRevision` in `registry/clusters/<cluster>/values.yaml`. The management cluster's ApplicationSets read it and use it as the source revision for every platform-owned Application they generate for that cluster.
+
+Nothing is triggered and nothing is applied by an external runner. The controllers that created the cluster are the controllers that keep it in its declared state, so the same loop that provisioned it converges it on the new version.
+
+<Note>
+**No Day-0 run is involved.** Day-0 belongs to a box's first management cluster. Adding a managed cluster after that is not a Day-0 problem, and giving it one would mean two provisioning paths that could disagree about what a cluster is.
+</Note>
+
+## What the cluster declares for itself
+
+A managed cluster is not a smaller copy of the management cluster. It declares:
+
+- **Its environment** — which promotion stage it serves. Several clusters may serve the same one.
+- **Its provider and region.**
+- **Its own platform version**, promoted independently of every other cluster in the box.
+
+Which combinations of environment and provider the platform supports is validated for each cluster against its own declaration, rather than inherited from the box.
+
+## Replacing one instead of upgrading it
+
+Some changes are not an upgrade: a different provider, a different region, a different name. Those are a new cluster and the removal of the old one.
+
+- **Removing a managed cluster is a commit, and nothing else.** The cluster exists because its `infrastructure/spokepool.yaml` exists; the commit that removes that file is the removal. The ApplicationSets stop generating its Applications, the infrastructure Application is deleted with its resources finalizer, the claim goes with it, and the provider's resources unwind.
+- **The new cluster takes a name the box has never used.** Every per-cluster identity derives from the cluster's name, including its database's archive prefix, and a reused name collides with what the old one wrote.
+- **Removing a cluster edits no environment.** The applications of the environment it served are declared independently of it and keep running on every other cluster serving that environment.
+
+<Warning>
+The commit is the destruction. Review it where the cause still is — your repository's own pull-request check — rather than discovering afterwards that a cluster is gone. A declaration removed from git is not the same thing as a destroyed cluster, and `kakt tenant cluster-status` reports what is actually left, by observation.
+</Warning>
+
+For the commands, see [Add a managed cluster](/guides/clusters/add-a-managed-cluster), [Replace a managed cluster](/guides/clusters/replace-a-managed-cluster) and [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster).

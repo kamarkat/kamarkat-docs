@@ -1,0 +1,36 @@
+---
+title: "Operational limitations"
+description: "What the platform does not do for an upgrade, stated plainly, so none of it is discovered during one."
+keywords: ["limitations", "contract", "conversion", "cutover", "one-way", "unsupported"]
+---
+
+> Every limit here is a decision, not a gap waiting to be closed quietly. They are listed so that no upgrade is planned around something the platform does not do.
+
+## Across a Cluster API contract
+
+**A cluster's recovery material is restorable only into a successor serving the same contract.** The compatibility chain is pinned link by link — the Kubernetes version a cluster runs, the Cluster API core serving a contract, the bootstrap and control-plane providers implementing it, and the infrastructure provider declaring it.
+
+- **No in-place contract conversion.** Restoring objects written under one contract into providers that have moved to another is a conversion, and the platform does not perform one.
+- **A provider upgrade re-opens the recovery contract.** Which recovery properties hold is read from the provider's own source at the version in force, so moving the provider is a change to what recovery means and is assessed before it is deployed, not after.
+
+That is the reason a [major upgrade](/documentation/upgrades/major-upgrade) replaces the box.
+
+## Across a box replacement
+
+- **The predecessor's running managed clusters are not preserved.** A replacement box provisions its own from your declarations.
+- **There is no cutover tooling.** Which box serves production is your decision, taken deliberately; nothing automates the switch, and nothing coordinates two boxes for you.
+- **A distinct `boxId` does not fence shared data or hostnames.** It separates the escrow scope and DNS record ownership. One database serving both boxes, or one hostname pointing at one of them, is a single resource whichever box is asking.
+
+## Replacing a management cluster
+
+- **The overlapping sequence is a contract, not a workflow.** The declaration is a command and the one-owner rule is enforced; nothing drives two live clusters through a switchover.
+- **A management cluster lost while its managed clusters survive is not rebuilt by an ordinary bootstrap.** Admission refuses a creation while those clusters still own provider resources, which is correct for a deliberate replacement and means this case is handled deliberately rather than by re-running a command.
+
+## One-way changes
+
+- **Nothing undoes a one-way migration automatically.** Reverting a declaration does not reverse a stored-resource migration — see [Rollback and reversibility](/documentation/upgrades/rollback-and-reversibility).
+- **A version's reversibility statement is the whole answer.** There is no mechanism that discovers, after the fact, whether a return is possible.
+
+## What this page is not
+
+It is not a list of things the platform intends to add. If one of these limits is load-bearing for a change you are planning, plan around it: the alternative is a plan that depends on behaviour the platform does not have.

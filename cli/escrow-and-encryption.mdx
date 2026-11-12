@@ -19,7 +19,7 @@ export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
 
 Where a command takes `--gitops-dir`, it needs none of them: the box's repository names its escrow, and the read is performed with your own [`kakt login`](/cli/signing-in) session.
 
-`--box` names the logical box the escrow is keyed by — the value `kakt tenant scaffold --box-id` pinned, which defaults to the management cluster's name. `--cluster` names the cluster within it. A box keeps its `--box` value across a rebuild, which is how a replacement management cluster finds the keys the old one escrowed.
+`--box` names the logical box the escrow is keyed by — the value `kakt box init --box-id` pinned, which defaults to `<tenant>-hub`. `--cluster` names the cluster within it. A box keeps its `--box` value across a rebuild, which is how a replacement management cluster finds the keys the old one escrowed.
 
 These commands report fingerprints and never values.
 
@@ -40,12 +40,12 @@ kakt escrow init --name acme-escrow
 | `--out` | Write the `INFISICAL_ESCROW_*` files here instead of this operator's own store (`~/.kamarkat/infisical`, or `$KAMARKAT_HOME/infisical`) |
 | `--client-id`, `--client-secret` | Use an identity you manage yourself instead of the organisation's automation identity. Passed together |
 
-It creates the project **as you**, so you are its admin, then finds or creates your organisation's one automation identity, configures its authentication, issues a client secret if the identity is new, and gives it membership of the project. The four `INFISICAL_ESCROW_*` values are written to `--out`.
+It creates the project **as you**, so you are its admin, then finds or creates your organisation's one automation identity, configures its authentication, issues a client secret for this box, and gives it membership of the project. The four `INFISICAL_ESCROW_*` values are written to `--out`.
 
 No roles to choose: the identity gets the organisation role `no-access` and the project role `member`, which is what secret and folder operations need.
 
 <Note>
-**One automation identity per organisation.** A second box reuses it and is added to its own project — the free plan allows five identities in total, and the escrow paths are already box-scoped. Re-running finds what exists and writes nothing, and never issues a second client secret for an identity that has one.
+**One automation identity per organisation.** A second box reuses it and is added to its own project — the free plan allows five identities in total, and the escrow paths are already box-scoped. Re-running finds the identity, its authentication and its membership and leaves them alone; the one thing it always does is issue this box a client secret, because an existing one cannot be read back. Universal Auth holds many per identity, so that neither touches nor invalidates what your other boxes are using, and each is revocable on its own.
 
 It needs an **organisation admin**: a member can create an identity but cannot give it an authentication method, so the command refuses rather than leaving an unusable one behind. [Get started](/quickstart/get-started) walks the whole sequence.
 </Note>

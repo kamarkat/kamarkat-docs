@@ -26,7 +26,7 @@ Values are read without echo and staged under `~/.kamarkat/` with mode `0600`, a
 
 It does not create the escrow, which is [`kakt escrow init`](/cli/escrow-and-encryption#kakt-escrow-init), and it never asks for the box Infisical administrator, which is generated and escrowed when the management cluster is declared. See [Create your box](/quickstart/create-your-box).
 
-Once the credential set is complete, the same command creates `<box>/<tenant>-gitops`, renders it from the platform template **with no clusters**, and stores your credentials on it as repository secrets.
+Once the credential set is complete, the same command creates the box's repository, renders it from the platform template **with no clusters**, and stores your credentials on it as repository secrets.
 
 ```bash
 kakt box init \
@@ -35,6 +35,36 @@ kakt box init \
   --domain acme.example \
   --region hel1
 ```
+
+#### The names a box is given
+
+A new box **mints its own identity**, once, from the Unix second it was initialized in. One timestamp, three names, so everything a box owns is recognisable as one box's:
+
+| | Example | Why it is unique |
+| :- | :- | :- |
+| Box id | `acme-1794447136` | keys the escrow path holding this box's master keys and the DNS owner id its records carry. Two boxes sharing it delete each other's TXT records |
+| Repository | `acme-inc/acme-gitops-1794447136` | a box is declared in its own repository, and a replacement box needs its own |
+| First management cluster | `acme-hub-1794447136` | the cluster's name keys its objects and its database's archive prefix, which collides between two boxes sharing one object store |
+
+Your git organization and your tenant are **not** renamed: `--box acme-inc` names an organization that exists, and `acme` stays the tenant. There is no flag that sets the three generated names — a chosen suffix would be a second naming scheme, and two boxes could then be given one identity on purpose. All three are written to `registry/box.yaml`, and every later command reads them from there.
+
+<Note>
+**One tenant may hold several boxes.** That is how a major upgrade works: a replacement box is prepared beside the one still serving, each with its own identity and its own repository. See [Major upgrade](/documentation/upgrades/major-upgrade).
+</Note>
+
+#### Continuing an interrupted run
+
+The declaration is written **before** the first remote call, so the identity exists on disk before anything is created. If a run stops after that — a credential expired, the push failed, a secret did not land — continue it:
+
+```bash
+kakt box init --resume ./acme-gitops-1794447136
+```
+
+A continuation reads that checkout's `registry/box.yaml` and reuses its exact names. It mints nothing, renames nothing, and creates nothing a second time: it creates the repository only if it is absent, pushes only if the repository has no commits, and sets the credentials again, because a secret cannot be read back to see whether it already holds the right value.
+
+<Warning>
+**A repository is only reused when it declares the box being continued.** If the repository under that name declares a different box, declares none, or cannot be read, the run stops without pushing or setting anything. And for a *new* box, a name that already exists is a failure rather than something to adopt — run again, and the next second mints a different identity.
+</Warning>
 
 <Note>
 **The management hub takes no `--environment`.** It is environment-independent: it
@@ -53,25 +83,21 @@ Creating a box happens once. Every change after it is a commit or a pull request
 | Flag | Meaning |
 | :- | :- |
 | `--tenant` | Your tenant identifier, lower-case. Required. It names the repository and your box |
-| `--box` | The git organization the repository is created in — `github.com/<box>/<tenant>-gitops`. Required. It is **not** the box's name: that is `--box-id` |
+| `--box` | The git organization the repository is created in. Required. It is **not** the box's name, and it is never renamed: the box's name is generated |
 | `--domain` | Your base domain. Required |
 | `--platform-admin` | The one human this box accepts for escrow-backed operations, by Infisical's account id. Defaults to the signed-in session; pass it only to name somebody else |
 | `--subdomain` | A DNS label every hostname sits under; empty publishes on the apex |
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines |
 | `--region` | The cloud region your clusters run in. Defaults to `hel1` |
-| `--box-id` | The box's own permanent identity, **pinned forever**. Defaults to `<tenant>-hub`, which is also the name its first management cluster usually takes. Different from `--box` above |
+| `--resume` | Continue the box in this checkout, reusing the identity it declares. Mints nothing and renames nothing |
 | `--workers` | Cloud worker nodes a cluster of this box starts with. Defaults to 2. Pass `0` to run on nodes on your own premises alone, which then have to be there |
 | `--private` | Create the repository private. Default `true` |
 | `--private-registry` | Your applications run private images, which makes a registry credential required |
 | `--bundle-version` | The platform version the box starts on. A released CLI defaults to the version it carries; an unreleased build has none and refuses rather than guess. `development` reads charts from your current branch |
 | `--dry-run` | Render only; create and push nothing |
-| `--out` | The checkout to leave behind. Defaults to `./<tenant>-gitops`, and the next command runs inside it |
+| `--out` | The checkout to leave behind. Defaults to `./<repository>`, and the next command runs inside it |
 | `--no-prompt` | Never prompt: every credential comes from the environment or `~/.kamarkat/`, and a missing one stops the run before anything is created |
 | `--no-browser` | Do not open the page that issues each credential; print the address instead. Also `KAKT_NO_BROWSER` |
-
-<Warning>
-**`--box` and `--box-id` are different values.** `--box` is your git organization — where the repository is created. `--box-id` is the box's permanent identity, which keys its escrow path and its DNS records. For `acme-inc/acme-gitops` holding a box called `acme-hub`, that is `--box acme-inc --box-id acme-hub`. One org can hold several boxes.
-</Warning>
 
 <Note>
 **Credentials are collected one step at a time.** Anything missing is asked for in a numbered step that opens the page issuing it and waits while you create it; input is never echoed, and what is already in your environment or kept in `~/.kamarkat/` is skipped. Two are not asked for at all: the box Infisical administrator's address comes from your session, and its password is generated and escrowed. [Prerequisites](/quickstart/prerequisites#step-3-gather-your-credentials) lists what to expect.
@@ -82,7 +108,7 @@ Creating a box happens once. Every change after it is a commit or a pull request
 </Warning>
 
 <Warning>
-`--box-id` is chosen once and never changes. Your escrow is keyed by it, so every escrow command takes the same value — and a box that is rebuilt keeps it, which is how the new management cluster finds the old one's keys. Leave it unset unless you have a reason, and record what it resolved to.
+The box id is minted once and never changes. Your escrow is keyed by it, so every escrow command takes the same value — and a box whose management cluster is replaced keeps it, which is how the replacement finds the old one's keys. `kakt box init` prints it when the box is created, and `registry/box.yaml` records it, so nothing has to remember it.
 </Warning>
 
 <Note>
@@ -141,13 +167,13 @@ replacement for the one it has.** A box outlives its clusters: the box keeps its
 cluster's objects, its nodes and its database's WAL archive prefix.
 
 ```bash
-kakt tenant add-management --name acme-hub          # the box's first
+kakt tenant add-management                          # the box's first
 kakt tenant add-management --name acme-mgmt-02      # its replacement
 ```
 
 | Flag | Meaning |
 | --- | --- |
-| `--name` | The cluster's name. Required. For a replacement, never a name this box has used |
+| `--name` | The cluster's name. **Omit it for the box's first**, which takes the name the box declares in `registry/box.yaml`. Required for a replacement, and never a name this box has used |
 | `--from` | The cluster this one succeeds. Needed only when the box already declares more than one, and meaningless for a first cluster |
 | `--gitops-dir` | The box's repository. Defaults to the working directory |
 | `--provider`, `--region`, `--bundle-version`, `--workers` | What this cluster differs from its box in. Each defaults to what `registry/box.yaml` declares |
@@ -158,7 +184,7 @@ fail — it addresses another box's escrow, or claims another box's DNS records.
 directory that declares no box says so.
 
 **The first cluster** is rendered from `templates/mgmt` using what the box
-declared: your domain, your escrow, your provider and region. It is also the
+declared: its name, your domain, your escrow, your provider and region. It is also the
 moment this box's own Infisical administrator is created — the password is
 generated, written to your escrow, and set on the repository, and a later run
 reads the escrowed one back rather than minting a second over the live instance.

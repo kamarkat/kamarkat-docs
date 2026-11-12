@@ -16,7 +16,7 @@ Kamarkat names two things separately:
 | **Names** | The tenant that owns the box | A product running on it |
 | **Identity** | An organization in the identity provider | A project within that organization |
 | **Namespace** | — | `tenant-<tenantId>-<appId>` |
-| **Repository** | One `<tenant>-gitops` per tenant | One directory per application |
+| **Repository** | One per box, named when the box is created | One directory per application |
 | **Cost attribution** | `tenant-id` label | `app-id` label |
 
 For example, a tenant `acme` running two products, `web` and `agents`, gets the namespaces `tenant-acme-web` and `tenant-acme-agents`. Both are attributed to `acme`, and costs split by product.

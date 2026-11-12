@@ -12,7 +12,7 @@ Kamarkat uses your git organization for four things:
 
 | Use | What it needs |
 | :- | :- |
-| **GitOps repository** | `<tenant>-gitops`, created once by `kakt box init` |
+| **GitOps repository** | one per box, created once by `kakt box init`, which names it |
 | **Day-0** | The **Bootstrap cluster** workflow, running in your git organization's CI |
 | **Application builds** | Write access to your GitOps repository, to pin each new version |
 | **Charts and images** | Your git organization's package registry, at `oci://ghcr.io/<org>/charts` |
@@ -28,7 +28,7 @@ Create a token with write access to your git organization's repositories and tha
 `kakt box init` stores it as `GITOPS_REPO_WRITE_TOKEN`. To set it yourself:
 
 ```bash
-gh secret set GITOPS_REPO_WRITE_TOKEN --repo acme-inc/acme-gitops
+gh secret set GITOPS_REPO_WRITE_TOKEN --repo acme-inc/acme-gitops-1794447136
 ```
 
 ### 3. Publish it to your application builds
@@ -43,6 +43,38 @@ The token is read from stdin, so it stays out of your shell history. Every repos
 
 Store `GHCR_USERNAME` and `GHCR_TOKEN` on your GitOps repository. The platform's own images are public; these are for yours.
 
+## Where the secrets live
+
+Every credential your box is built with becomes a **GitHub Actions secret on the box's own repository**. `kakt box init` sets them there, and the platform keeps none of them.
+
+```bash
+gh secret list --repo acme-inc/acme-gitops-1794447136
+```
+
+Or in the browser: **Settings › Secrets and variables › Actions**. Both show names and timestamps — GitHub never returns a secret's value. That is also why `kakt` sets each one rather than checking first and skipping: "already correct" is not a state anything can observe, so a re-run writes the value it already holds, which changes nothing, instead of skipping one that failed last time.
+
+### Who reads them, and when
+
+| | Reads the repository's Actions secrets |
+| :- | :- |
+| The **first management cluster** (Day-0) | **Yes.** `bootstrap-cluster.yml` is the only workflow that creates a cluster, and it forwards them to the platform's workflow it calls |
+| A **replacement** management cluster | **Yes** — the same workflow, dispatched again with the new cluster's name |
+| A **managed cluster** | **No.** It is a declaration your management cluster reconciles; no workflow runs, so no Actions secret is read |
+| Your box, running | Day-0 seeds most of them into the box's own secret store, so the clusters keep working from their own copies. The repository's copies stay the source for the next bootstrap |
+
+So these are not "Day-0 secrets" that stop mattering afterwards. They are what the box is built from, every time a management cluster is built — and a box whose repository has lost one cannot create a replacement management cluster until it is set again.
+
+Two behave differently, and both are deliberate:
+
+- **`HCLOUD_TOKEN` is read from Actions for the first enrolment only.** After it is enrolled into your escrow, every command reads the escrowed copy — a token exported in a shell authenticates against whichever cloud project issued it, which is how a box gets built against the wrong account.
+- **`GITOPS_REPO_WRITE_TOKEN` keeps earning its place after Day-0.** Your management cluster's ArgoCD reads the repository with it, and the organization-level copy is what your application builds pin their versions with.
+
+### What is not on the repository
+
+`GITHUB_ORG_SETUP_TOKEN` — the credential that creates the repository. It stays on your own machine, under `~/.kamarkat/`, because it can create repositories across your whole organization and it is yours rather than the box's. A box never holds it, and nothing in a box needs it.
+
+The box's own Infisical administrator is not asked for at all: the address comes from your `kakt login` session, and the password is generated and written to your escrow when the management cluster is declared. The pair is then set on the repository like any other secret.
+
 ## What you need to know
 
 ### Free plans deliver organization secrets to public repositories only
@@ -51,7 +83,7 @@ On GitHub's free plan, a private repository's workflow receives an empty organiz
 
 ```bash
 kakt tenant set-gitops-token --repo acme-inc/shop
-kakt tenant set-gitops-token --discover --gitops-repo acme-inc/acme-gitops
+kakt tenant set-gitops-token --discover --gitops-repo acme-inc/acme-gitops-1794447136
 ```
 
 `--discover` finds the repositories whose workflows write to your GitOps repository.

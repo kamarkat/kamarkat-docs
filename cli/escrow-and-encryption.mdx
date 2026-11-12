@@ -19,7 +19,7 @@ export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
 
 Where a command takes `--gitops-dir`, it needs none of them: the box's repository names its escrow, and the read is performed with your own [`kakt login`](/cli/signing-in) session.
 
-`--box` names the logical box the escrow is keyed by — the value `kakt box init --box-id` pinned, which defaults to `<tenant>-hub`. `--cluster` names the cluster within it. A box keeps its `--box` value across a rebuild, which is how a replacement management cluster finds the keys the old one escrowed.
+`--box` names the logical box the escrow is keyed by — the box id `kakt box init` minted, which its repository records in `registry/box.yaml`. `--cluster` names the cluster within it. A box keeps its `--box` value across a rebuild, which is how a replacement management cluster finds the keys the old one escrowed.
 
 These commands report fingerprints and never values.
 

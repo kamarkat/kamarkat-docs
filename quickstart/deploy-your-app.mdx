@@ -17,7 +17,7 @@ kakt tenant set-gitops-token --org acme-inc
 The command reads the token from stdin, so it stays out of your shell history. Every repository in that git organization inherits it, including ones you create later.
 
 <Warning>
-On GitHub's free plan, organization secrets reach **public** repositories only. A private repository's workflow receives an empty value and fails with *"Invalid username or token"*. On the free plan, publish per repository instead: `kakt tenant set-gitops-token --repo acme-inc/shop`, or let `--discover --gitops-repo acme-inc/acme-gitops` find the repositories whose workflows write to it.
+On GitHub's free plan, organization secrets reach **public** repositories only. A private repository's workflow receives an empty value and fails with *"Invalid username or token"*. On the free plan, publish per repository instead: `kakt tenant set-gitops-token --repo acme-inc/shop`, or let `--discover --gitops-repo acme-inc/acme-gitops-1794447136` find the repositories whose workflows write to it.
 </Warning>
 
 ## Step 2: Build your chart on the platform library
@@ -53,7 +53,7 @@ Add a job to your application's CI that:
 helm package charts/frontend --version "$VERSION" --app-version "$IMAGE_DIGEST"
 helm push "frontend-${VERSION}.tgz" oci://ghcr.io/acme-inc/charts
 
-git clone "https://x-access-token:${GITOPS_REPO_WRITE_TOKEN}@github.com/acme-inc/acme-gitops.git" gitops
+git clone "https://x-access-token:${GITOPS_REPO_WRITE_TOKEN}@github.com/acme-inc/acme-gitops-1794447136.git" gitops
 yq -i ".dependencies[0].version = \"${VERSION}\"" gitops/environments/dev/shop/frontend/Chart.yaml
 git -C gitops commit -am "shop/frontend ${VERSION}" && git -C gitops push
 ```

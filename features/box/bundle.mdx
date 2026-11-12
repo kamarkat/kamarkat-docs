@@ -13,7 +13,7 @@ The **bundle** is the whole platform at one version: every component, every char
 Your GitOps repository records, for each cluster, the version it runs and the values it runs with:
 
 ```text
-<tenant>-gitops/
+<box repository>/
 └── registry/clusters/<cluster>/
     ├── bundle.yaml   # the version, changed by upgrade proposals
     └── values.yaml   # yours: only what differs from the defaults

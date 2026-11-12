@@ -33,15 +33,15 @@ kakt box init \
 <Note>
 Two values are easy to mix up, because `--box` means something different here than it does on the escrow commands.
 
-- `--box acme-inc` is your **git organization** — where the repository is created, as `github.com/acme-inc/acme-gitops`.
-- The **box's own name** is `--box-id`, which defaults to the management cluster's name (`acme-hub`). That is the value `kakt escrow verify --box`, `kakt kubeconfig --box` and the other escrow commands take.
+- `--box acme-inc` is your **git organization** — where the repository is created.
+- The **box's own name is generated**, not passed: one timestamp gives the box id, the repository and the first management cluster's name (`acme-1794447136`, `acme-gitops-1794447136`, `acme-hub-1794447136`). The box id is the value `kakt escrow verify --box`, `kakt kubeconfig --box` and the other escrow commands take, and the command prints it when the box is created.
 
 The one human this box accepts for escrow-backed operations is taken from your `kakt login` session and printed as it is used. Pass `--platform-admin` only to name somebody else.
 </Note>
 
-Add `--dry-run` first to see the repository without creating anything. The box's identity is `<tenant>-hub` unless you pass `--box-id`, and its management cluster is declared separately with `kakt tenant add-management`. A released CLI starts the box on the version it carries; an unreleased build has none to offer and refuses, so pass `--bundle-version` with a published version, or `development` to read charts from your current branch. Every flag, and the escrow and credential flags a real run needs, are in [Create your box](/quickstart/create-your-box).
+Add `--dry-run` first to see the repository without creating anything. Its management cluster is declared separately, with `kakt tenant add-management`. A released CLI starts the box on the version it carries; an unreleased build has none to offer and refuses, so pass `--bundle-version` with a published version, or `development` to read charts from your current branch. Every flag, and the escrow and credential flags a real run needs, are in [Create your box](/quickstart/create-your-box).
 
-It creates the repository with no clusters and stores your credentials on it as secrets. Declare the management cluster next, with `kakt tenant add-management --name <cluster>`, then commit it and dispatch the repository's bootstrap workflow.
+It creates the repository with no clusters and stores your credentials on it as GitHub Actions secrets, which is what the workflow that creates a management cluster runs under — [Where the secrets live](/features/admin/git-connection#where-the-secrets-live). Declare the management cluster next — `kakt tenant add-management`, with no name, which takes the one the box declared — then commit it and dispatch the repository's bootstrap workflow. If the run stops part-way, continue it with `kakt box init --resume <checkout>`, which reuses the identity already written.
 
 ## Step 2: Let Day-0 run
 

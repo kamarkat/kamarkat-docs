@@ -8,11 +8,13 @@ A box outlives every cluster in it, so the box is what you create and a cluster 
 
 ```bash
 kakt box init --tenant acme --box acme-inc --domain acme.example --region hel1
-cd acme-gitops
-kakt tenant add-management --name acme-hub
+cd acme-gitops-1794447136
+kakt tenant add-management
 ```
 
-`kakt box init` creates `<org>/<tenant>-gitops` in your git organization and renders it from the platform template, with **no clusters**. It writes only the facts unique to you: your tenant, that git organization, your domain, your region, and your box's permanent identity. This happens once; every change after it is a commit or a pull request.
+`kakt box init` creates the box's repository in your git organization and renders it from the platform template, with **no clusters**. It writes only the facts unique to you: your tenant, that git organization, your domain, your region, and the identity it mints for the box. This happens once; every change after it is a commit or a pull request.
+
+The box names itself. One timestamp, taken when it is initialized, gives the box id, the repository and the name its first management cluster will take — `acme-1794447136`, `acme-gitops-1794447136`, `acme-hub-1794447136` — so one tenant can hold more than one box without the two colliding. The full contract is in [`kakt box init`](/cli/boxes-and-clusters#kakt-box-init); you do not choose or type any of the three.
 
 ## Step 1: What the box is built with
 
@@ -56,23 +58,31 @@ Once the set is complete, the same run creates the repository:
 
 ```text
 [box] platform administrator: you@acme.example (6e1f…)
-[box] rendered acme-gitops into acme-gitops
+[box] rendered acme-gitops-1794447136 into acme-gitops-1794447136
 [box] authenticating as the platform (personal access token)
-[box] created acme-inc/acme-gitops
-[box] pushed to https://github.com/acme-inc/acme-gitops
-[box] ✓ HCLOUD_TOKEN set on acme-inc/acme-gitops
+[box] created acme-inc/acme-gitops-1794447136
+[box] pushed to https://github.com/acme-inc/acme-gitops-1794447136
+[box] ✓ HCLOUD_TOKEN set on acme-inc/acme-gitops-1794447136
 …
-acme-inc/acme-gitops is a box, with no clusters.
-  registry/box.yaml declares it: boxId acme-hub, domain acme.example.
-  A checkout is at acme-gitops.
+acme-inc/acme-gitops-1794447136 is a box, with no clusters.
+
+  box id             acme-1794447136
+  repository         acme-inc/acme-gitops-1794447136
+  management cluster acme-hub-1794447136   (declared next, not yet created)
+  checkout           acme-gitops-1794447136
 ```
+
+Each `✓` line is a **GitHub Actions secret set on the new repository** — `Settings › Secrets and variables › Actions`, or `gh secret list --repo <repository>`. That is where your box is built from: the workflow that creates a management cluster runs in this repository, on your runners, under these secrets, and the platform keeps no copy of any of them. They are not consumed by Day-0 and then spent — a replacement management cluster reads the same secrets later. See [Where the secrets live](/features/admin/git-connection#where-the-secrets-live) for who reads which, and when.
+
+<Note>
+**Keep the box id.** Every escrow command takes it, and it is minted rather than chosen. `registry/box.yaml` records all three names, so any command run inside the checkout reads them — you need the id by hand only for break-glass access from somewhere else.
+</Note>
 
 | Flag | Meaning |
 | :- | :- |
 | `--tenant` | Your tenant identifier, lower-case. It names the repository and your box. |
-| `--box` | The git organization the repository is created in — `github.com/<box>/<tenant>-gitops`. Not the box's name; that is `--box-id`. |
+| `--box` | The git organization the repository is created in. Not the box's name, which is generated. |
 | `--domain` | Your base domain. |
-| `--box-id` | Your box's permanent identity, pinned forever. Defaults to `<tenant>-hub`. |
 | `--platform-admin` | The one human this box accepts for escrow-backed operations. Defaults to the signed-in session; pass it only to name somebody else. |
 | `--subdomain` | Optional. A DNS label every hostname sits under; empty publishes on the apex. |
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines. |
@@ -81,33 +91,33 @@ acme-inc/acme-gitops is a box, with no clusters.
 | `--bundle-version` | The platform version the box starts on. A released CLI defaults to the version it carries; an unreleased build refuses rather than guess. |
 | `--dry-run` | Render locally and create nothing, which is how to see what you will receive. |
 | `--no-prompt` | Never ask: every credential comes from the environment or `~/.kamarkat/`. For automation. |
-| `--out` | The checkout to leave behind. Defaults to `./<tenant>-gitops`. |
+| `--out` | The checkout to leave behind. Defaults to `./<repository>`. |
 
 Pass `--escrow-url`, `--escrow-project-id`, `--escrow-client-id` and `--escrow-client-secret` only to use an escrow this machine did not create, or the credential flags to create a box whose secrets are not staged on this machine.
 
 ## Step 3: Its management cluster
 
-Run the second command inside the checkout:
+Run the second command inside the checkout. No name: the box's first management cluster takes the name the box declared for it.
 
 ```bash
-cd acme-gitops
-kakt tenant add-management --name acme-hub
+cd acme-gitops-1794447136
+kakt tenant add-management
 ```
 
-It renders `registry/clusters/acme-hub/` from the box's own declaration — your domain, your escrow, your provider and region — then generates this box's Infisical administrator password, writes it to your escrow, and sets it on the repository. A later run reads the escrowed one back rather than minting a second over the live instance.
+It renders `registry/clusters/acme-hub-1794447136/` from the box's own declaration — your domain, your escrow, your provider and region — then generates this box's Infisical administrator password, writes it to your escrow, and sets it on the repository. A later run reads the escrowed one back rather than minting a second over the live instance.
 
 ```text
-box acme-hub
-declared management cluster acme-hub:
-  registry/clusters/acme-hub/bundle.yaml
-  registry/clusters/acme-hub/values.yaml
+box acme-1794447136
+declared management cluster acme-hub-1794447136:
+  registry/clusters/acme-hub-1794447136/bundle.yaml
+  registry/clusters/acme-hub-1794447136/values.yaml
   …
 [box] generated this box's Infisical administrator (you@acme.example) and escrowed it
-[box] ✓ INFISICAL_ADMIN_EMAIL set on acme-inc/acme-gitops
-[box] ✓ INFISICAL_ADMIN_PASSWORD set on acme-inc/acme-gitops
+[box] ✓ INFISICAL_ADMIN_EMAIL set on acme-inc/acme-gitops-1794447136
+[box] ✓ INFISICAL_ADMIN_PASSWORD set on acme-inc/acme-gitops-1794447136
 
 Commit and push, then create it:
-  gh workflow run bootstrap-cluster -f cluster=acme-hub
+  gh workflow run bootstrap-cluster -f cluster=acme-hub-1794447136
 ```
 
 `--provider`, `--region`, `--bundle-version` and `--workers` override what the box declares, for this cluster only. Everything else — the domain, the escrow, the administrator — is the box's and is not a per-cluster choice.
@@ -117,8 +127,8 @@ Committing declares the cluster. Nothing builds it until you dispatch that workf
 ## What is in your repository
 
 ```text
-acme-gitops/
-├── registry/box.yaml              what this box IS: boxId, domain, escrow, and the defaults its clusters start from
+acme-gitops-1794447136/
+├── registry/box.yaml              what this box IS: its three names, domain, escrow, and the defaults its clusters start from
 ├── registry/clusters/<cluster>/   one directory per cluster: bundle.yaml (version), values.yaml (yours)
 ├── environments/<env>/<app>/      one directory per application, added in "Run your first app"
 └── templates/                     what you copy to add a cluster, an app or a workload

@@ -48,7 +48,7 @@ One exception is worth doing first, because it is needed before the repository e
 
 | Credential | What it is |
 | :- | :- |
-| `GITHUB_ORG_SETUP_TOKEN` | **Yours, not the box's.** The credential that creates the repository in your git organization, so it is needed before any repository secret can be set. Either an App installation token, which is preferred because the access stays yours to revoke, or a personal access token with the `repo` scope — supply whichever you have and nothing else changes. `kakt box init` asks for it and keeps it on this machine, so you supply it once per machine rather than once per box. |
+| `GITHUB_ORG_SETUP_TOKEN` | **Yours, not the box's.** The credential that creates the repository in your git organization, so it is needed before any repository secret can be set. Either an App installation token, which is preferred because the access stays yours to revoke, or a personal access token with the `repo` **and `workflow`** scopes — supply whichever you have and nothing else changes. `workflow` is not implied by `repo`, and your box's repository carries the workflow that bootstraps it, so a token without it creates the repository and is then refused by the push. `kakt box init` asks for it and keeps it on this machine, so you supply it once per machine rather than once per box. |
 
 ### Required
 

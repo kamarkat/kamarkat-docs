@@ -39,18 +39,18 @@
             "group": "Build your first cluster",
             "pages": [
               "quickstart/get-started",
-              "quickstart/initialize-your-box",
-              "quickstart/build-your-management-cluster",
-              "quickstart/access-your-box",
-              "quickstart/add-your-managed-cluster"
+              "quickstart/initialize-a-box",
+              "quickstart/build-the-management-cluster",
+              "quickstart/access-the-box",
+              "quickstart/add-a-managed-cluster"
             ]
           },
           {
             "group": "Run your first app",
             "pages": [
-              "quickstart/declare-your-app",
+              "quickstart/declare-an-app",
               "quickstart/supply-secrets",
-              "quickstart/deploy-your-app"
+              "quickstart/deploy-an-app"
             ]
           }
         ]
@@ -106,7 +106,7 @@
             "group": "Box",
             "pages": [
               "guides/box/create-a-box",
-              "guides/box/check-your-box",
+              "guides/box/check-a-box",
               "guides/box/resize-the-management-cluster",
               "guides/box/rotate-the-build-credential",
               "guides/box/replace-a-management-cluster",
@@ -154,14 +154,14 @@
           {
             "group": "Platform versions",
             "pages": [
-              "guides/platform/upgrade-your-box",
+              "guides/platform/upgrade-a-box",
               "guides/platform/roll-back-a-version"
             ]
           },
           {
             "group": "Escrow and encryption",
             "pages": [
-              "guides/escrow/verify-your-escrow",
+              "guides/escrow/verify-an-escrow",
               "guides/escrow/use-break-glass-access",
               "guides/escrow/turn-on-encryption",
               "guides/escrow/rotate-the-encryption-key"
@@ -170,7 +170,7 @@
           {
             "group": "Support",
             "pages": [
-              "guides/support/review-what-your-box-reports"
+              "guides/support/review-what-a-box-reports"
             ]
           }
         ]
@@ -275,20 +275,60 @@
   },
   "redirects": [
     {
+      "source": "/guides/support/review-what-your-box-reports",
+      "destination": "/guides/support/review-what-a-box-reports"
+    },
+    {
+      "source": "/guides/escrow/verify-your-escrow",
+      "destination": "/guides/escrow/verify-an-escrow"
+    },
+    {
+      "source": "/guides/platform/upgrade-your-box",
+      "destination": "/guides/platform/upgrade-a-box"
+    },
+    {
+      "source": "/guides/box/check-your-box",
+      "destination": "/guides/box/check-a-box"
+    },
+    {
+      "source": "/quickstart/deploy-your-app",
+      "destination": "/quickstart/deploy-an-app"
+    },
+    {
+      "source": "/quickstart/declare-your-app",
+      "destination": "/quickstart/declare-an-app"
+    },
+    {
+      "source": "/quickstart/add-your-managed-cluster",
+      "destination": "/quickstart/add-a-managed-cluster"
+    },
+    {
+      "source": "/quickstart/access-your-box",
+      "destination": "/quickstart/access-the-box"
+    },
+    {
+      "source": "/quickstart/build-your-management-cluster",
+      "destination": "/quickstart/build-the-management-cluster"
+    },
+    {
+      "source": "/quickstart/initialize-your-box",
+      "destination": "/quickstart/initialize-a-box"
+    },
+    {
       "source": "/quickstart/bootstrap-your-box",
-      "destination": "/quickstart/build-your-management-cluster"
+      "destination": "/quickstart/build-the-management-cluster"
     },
     {
       "source": "/quickstart/create-your-box",
-      "destination": "/quickstart/initialize-your-box"
+      "destination": "/quickstart/initialize-a-box"
     },
     {
       "source": "/quickstart/scaffold-your-repository",
-      "destination": "/quickstart/initialize-your-box"
+      "destination": "/quickstart/initialize-a-box"
     },
     {
       "source": "/quickstart/collect-your-credentials",
-      "destination": "/quickstart/initialize-your-box"
+      "destination": "/quickstart/initialize-a-box"
     },
     {
       "source": "/features/capabilities/workloads",

@@ -8,7 +8,7 @@ This is the first thing you do, and all of it happens before any infrastructure 
 
 Your box's secret store is encrypted by master keys. The box cannot keep them itself: they are what decrypts it, so they would be unreachable exactly when you need them. The escrow keeps a copy outside the box, in a secret manager you control and Kamarkat does not.
 
-The escrow also holds each cluster's admin kubeconfig, which you use only for [break-glass access](/quickstart/access-your-box#break-glass-access), and the cloud credential your box's infrastructure is built and destroyed with.
+The escrow also holds each cluster's admin kubeconfig, which you use only for [break-glass access](/quickstart/access-the-box#break-glass-access), and the cloud credential your box's infrastructure is built and destroyed with.
 
 You reach it as **yourself**. Step 1 signs you in, and from then on every command that touches the escrow uses your own session rather than a credential copied onto your machine.
 
@@ -39,7 +39,7 @@ you@acme.example at https://app.infisical.com
   session kept in macOS keychain
 ```
 
-**Keep that `identity` value.** You need it when you [initialize your box](/quickstart/initialize-your-box), which declares it as the box's platform administrator — the one human the box accepts for escrow-backed operations. An address is not used for that, because an address can be changed and re-assigned.
+**Keep that `identity` value.** You need it when you [initialize your box](/quickstart/initialize-a-box), which declares it as the box's platform administrator — the one human the box accepts for escrow-backed operations. An address is not used for that, because an address can be changed and re-assigned.
 
 ## Step 2: Create the escrow project
 
@@ -91,6 +91,6 @@ There is nothing to export. The store belongs to you rather than to a checkout, 
 
 ## Next
 
-<Card title="Initialize a box" icon="key" href="/quickstart/initialize-your-box">
+<Card title="Initialize a box" icon="key" href="/quickstart/initialize-a-box">
   One command walks you through everything else your box is built with.
 </Card>

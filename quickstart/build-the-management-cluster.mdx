@@ -109,7 +109,7 @@ kakt verify --cluster acme-mgmt-1794447136 --timeout 15m
 `kakt verify` reports what is still outstanding if the budget runs out.
 
 <Tip>
-If a run fails part-way, fix the cause and start the workflow again. Phases that completed are not repeated, and a phase that is not safe to repeat refuses to resume rather than running twice.
+If a run fails part-way, fix the cause and start the workflow again. Phases recorded as complete are skipped, and some first re-check their result and run again if it no longer holds. If something a later phase depends on is gone, the run stops and says whether to re-run an earlier phase or tear down and start over.
 </Tip>
 
 ## What this does and does not cover

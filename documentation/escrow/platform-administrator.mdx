@@ -62,7 +62,7 @@ Refusals name both ends, because the usual cause is holding the wrong session ra
 ```text
 you@acme.example is not the platform administrator this box declares.
 
-Box: acme-hub
+Box: acme-mgmt-1794447136
 Declared: 3f9c1b7e-...-a21d
 This session: 88b2e04a-...-7c55
 ```
@@ -84,10 +84,10 @@ Automation authenticates as itself and never borrows your session.
 The human session wins whenever there is one. That matters on a workstation that also carries CI credentials: without it, the machine identity would quietly act on your behalf, your work would be attributed to the pipeline, and the administrator check would be skipped. `KAKT_IDENTITY=machine` selects the other way explicitly and fails if no machine identity is configured — it never falls back to your login.
 
 ```bash
-KAKT_IDENTITY=machine kakt escrow verify --box acme-hub --cluster acme-hub --management
+KAKT_IDENTITY=machine kakt escrow verify --box acme-1794447136 --cluster acme-mgmt-1794447136 --management
 ```
 
-Your box's `hub-operator` uses a machine identity to escrow recovery material as it runs, and your bootstrap workflow uses the same one. There is **one per organization**, created by `kakt escrow init` and reused by every later box — you do not create or choose it.
+Your box's platform operator uses a machine identity to escrow recovery material as it runs, and your bootstrap workflow uses the same one. There is **one per organization**, created by `kakt escrow init` and reused by every later box — you do not create or choose it.
 
 ### Operating the machine identity
 
@@ -98,9 +98,9 @@ One identity, and these are the facts your box depends on:
 | | |
 |---|---|
 | Auth method | **Universal Auth** — client ID and client secret. It is the only method the platform uses |
-| Role on the escrow project | **admin**, granted when it creates the project (`kakt escrow init` authenticates as it) |
+| Role on the escrow project | **member**, which is what reading and writing secrets and creating folders needs. Its organization role is `no-access` |
 | Created by | `kakt escrow init`, once per organization, named `kamarkat-automation` |
-| Where its secret lives | your repository's secrets, and the Secret `hub-operator` reads in the box |
+| Where its secret lives | your repository's secrets, and the Secret the platform operator reads in the box |
 | Token lifetime | a short-lived access token per login. Nothing renews one, because every consumer is a short run |
 
 <Warning>

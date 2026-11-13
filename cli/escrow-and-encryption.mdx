@@ -55,7 +55,7 @@ It needs an **organisation admin**: a member can create an identity but cannot g
 Records this box's escrow coordinates inside that escrow, so a declaration and its escrow can be checked against each other afterwards.
 
 ```bash
-kakt escrow bind-destination --gitops-dir . --cluster acme-hub
+kakt escrow bind-destination --gitops-dir . --cluster acme-mgmt-1794447136
 ```
 
 | Flag | Meaning |
@@ -77,8 +77,8 @@ What the binding does and does not establish, who may reach an escrow, and why n
 Reports which artefacts your box cannot be rebuilt without are actually present, by fingerprint — so a missing one is visible before a recovery rather than during one.
 
 ```bash
-kakt escrow verify --box acme-hub --cluster acme-hub --management
-kakt escrow verify --box acme-hub --cluster acme-02 --workload
+kakt escrow verify --box acme-1794447136 --cluster acme-mgmt-1794447136 --management
+kakt escrow verify --box acme-1794447136 --cluster acme-02 --workload
 ```
 
 Pass `--management` for the management cluster, where every artefact applies, and `--workload` for a managed cluster, where the management-cluster-only artefacts do not.
@@ -92,7 +92,7 @@ Run this after Day-0. An escrow cannot be added to a box afterwards, so the one 
 Decrypts one value, exactly as the cluster stored it, using the key held in the escrow.
 
 ```bash
-kakt escrow verify-recovery --box acme-hub --cluster acme-hub --from /tmp/probe.bin
+kakt escrow verify-recovery --box acme-1794447136 --cluster acme-mgmt-1794447136 --from /tmp/probe.bin
 ```
 
 Presence is not recovery. `escrow verify` reports that a key exists; this reports whether that key is the one your cluster's API server is actually encrypting with. A key that decrypts nothing looks identical to a working one in a presence check, and the difference surfaces during a rebuild — the one moment it cannot be fixed.
@@ -107,8 +107,8 @@ Retrieves a cluster's admin kubeconfig from the escrow.
 
 ```bash
 kakt login
-kakt kubeconfig --cluster acme-hub --gitops-dir . --out acme-hub.kubeconfig
-kubectl --kubeconfig acme-hub.kubeconfig get nodes
+kakt kubeconfig --cluster acme-mgmt-1794447136 --gitops-dir . --out acme-mgmt-1794447136.kubeconfig
+kubectl --kubeconfig acme-mgmt-1794447136.kubeconfig get nodes
 ```
 
 With `--gitops-dir`, the box's own declaration names its escrow and the read is performed with your identity ([Signing in](/cli/signing-in)) — so this works from any authorized workstation. Without it, pass `--box` and the four `INFISICAL_ESCROW_*` values in the environment, which is what automation does.
@@ -117,14 +117,14 @@ With `--gitops-dir`, the box's own declaration names its escrow and the read is 
 This is break-glass access. Normal access is through your own identity provider, where each person authenticates as themselves. Use this when that is not available: the identity provider is down, the cluster is broken, or nobody can sign in. The credential is cluster-admin, is not tied to a person, and must never be committed.
 </Warning>
 
-The escrow holds one kubeconfig per cluster, so pass the cluster you need. Without `--out` it prints to stdout. `--box` overrides the declaration, which matters for a successor hub: it reads its predecessor's artefacts under the box they share, while the declaration names only the current cluster.
+The escrow holds one kubeconfig per cluster, so pass the cluster you need. Without `--out` it prints to stdout. `--box` overrides the declaration, which matters for a successor management cluster: it reads its predecessor's artefacts under the box they share, while the declaration names only the current cluster.
 
 ### kakt escrow enroll-provider-credential
 
 Puts the cloud credential this box was built with into its escrow, so lifecycle commands can reach the provider from any authorized workstation.
 
 ```bash
-kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-hub < token
+kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-mgmt-1794447136 < token
 ```
 
 This is the only place a provider credential is accepted from an operator. Bootstrap does not enrol one: it reads the escrowed copy and refuses to create infrastructure if there is none, because a credential that exists nowhere but the bootstrapping machine cannot destroy what it built. A first enrolment also establishes the box's escrow binding.
@@ -132,7 +132,7 @@ This is the only place a provider credential is accepted from an operator. Boots
 The credential arrives on stdin, never an argument, and is never printed back. Re-running with the same credential writes nothing; a *different* one is refused unless you pass `--rotate`, because the escrowed copy may be the only one that reaches infrastructure the box already owns.
 
 <Note>
-It is escrowed under the **box**, not the cluster. The credential buys and destroys the box's infrastructure and outlives any cluster in it, so a successor management cluster finds the same one (ADR-111 §1).
+It is escrowed under the **box**, not the cluster. The credential buys and destroys the box's infrastructure and outlives any cluster in it, so a successor management cluster finds the same one.
 </Note>
 
 ### kakt escrow migrate-paths
@@ -140,7 +140,7 @@ It is escrowed under the **box**, not the cluster. The credential buys and destr
 Copies a box's admin kubeconfig and both at-rest encryption key generations onto the per-cluster paths a cluster now has.
 
 ```bash
-kakt escrow migrate-paths --box acme-hub --cluster acme-hub --cluster acme-02
+kakt escrow migrate-paths --box acme-1794447136 --cluster acme-mgmt-1794447136 --cluster acme-02
 ```
 
 It copies and never generates, derives or rotates. It refuses to overwrite a destination holding different bytes, reads every destination back and compares it with its source before reporting an artefact migrated, and leaves the old copies in place.
@@ -158,7 +158,7 @@ These two commands exist and are documented here for completeness. The capabilit
 Reads the object-store credential for management-state backups from stdin and preserves it in the escrow.
 
 ```bash
-kakt escrow enroll-store-credential --box acme-hub < credential.ini
+kakt escrow enroll-store-credential --box acme-1794447136 < credential.ini
 ```
 
 The credential is yours and is never generated here. It arrives on stdin, so it is not in a command argument, a shell history or a process list, and it is never printed back. Enrolment is one-time: a credential already escrowed is left alone unless `--rotate` is given.
@@ -168,7 +168,7 @@ The credential is yours and is never generated here. It arrives on stdin, so it 
 Creates the two Secrets a cluster needs to read its management-state backups: the customer-supplied key the objects are encrypted under, and the store credential that reaches the bucket.
 
 ```bash
-kakt escrow deliver-backup-credentials --box acme-hub --kubeconfig acme-hub.kubeconfig
+kakt escrow deliver-backup-credentials --box acme-1794447136 --kubeconfig acme-mgmt-1794447136.kubeconfig
 ```
 
 Create-only. An identical Secret is accepted as already present; a different one is refused and left alone. A missing escrowed key fails closed and is never replaced by a new one, because a new key cannot decrypt a backup written under the old. `--dry-run` compares and writes nothing.
@@ -180,8 +180,8 @@ Create-only. An identical Secret is accepted as already present; a different one
 Delivers what at-rest encryption of Secrets needs to a cluster that already exists: the Secret its control plane reads its encryption provider configuration from. The key is restored from the escrow when one holds it, and generated otherwise — and a generated key is escrowed before anything is applied.
 
 ```bash
-kakt encryption enable --box acme-hub --cluster acme-hub \
-  --apply-class --kubeconfig acme-hub.kubeconfig
+kakt encryption enable --box acme-1794447136 --cluster acme-mgmt-1794447136 \
+  --apply-class --kubeconfig acme-mgmt-1794447136.kubeconfig
 ```
 
 | Flag | Meaning |
@@ -201,9 +201,9 @@ Run this against the management cluster for any cluster, and run it as the first
 Replaces the key Secrets are encrypted with, in two stages, without losing data already written.
 
 ```bash
-kakt encryption rotate --box acme-hub --cluster acme-hub --kubeconfig acme-hub.kubeconfig
+kakt encryption rotate --box acme-1794447136 --cluster acme-mgmt-1794447136 --kubeconfig acme-mgmt-1794447136.kubeconfig
 # roll the control plane, rewrite every Secret, verify, then:
-kakt encryption rotate --box acme-hub --cluster acme-hub --finalize
+kakt encryption rotate --box acme-1794447136 --cluster acme-mgmt-1794447136 --finalize
 ```
 
 Stage one mints a new key, makes it the write key and retains the current one for reads, so nothing is unreadable at any point. Stage two, with `--finalize`, removes the retained key; it refuses unless the live configuration is actually mid-rotation.

@@ -1,6 +1,6 @@
 ---
 title: "Rollback and reversibility"
-description: "Reverting the version a cluster declares restores what it asks for, not what it had. Whether the two are the same is a property of the version, declared before you take it."
+description: "Reverting the version a cluster declares restores what it asks for, not what it had. Whether the two are the same is a property of the version, declared in its release notes."
 keywords: ["rollback", "reversibility", "revert", "declaration", "one-way upgrade"]
 ---
 
@@ -16,10 +16,12 @@ So the platform promises **declaration rollback** and does not promise operation
 
 ## Reversibility is a property of the version
 
-Each published version states its predecessor and whether that predecessor can be operationally restored from it. The statement is made when the version is published, is immutable afterwards, and is derived from what the upgrade actually does rather than asserted.
+Each published version's release notes carry a **Taking this version** table. It states the minimum version the release may be taken from, and whether its predecessor can be operationally restored from it: `yes`, `no` or `unknown`. The statement is made when the version is published and is immutable afterwards.
+
+The platform's maintainers declare reversibility for each release. A release that declares nothing says `unknown` rather than `yes`. Treat `unknown` as `no`.
 
 <Warning>
-**A version that is not reversible says so before you take it.** That is the point of declaring it at publication: you learn it at the moment of deciding, not at the moment of needing to undo it. If you need the option to return, take it before you promote — that is the only point at which it exists.
+**Read the statement before you take the version.** That is the point of declaring it at publication: you learn it at the moment of deciding, not at the moment of needing to undo it. Only `yes` means going back restores the previous state. If you need the option to return, take it before you promote — that is the only point at which it exists.
 </Warning>
 
 ## Before a one-way promotion
@@ -35,4 +37,4 @@ Everything that protects you here is something you do first:
 
 Revert the change to the cluster's declaration and let your management cluster reconcile it. For the commands, see [Roll back a platform version](/guides/platform/roll-back-a-version).
 
-What that gives you is a cluster asking for the earlier version. Whether it is the cluster you had depends on the version you came from, which said so.
+What that gives you is a cluster asking for the earlier version. Whether it is the cluster you had depends on the version you came from, and its release notes say what is known.

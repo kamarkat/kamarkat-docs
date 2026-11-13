@@ -34,7 +34,7 @@ Confirm the `identity` line matches what you declared. If it does not, every com
 ## 3. Bind the box to its escrow
 
 ```bash
-kakt escrow bind-destination --gitops-dir . --cluster acme-hub
+kakt escrow bind-destination --gitops-dir . --cluster acme-mgmt-1794447136
 ```
 
 Full flags: [`kakt escrow bind-destination`](/cli/escrow-and-encryption#kakt-escrow-bind-destination).
@@ -64,7 +64,7 @@ That last row is deliberate. Letting `--rebind` perform a first binding would ma
 ## 4. Enrol the provider credential
 
 ```bash
-kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-hub < token
+kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-mgmt-1794447136 < token
 ```
 
 Full flags: [`kakt escrow enroll-provider-credential`](/cli/escrow-and-encryption#kakt-escrow-enroll-provider-credential).
@@ -87,7 +87,7 @@ The refusal is what stops a changed secret from silently repointing a box at ano
 ## 5. Verify
 
 ```bash
-kakt escrow verify --box acme-hub --cluster acme-hub --management
+kakt escrow verify --box acme-1794447136 --cluster acme-mgmt-1794447136 --management
 ```
 
 Reports each artifact by fingerprint, never by value. For each managed cluster, pass its name with `--workload` instead — see [`kakt escrow verify`](/cli/escrow-and-encryption#kakt-escrow-verify).
@@ -101,7 +101,7 @@ A box built before this was in place has coordinates but no administrator, no bi
 3. **Enrol the provider credential**, which also binds the destination:
 
    ```bash
-   kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-hub < token
+   kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-mgmt-1794447136 < token
    ```
 
 Then verify. Nothing already in the escrow is moved or rewritten by this, and no existing artifact changes path.

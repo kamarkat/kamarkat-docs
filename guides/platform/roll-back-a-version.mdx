@@ -1,6 +1,6 @@
 ---
 title: "Roll back a platform version"
-description: "Revert the change to the cluster's bundle.yaml. Whether that also restores the cluster's previous state depends on the version, and its release page says."
+description: "Revert the change to the cluster's bundle.yaml. Whether that also restores the cluster's previous state depends on the version, and its release notes say what is known."
 keywords: ["rollback", "platform version", "revert", "bundle.yaml", "predecessor restorable"]
 ---
 
@@ -8,13 +8,13 @@ keywords: ["rollback", "platform version", "revert", "bundle.yaml", "predecessor
 
 ## Before you start
 
-Read the release page of the version you are leaving. Its **Predecessor restorable from this version** field says whether reverting restores the previous state:
+Read the release notes of the version you are leaving: the release for tag `v<version>` on `kamarkat/kamarkat`. The **Predecessor restorable from this version** row of its **Taking this version** table says whether reverting restores the previous state:
 
 | Value | Meaning |
 | :- | :- |
 | `yes` | Going back restores the cluster's previous state. |
 | `no` | The upgrade changed something going back does not undo — a controller that migrated stored resources to a new API version leaves them migrated. Going back may leave the cluster unable to reconcile. |
-| `unknown` | The release states nothing. Treat it as `no`. |
+| `unknown` | Reversibility was not declared for this release, which is the default. Treat it as `no`. |
 
 ## Step 1: Revert the version
 
@@ -29,7 +29,7 @@ Or set both fields in `registry/clusters/<cluster>/bundle.yaml` back to the vers
 ## Step 2: Verify
 
 ```bash
-kakt verify --cluster acme-hub
+kakt verify --cluster acme-mgmt-1794447136
 ```
 
 If the cluster does not converge on the previous version, go forward instead: a later version that fixes the problem is the way out of a `no`.

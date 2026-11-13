@@ -17,7 +17,7 @@ The management cluster's topology is written by Day-0 into your repository. Once
 
 In `registry/clusters/<management-cluster>/generated/hub-cluster.yaml`, set the worker `replicas`:
 
-```yaml registry/clusters/acme-hub/generated/hub-cluster.yaml
+```yaml registry/clusters/acme-mgmt-1794447136/generated/hub-cluster.yaml
   topology:
     workers:
       machineDeployments:
@@ -33,8 +33,8 @@ Do not add autoscaler annotations to this file while `replicas` is set. The clus
 ## Step 2: Commit and verify
 
 ```bash
-git commit -am "Resize acme-hub to 3 workers" && git push
-kakt verify --cluster acme-hub
+git commit -am "Resize acme-mgmt-1794447136 to 3 workers" && git push
+kakt verify --cluster acme-mgmt-1794447136
 ```
 
 To resize a managed cluster, see [Resize a managed cluster](/guides/clusters/resize-a-managed-cluster).

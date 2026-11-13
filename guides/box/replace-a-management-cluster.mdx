@@ -22,7 +22,7 @@ This is destructive and it is not a cutover. Every managed cluster of this box i
 - **You need the box's recovery material.** The replacement is a new cluster in the same box, so it reads the box's escrow. Confirm it is there before you destroy anything:
 
   ```bash
-  kakt escrow verify --box acme-hub --cluster acme-hub --management
+  kakt escrow verify --box acme-1794447136 --cluster acme-mgmt-1794447136 --management
   ```
 
 <Note>
@@ -36,13 +36,13 @@ The management cluster goes last. It holds its managed clusters' Cluster API obj
 Remove each one, which is a commit each:
 
 ```bash
-kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-stg-01
+kakt tenant remove-cluster --mgmt-cluster acme-mgmt-1794447136 --name acme-stg-01
 ```
 
 Then confirm each is actually gone before continuing. Removing a declaration from Git is not a destroyed cluster:
 
 ```bash
-kakt tenant cluster-status --name acme-stg-01 --mgmt-cluster acme-hub
+kakt tenant cluster-status --name acme-stg-01 --mgmt-cluster acme-mgmt-1794447136
 ```
 
 Wait for `removed`. `failed` means its resources are still at your provider with nothing left to delete them, and the next step would strand them.
@@ -50,7 +50,7 @@ Wait for `removed`. `failed` means its resources are still at your provider with
 ## Step 2: Destroy the management cluster
 
 ```bash
-kakt teardown --name acme-hub --gitops-dir . --confirm
+kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm
 ```
 
 It refuses while any cluster it manages still owns infrastructure, so a cluster missed in step 1 stops it here rather than being orphaned.
@@ -97,7 +97,7 @@ kakt tenant add-cluster \
 
 The environment's applications are deployed to it because it declares that environment — no application declaration is edited. Supply each one's secrets against the new cluster, and restore any data you need, as in [Replace a managed cluster](/guides/clusters/replace-a-managed-cluster#step-3-let-the-replacement-receive-the-environment).
 
-Once the replacement is serving, you may remove the predecessor's `registry/clusters/acme-hub/` directory. The box still remembers it: every management cluster this repository has declared is part of the box's record, so a forgotten cluster's surviving infrastructure is never invisible to the next replacement.
+Once the replacement is serving, you may remove the predecessor's `registry/clusters/acme-mgmt-1794447136/` directory. The box still remembers it: every management cluster this repository has declared is part of the box's record, so a forgotten cluster's surviving infrastructure is never invisible to the next replacement.
 
 ## What this does not change
 

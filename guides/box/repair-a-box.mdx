@@ -9,7 +9,7 @@ keywords: ["repair", "reseed", "day-0", "failed", "not converging"]
 ## Step 1: Find what is outstanding
 
 ```bash
-kakt verify --cluster acme-hub
+kakt verify --cluster acme-mgmt-1794447136
 ```
 
 It names the invariant that does not hold and what it is waiting on. Most causes are a commit away: fix the declaration it names and push.
@@ -23,7 +23,7 @@ Start the **Bootstrap cluster** workflow in your repository again. Completed pha
 The Day-0 seed reaches only newly created clusters. To bring an existing management cluster up to the seed the current CLI renders:
 
 ```bash
-kakt reseed --kubeconfig acme-hub.kubeconfig
+kakt reseed --kubeconfig acme-mgmt-1794447136.kubeconfig
 ```
 
 The environment, provider and topology come from the cluster's existing seed, so a reseed cannot change which cluster the seed describes. The platform version is left as the cluster records it.

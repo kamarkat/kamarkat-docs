@@ -23,7 +23,7 @@ this box's escrow holds no Hetzner credential, and clusters are created with one
 
 Enrol it, as the platform administrator:
 
-  kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-hub < token
+  kakt escrow enroll-provider-credential --gitops-dir . --cluster acme-mgmt-1794447136 < token
 ```
 
 ## One credential, both halves
@@ -60,18 +60,18 @@ A refusal names the box, each blocker with its resource count, and the commands 
 ```text
 Cannot create the management cluster.
 
-Box: acme-hub
+Box: acme-mgmt-1794447136
 Creating: acme-mgmt-02
 
 This box already has a management cluster:
 
-  acme-hub still owns 7 provider resource(s)
+  acme-mgmt-1794447136 still owns 7 provider resource(s)
 
 Destroy it:
-  kakt teardown --name acme-hub --gitops-dir . --confirm
+  kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm
 
 Nothing here needs deleting by hand, and nothing is lost by this refusal:
-this repository is reused as it is, boxId stays acme-hub, and the escrow
+this repository is reused as it is, boxId stays acme-mgmt-1794447136, and the escrow
 artefacts and database archives of every past incarnation stay under their
 own names.
 ```
@@ -92,7 +92,7 @@ In CI the provider credential is enrolled from a repository secret on **stdin**,
 
 ## What is written back
 
-During bootstrap the box escrows its own recovery material: master keys, the identity provider's key, its admin kubeconfig and its at-rest encryption key. That is `hub-operator`'s doing, using a machine identity — not your session. See [Artifacts and scopes](/documentation/escrow/artifacts-and-scopes).
+During bootstrap the box escrows its own recovery material: master keys, the identity provider's key, its admin kubeconfig and its at-rest encryption key. That is the platform operator's doing, using a machine identity — not your session. See [Artifacts and scopes](/documentation/escrow/artifacts-and-scopes).
 
 ## Related topics
 

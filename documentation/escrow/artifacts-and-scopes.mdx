@@ -65,7 +65,7 @@ Nothing in this column authenticates to the hosted escrow. No tenant, applicatio
 ## Checking what is actually there
 
 ```bash
-kakt escrow verify --box acme-hub --cluster acme-hub --management
+kakt escrow verify --box acme-1794447136 --cluster acme-mgmt-1794447136 --management
 ```
 
 Reports each artifact by fingerprint, never by value. Pass `--management` for a management cluster, where every artifact applies, and `--workload` for a managed cluster, where the management-only artifacts do not — see [`kakt escrow verify`](/cli/escrow-and-encryption#kakt-escrow-verify).

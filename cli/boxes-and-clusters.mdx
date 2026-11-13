@@ -67,15 +67,15 @@ A continuation reads that checkout's `registry/box.yaml` and reuses its exact na
 </Warning>
 
 <Note>
-**The management hub takes no `--environment`.** It is environment-independent: it
+**The management cluster takes no `--environment`.** It is environment-independent: it
 has its own identity (`boxId`), its own secret scope
 (`management.infisicalEnvironmentSlug`) and its own capacity policy. A `dev`, `stg`
 or `prod` stage is a property of each **workload** cluster, declared with
-`kakt tenant add-cluster --environment`, and one hub manages clusters in all of
-them.
+`kakt tenant add-cluster --environment`, and one management cluster manages clusters
+in all of them.
 
-The hub's secret scope is created for the box during bootstrap, so there is
-nothing to set up in Infisical beforehand.
+The management cluster's secret scope is created for the box during bootstrap, so
+there is nothing to set up in the secret store beforehand.
 </Note>
 
 Initializing a box happens once. Every change after it is a commit or a pull request. See [Initialize a box](/quickstart/initialize-a-box) for the credentials it expects and what the repository contains.
@@ -121,7 +121,7 @@ Declares an additional managed cluster. It renders the cluster template your Git
 
 ```bash
 kakt tenant add-cluster \
-  --mgmt-cluster acme-hub \
+  --mgmt-cluster acme-mgmt-1794447136 \
   --name acme-02 \
   --tenant acme \
   --bundle-version <version> \
@@ -224,22 +224,22 @@ they answer without a kubeconfig:
 ```text
 Cannot create the management cluster.
 
-Box: acme-hub
+Box: acme-mgmt-1794447136
 Creating: acme-mgmt-02
 
 This box already has a management cluster:
 
-  acme-hub still owns 7 provider resource(s)
+  acme-mgmt-1794447136 still owns 7 provider resource(s)
 
 A box has one management cluster at a time. Two of them reconcile the same
 declarations in this repository, so each would provision the other's workload
 clusters under names already taken.
 
 Destroy it:
-  kakt teardown --name acme-hub --gitops-dir . --confirm
+  kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm
 
 Nothing here needs deleting by hand, and nothing is lost by this refusal:
-this repository is reused as it is, boxId stays acme-hub, and the escrow
+this repository is reused as it is, boxId stays acme-mgmt-1794447136, and the escrow
 artefacts and database archives of every past incarnation stay under their
 own names.
 ```
@@ -277,10 +277,10 @@ repository — is refused rather than read as "nothing there".
 
 ```bash
 # 1. remove the workload clusters, which is a commit each
-kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-stg-01
+kakt tenant remove-cluster --mgmt-cluster acme-mgmt-1794447136 --name acme-stg-01
 
 # 2. destroy the current management cluster
-kakt teardown --name acme-hub --gitops-dir . --confirm
+kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm
 
 # 3. declare the replacement; boxId is untouched
 kakt tenant add-management --name acme-mgmt-02
@@ -303,7 +303,7 @@ Day-0 runs as a workflow in your GitOps repository and calls these for you. Run 
 Creates the management cluster and stops there. The gates that decide whether the box is usable — secrets present, the secret store reachable, databases provisioned, declared managed clusters actually up — are separate steps.
 
 ```bash
-kakt bootstrap-mgmt --name acme-hub --provider hetzner --region hel1
+kakt bootstrap-mgmt --name acme-mgmt-1794447136 --provider hetzner --region hel1
 ```
 
 <Warning>
@@ -345,7 +345,7 @@ Values default to `~/.kamarkat/tailscale/authkey` and `~/.kamarkat/tailscale/hos
 Polls the invariants a cluster must satisfy before it serves — nodes Ready, secret stores valid, secrets synced, Applications Synced and Healthy, pods Running — until they all hold or the budget elapses. It reports which invariant is outstanding and what it is waiting on, so a cluster that is still settling reads differently from one that is stuck.
 
 ```bash
-kakt verify --cluster acme-hub --timeout 15m
+kakt verify --cluster acme-mgmt-1794447136 --timeout 15m
 ```
 
 | Flag | Meaning |
@@ -367,7 +367,7 @@ kakt bundle-version
 Produces the verdict for a proposed version against the cluster it targets: that the release's declared minimum permits the step, that the version is published where your box pulls from, and that the cluster is reconciling now.
 
 ```bash
-kakt proposal preflight --candidate <version> --cluster acme-hub
+kakt proposal preflight --candidate <version> --cluster acme-mgmt-1794447136
 ```
 
 A check that cannot run returns unverified rather than passing. `--fail-on-unverified` exits non-zero on that, `--out` writes the markdown verdict to a file and `--json` writes it as JSON. See [Versioning](/versions/overview) for what a version is.
@@ -389,7 +389,7 @@ Read-only. It changes nothing in either the cluster or the provider, and unresol
 Re-renders the Day-0 seed from the current CLI and applies it. Use it after a seed parameter changes, which otherwise reaches only newly created clusters.
 
 ```bash
-kakt reseed --kubeconfig acme-hub.kubeconfig
+kakt reseed --kubeconfig acme-mgmt-1794447136.kubeconfig
 ```
 
 The management secret scope, provider and topology come from the cluster's existing seed, so a reseed cannot change which cluster the seed describes. The version is left as the cluster records it; `--bundle-version` moves it deliberately, and the move is printed against the version it replaces.
@@ -399,7 +399,7 @@ The management secret scope, provider and topology come from the cluster's exist
 Writes a managed cluster's escrowed trust roots into a replacement management cluster, so it can issue node certificates for a cluster that is already running.
 
 ```bash
-kakt cluster restore-pki --box acme-hub --cluster acme-02 --kubeconfig new-hub.kubeconfig
+kakt cluster restore-pki --box acme-1794447136 --cluster acme-02 --kubeconfig new-mgmt.kubeconfig
 ```
 
 For reconstruction, not for provisioning: a new managed cluster gets new trust roots on the ordinary declarative path. It refuses to run unless cluster lifecycle is paused on that cluster, fails closed when the escrow holds nothing, and fails explicitly when a live value disagrees with the escrow rather than overwriting either. Safe to re-run, and it reports fingerprints only.
@@ -412,7 +412,7 @@ Deletes a box: the management cluster, the managed clusters it holds, and the cl
 
 ```bash
 kakt login
-kakt teardown --name acme-hub --gitops-dir . --confirm
+kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm
 ```
 
 Access is resolved before anything is destroyed: the box's declaration names its escrow, and the escrowed kubeconfig and provider credential are read with your identity ([Signing in](/cli/signing-in)). Nothing is read from your disk, so the machine that created the box has no special standing.
@@ -421,19 +421,19 @@ Then the provider is asked what the box actually has, and you confirm against **
 
 ```
 Target
-  management cluster  acme-hub
+  management cluster  acme-mgmt-1794447136
   workload clusters   acme-stg-01
   state               infrastructure present, Kubernetes reachable
 
 To delete (3)
-  server           acme-hub-control-plane-x7k      id=62418891   caph-cluster-acme-hub=owned
+  server           acme-mgmt-1794447136-control-plane-x7k      id=62418891   caph-cluster-acme-mgmt-1794447136=owned
   ...
 Excluded (2) -- not deleted
   server           acme-prod-01-md-9fj             id=62418744   owned by acme-prod-01, which this operation does not target
-  volume           pvc-5c1e                        id=20114      shared with other clusters (caph-cluster-acme-hub=shared)
+  volume           pvc-5c1e                        id=20114      shared with other clusters (caph-cluster-acme-mgmt-1794447136=shared)
 ```
 
-A resource is deleted only when it carries `caph-cluster-<cluster>: owned` for a cluster in that target set — the ownership label CAPH writes. Resources marked `shared`, resources with no ownership label, and resources belonging to a cluster you did not name are listed and left alone. Nothing is selected by name, prefix or substring, which is why a box whose clusters share a prefix (`acme-hub`, `acme-stg-01`) cannot lose the wrong one.
+A resource is deleted only when it carries `caph-cluster-<cluster>: owned` for a cluster in that target set — the ownership label CAPH writes. Resources marked `shared`, resources with no ownership label, and resources belonging to a cluster you did not name are listed and left alone. Nothing is selected by name, prefix or substring, which is why a box whose clusters share a prefix (`acme-mgmt-1794447136`, `acme-stg-01`) cannot lose the wrong one.
 
 ### The management cluster goes last
 
@@ -442,7 +442,7 @@ A management cluster is not torn down while a cluster it manages is still there.
 ```
 teardown failed: the management cluster goes last
 
-acme-hub manages a cluster that is still there:
+acme-mgmt-1794447136 manages a cluster that is still there:
 
   acme-stg-01                      the management cluster's own CAPI inventory
 
@@ -456,7 +456,7 @@ they exist.
 Remove each managed cluster first with [`kakt tenant remove-cluster`](#kakt-tenant-remove-cluster), then tear the box down. Or, when the whole box is going, name them on the teardown itself:
 
 ```bash
-kakt teardown --name acme-hub --gitops-dir . --confirm \
+kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm \
   --destroy-managed acme-stg-01
 ```
 
@@ -469,7 +469,7 @@ The check is made twice, from different evidence, because each source is blind t
 - **The management cluster's own CAPI inventory**, asked before anything is destroyed. Authoritative while the cluster answers, and the gate runs before the drain and the finalizer strip, both of which are already irreversible.
 - **The provider's inventory**, for every cluster the box declares in `registry/clusters/` or you name with `--managed-cluster`. This catches a cluster whose CAPI objects were deleted while its servers survived — a half-finished removal — and it is the only check available for a box whose API is gone. A cluster the provider says owns nothing is gone for this purpose: no resource in the project carries its ownership label.
 
-A management-cluster teardown no longer cascades into the clusters it manages. It used to read the hub's cluster list and sweep them into the same run, which destroyed clusters nobody named on the command line and, when half the sweep failed, left the remainder with no management cluster to delete them from.
+A management-cluster teardown no longer cascades into the clusters it manages. It never sweeps the clusters a management cluster manages into the same run: that would destroy clusters nobody named on the command line and, if part of the sweep failed, leave the rest with no management cluster to delete them from.
 
 ### Two modes, chosen explicitly
 
@@ -478,8 +478,8 @@ A management-cluster teardown no longer cascades into the clusters it manages. I
 **Infrastructure-only.** The API cannot be reached, so you ask for the recovery path by name:
 
 ```bash
-kakt teardown --name acme-hub --gitops-dir . --confirm \
-  --infrastructure-only acme-hub,acme-stg-01
+kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm \
+  --infrastructure-only acme-mgmt-1794447136,acme-stg-01
 ```
 
 It deletes only positively owned provider resources and reports everything the cluster would have done as outstanding. A missing kubeconfig never turns the first mode into the second: without access and without the flag the command refuses, and asking for the flag on a box that *is* reachable is refused too.
@@ -520,7 +520,7 @@ If it cannot resolve access it stops rather than proceeding: a teardown that can
 Deletes a managed cluster's declaration. **The commit is the removal.** For the whole task, see [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster).
 
 ```bash
-kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-02
+kakt tenant remove-cluster --mgmt-cluster acme-mgmt-1794447136 --name acme-02
 git add -A registry && git commit -m "Destroy acme-02" && git push
 ```
 
@@ -547,7 +547,7 @@ The commit destroys the cluster and its databases. Its secrets and backups stay,
 Reports what is actually left of a managed cluster. Read-only.
 
 ```bash
-kakt tenant cluster-status --name acme-02 --mgmt-cluster acme-hub
+kakt tenant cluster-status --name acme-02 --mgmt-cluster acme-mgmt-1794447136
 ```
 
 ```

@@ -65,7 +65,7 @@ The version must be named and must already be in the registry: promoting first w
 Syncs the box to a version already promoted, and verifies every Application reached it.
 
 ```bash
-KUBECONFIG=<hub kubeconfig> kakt release sync --version 0.1.17-rc.1
+KUBECONFIG=<management cluster kubeconfig> kakt release sync --version 0.1.17-rc.1
 ```
 
 Use it when a release reported that the box did not converge. Fix the Applications it named, then run this again. Never publish the version again.

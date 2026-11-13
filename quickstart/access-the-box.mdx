@@ -17,11 +17,11 @@ Use the admin kubeconfig only when ordinary sign-in is not available: the identi
 From your box's GitOps repository, which declares the escrow that holds it:
 
 ```bash
-kakt kubeconfig --cluster acme-hub --gitops-dir . --out acme-hub.kubeconfig
-kubectl --kubeconfig acme-hub.kubeconfig get nodes
+kakt kubeconfig --cluster acme-mgmt-1794447136 --gitops-dir . --out acme-mgmt-1794447136.kubeconfig
+kubectl --kubeconfig acme-mgmt-1794447136.kubeconfig get nodes
 ```
 
-The read runs with your own [`kakt login`](/cli/signing-in) session, so it is attributed to you and needs no credential copied onto your machine. Elsewhere, pass `--box acme-hub` with the four `INFISICAL_ESCROW_*` values in the environment.
+The read runs with your own [`kakt login`](/cli/signing-in) session, so it is attributed to you and needs no credential copied onto your machine. Elsewhere, pass `--box acme-1794447136` with the four `INFISICAL_ESCROW_*` values in the environment.
 
 The escrow holds one kubeconfig per cluster, so pass the cluster you need.
 

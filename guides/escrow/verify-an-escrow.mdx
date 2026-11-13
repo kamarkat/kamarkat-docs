@@ -17,13 +17,13 @@ export INFISICAL_ESCROW_CLIENT_ID=<machine-identity-client-id>
 export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
 ```
 
-`--box` is the box id your box was created with, which defaults to `<tenant>-hub`.
+`--box` is the box id minted when your box was initialized, such as `acme-1794447136`. `registry/box.yaml` records it.
 
 ## Step 1: Check every artefact is present
 
 ```bash
-kakt escrow verify --box acme-hub --cluster acme-hub --management
-kakt escrow verify --box acme-hub --cluster acme-01 --workload
+kakt escrow verify --box acme-1794447136 --cluster acme-mgmt-1794447136 --management
+kakt escrow verify --box acme-1794447136 --cluster acme-01 --workload
 ```
 
 `--management` for the management cluster, `--workload` for each managed cluster. It reports each artefact by fingerprint, never by value.
@@ -37,7 +37,7 @@ A key that is present but is not the one your cluster encrypts with looks identi
 3. Decrypt it with the escrowed key:
 
 ```bash
-kakt escrow verify-recovery --box acme-hub --cluster acme-hub --from /tmp/probe.bin
+kakt escrow verify-recovery --box acme-1794447136 --cluster acme-mgmt-1794447136 --from /tmp/probe.bin
 ```
 
 Neither the key nor the decrypted value is printed. Delete the probe file and Secret afterwards.

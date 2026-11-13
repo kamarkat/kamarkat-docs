@@ -11,7 +11,7 @@ Rotate every 90 days, and at once when a key may have been disclosed. During a r
 ## Step 1: Start the rotation
 
 ```bash
-kakt encryption rotate --box acme-hub --cluster acme-hub --kubeconfig acme-hub.kubeconfig
+kakt encryption rotate --box acme-1794447136 --cluster acme-mgmt-1794447136 --kubeconfig acme-mgmt-1794447136.kubeconfig
 ```
 
 A new key becomes the write key; the current one is kept for reads. Both are escrowed before anything is applied.
@@ -21,7 +21,7 @@ A new key becomes the write key; the current one is kept for reads. Both are esc
 Wait for the control plane to roll, then rewrite each Secret so it is stored under the new key:
 
 ```bash
-kakt verify --cluster acme-hub
+kakt verify --cluster acme-mgmt-1794447136
 kubectl get secrets --all-namespaces -o json | kubectl replace -f -
 ```
 
@@ -32,7 +32,7 @@ Check that every Secret carries the new key's name, and that the escrowed key de
 ## Step 4: Finish the rotation
 
 ```bash
-kakt encryption rotate --box acme-hub --cluster acme-hub --finalize
+kakt encryption rotate --box acme-1794447136 --cluster acme-mgmt-1794447136 --finalize
 ```
 
 It removes the old key, and refuses unless the cluster is actually mid-rotation.

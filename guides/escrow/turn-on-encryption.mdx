@@ -11,8 +11,8 @@ At-rest encryption seals every Kubernetes Secret a cluster stores. This turns it
 ## Step 1: Deliver the key
 
 ```bash
-kakt encryption enable --box acme-hub --cluster acme-hub \
-  --apply-class --kubeconfig acme-hub.kubeconfig
+kakt encryption enable --box acme-1794447136 --cluster acme-mgmt-1794447136 \
+  --apply-class --kubeconfig acme-mgmt-1794447136.kubeconfig
 ```
 
 The key is restored from the escrow if it holds one, and generated otherwise — a generated key is escrowed before anything is applied. Pass `--apply-class` for the management cluster; leave it off for a managed cluster, whose template the GitOps engine already carries. `--dry-run` shows what would be applied.
@@ -22,7 +22,7 @@ The key is restored from the escrow if it holds one, and generated otherwise —
 Adopting the new control-plane template replaces each control-plane node. Wait until every one has been replaced:
 
 ```bash
-kakt verify --cluster acme-hub
+kakt verify --cluster acme-mgmt-1794447136
 ```
 
 ## Step 3: Rewrite every Secret

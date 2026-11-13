@@ -11,7 +11,7 @@ Run this after any change you are waiting on — a new cluster, a platform upgra
 ## Check a cluster
 
 ```bash
-kakt verify --cluster acme-hub
+kakt verify --cluster acme-mgmt-1794447136
 kakt verify --cluster acme-01
 ```
 
@@ -24,8 +24,8 @@ It reads the cluster's kubeconfig from the box's escrow, using your own `kakt lo
 A box is rebuilt from its escrow. Check it holds every artefact, before you need them:
 
 ```bash
-kakt escrow verify --box acme-hub --cluster acme-hub --management
-kakt escrow verify --box acme-hub --cluster acme-01 --workload
+kakt escrow verify --box acme-1794447136 --cluster acme-mgmt-1794447136 --management
+kakt escrow verify --box acme-1794447136 --cluster acme-01 --workload
 ```
 
 See [Verify an escrow](/guides/escrow/verify-an-escrow), which also proves a held key actually decrypts.

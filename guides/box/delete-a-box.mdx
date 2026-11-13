@@ -17,7 +17,7 @@ So a teardown that found one refuses, names it, and deletes nothing:
 ```
 teardown failed: the management cluster goes last
 
-acme-hub manages a cluster that is still there:
+acme-mgmt-1794447136 manages a cluster that is still there:
 
   acme-stg-01                      the management cluster's own CAPI inventory
 ```
@@ -32,9 +32,9 @@ acme-hub manages a cluster that is still there:
 One commit per cluster: delete the declaration, push, and the management cluster destroys the cluster. See [Remove a managed cluster](/guides/clusters/remove-a-managed-cluster).
 
 ```bash
-kakt tenant remove-cluster --name acme-stg-01 --mgmt-cluster acme-hub --gitops-dir .
+kakt tenant remove-cluster --name acme-stg-01 --mgmt-cluster acme-mgmt-1794447136 --gitops-dir .
 git add -A registry && git commit -m "Destroy acme-stg-01" && git push
-kakt tenant cluster-status --name acme-stg-01 --mgmt-cluster acme-hub   # watch it finish
+kakt tenant cluster-status --name acme-stg-01 --mgmt-cluster acme-mgmt-1794447136   # watch it finish
 ```
 
 <Tip>
@@ -44,7 +44,7 @@ To do both in one run, skip step 1 and name the clusters on the teardown: `--des
 ## Step 2: Tear down the management cluster
 
 ```bash
-kakt teardown --name acme-hub --gitops-dir . --confirm
+kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm
 ```
 
 It asks the provider what the box has, shows you the resources it is about to delete with the ownership label that admits each one, and runs the cluster's own cleanup before touching them.
@@ -60,11 +60,11 @@ Its cluster list dies with it, so name the clusters to destroy. They go first an
 ```bash
 export HCLOUD_TOKEN=...   # only if this box escrowed no provider credential
 
-kakt teardown --name acme-hub --gitops-dir . --confirm \
-  --infrastructure-only acme-hub,acme-stg-01
+kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm \
+  --infrastructure-only acme-mgmt-1794447136,acme-stg-01
 ```
 
-Between the two the provider is asked again. If anything of `acme-stg-01` survived, `acme-hub` is left standing deliberately — it is the only thing that could still finish the job — and the run exits non-zero saying what remains.
+Between the two the provider is asked again. If anything of `acme-stg-01` survived, `acme-mgmt-1794447136` is left standing deliberately — it is the only thing that could still finish the job — and the run exits non-zero saying what remains.
 
 A recovery run reports the cluster's own cleanup as not performed: load balancers the in-cluster controller owns, finalizers, and the DNS records whose owner id only the cluster knows. To release those records afterwards, pass `--dns-only` with `--dns-owner` and `--dns-zone`.
 

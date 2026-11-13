@@ -14,7 +14,7 @@ This page defines the words the platform uses for boxes and clusters, and the ru
 flowchart TD
   B["Box — boxId<br/>permanent"]
   R["GitOps repository<br/>reused for the life of the box"]
-  M1["Management cluster<br/>clusterName: acme-hub<br/>destroyed"]
+  M1["Management cluster<br/>clusterName: acme-mgmt-1794447136<br/>destroyed"]
   M2["Management cluster<br/>clusterName: acme-mgmt-02<br/>active"]
   W1["Workload cluster<br/>acme-stg-01"]
   W2["Workload cluster<br/>acme-prd-01"]
@@ -54,7 +54,7 @@ The management cluster runs the platform: the GitOps engine, cluster lifecycle, 
 A box may have several management clusters across its life. Each is a new `clusterName` under the same `boxId`, so a replacement never writes into its predecessor's archive and never overwrites its predecessor's recovery credentials.
 
 <Note>
-A box and its first management cluster are usually given the same name, because `boxId` defaults to the first cluster's name. They are still two values, and they diverge the moment you replace the cluster. `boxId` is the one that stays.
+A box and its first management cluster are named from the same timestamp when the box is initialized, such as `acme-1794447136` and `acme-mgmt-1794447136`. They are two values, and they diverge further the moment you replace the cluster. `boxId` is the one that stays.
 </Note>
 
 ### Workload cluster
@@ -95,7 +95,7 @@ The box has no management cluster holding infrastructure. You create the box, de
 
 ```bash
 kakt box init --tenant acme --box acme-inc --domain acme.example
-gh workflow run bootstrap-cluster -f cluster=acme-hub
+gh workflow run bootstrap-cluster -f cluster=acme-mgmt-1794447136
 ```
 
 `boxId` is pinned here, at the box's first incarnation.
@@ -106,10 +106,10 @@ You are intentionally replacing the management cluster, and you are not preservi
 
 ```bash
 # 1. remove each workload cluster — a commit each
-kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-stg-01
+kakt tenant remove-cluster --mgmt-cluster acme-mgmt-1794447136 --name acme-stg-01
 
 # 2. destroy the management cluster
-kakt teardown --name acme-hub --gitops-dir . --confirm
+kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm
 
 # 3. declare the replacement — boxId is untouched
 kakt tenant add-management --name acme-mgmt-02

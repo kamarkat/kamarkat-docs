@@ -21,7 +21,7 @@ A managed cluster exists because its declaration exists: `registry/clusters/<nam
 From the root of your GitOps repository:
 
 ```bash
-kakt tenant remove-cluster --mgmt-cluster acme-hub --name acme-stg-01
+kakt tenant remove-cluster --mgmt-cluster acme-mgmt-1794447136 --name acme-stg-01
 ```
 
 It deletes `registry/clusters/acme-stg-01/`, the directory holding the claim. Your working tree is edited; nothing is destroyed, because nothing is committed.
@@ -45,7 +45,7 @@ When the commit lands on the reconciled branch, the management cluster stops gen
 The commit returns at once; the cluster takes minutes to go.
 
 ```bash
-kakt tenant cluster-status --name acme-stg-01 --mgmt-cluster acme-hub
+kakt tenant cluster-status --name acme-stg-01 --mgmt-cluster acme-mgmt-1794447136
 ```
 
 It prints what it observed — the declaration, the two Applications, the claim, the Cluster API object and your provider's inventory — and then the state: `deleting` while the platform is unwinding it, `removed` once your provider reports nothing carrying its ownership label, `failed` if nothing is left that can finish the job. A declaration gone from git is never by itself reported as a destroyed cluster.
@@ -59,8 +59,8 @@ This destroys the cluster and everything on it, including its databases. There i
 There are no Applications to delete, and nothing on the platform can destroy the cluster. The cluster goes with the box, on the teardown that names it:
 
 ```bash
-kakt teardown --name acme-hub --gitops-dir . --confirm \
-  --infrastructure-only acme-hub,acme-stg-01
+kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm \
+  --infrastructure-only acme-mgmt-1794447136,acme-stg-01
 ```
 
 The named cluster's resources are deleted first, the provider is asked again, and the management cluster goes only once nothing carries the other's ownership label. The run reports the cluster's own cleanup as not performed, and exits non-zero if anything is left — see [Delete a box](/guides/box/delete-a-box).

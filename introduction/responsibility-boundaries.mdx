@@ -20,7 +20,7 @@ Your management cluster runs the platform's services and reconciles the box from
 
 Kamarkat publishes each platform version as one tested bundle. The upgrade automation configured in your repository proposes it as a pull request, and a pre-flight check in your box judges it against the cluster it targets. Nothing changes until you merge.
 
-Reverting a platform-version declaration changes the desired state that GitOps reconciles. It does not guarantee reversal of database migrations, deleted resources or other stateful changes. Use the supported [rollback](/guides/platform/roll-back-a-version) or recovery procedure for the affected version.
+Reverting a platform-version declaration changes the desired state that GitOps reconciles. It does not guarantee reversal of database migrations, deleted resources or other stateful changes. Each version's release notes state whether going back restores the previous state, or `unknown` when it was not declared. Use the supported [rollback](/guides/platform/roll-back-a-version) or recovery procedure for the affected version.
 
 ### Your applications
 

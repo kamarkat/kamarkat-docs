@@ -9,7 +9,7 @@ keywords: ["kakt teardown", "infrastructure-only", "destroy-managed", "ownership
 ## Normal teardown
 
 ```bash
-kakt teardown --name acme-hub --gitops-dir . --confirm
+kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm
 ```
 
 Full flags in [`kakt teardown`](/cli/boxes-and-clusters#kakt-teardown). Two matter for everything below: `--destroy-managed` names the workload clusters to destroy first, through the platform, and `--infrastructure-only` is the recovery form for a box whose API cannot be reached.
@@ -23,7 +23,7 @@ The management cluster goes last, and the command refuses while a cluster it man
 To empty a box in one run, name the managed clusters:
 
 ```bash
-kakt teardown --name acme-hub --gitops-dir . --confirm \
+kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm \
   --destroy-managed acme-stg-01
 ```
 
@@ -40,8 +40,8 @@ The run re-reads the provider after deleting and exits non-zero while anything i
 ## Infrastructure-only: a box whose API is gone
 
 ```bash
-kakt teardown --name acme-hub --gitops-dir . --confirm \
-  --infrastructure-only acme-hub,acme-stg-01
+kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm \
+  --infrastructure-only acme-mgmt-1794447136,acme-stg-01
 ```
 
 The recovery form, for a box whose Kubernetes API cannot be reached. It asks for no cluster access and acquires none — it reads the provider with the box's escrowed credential, deletes strictly by ownership label with the workload clusters first and the management cluster last, and reports Kubernetes-side cleanup as **not performed**, because it was not.

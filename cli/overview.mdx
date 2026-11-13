@@ -33,7 +33,7 @@ Run `kakt <command> --help` for the complete flag set of any command. This page 
 | Command | What it does |
 | :- | :- |
 | `kakt login` | Authenticate to the Infisical your boxes escrow to, as yourself |
-| `kakt whoami` | Show which identity `kakt` would use to reach a hub, and where the session is kept |
+| `kakt whoami` | Show which identity `kakt` would use to reach a management cluster, and where the session is kept |
 | `kakt logout` | Remove this machine's stored session |
 
 A command that reaches a management cluster — `kakt kubeconfig`, `kakt teardown` — does not read a kubeconfig off your disk. The box's repository declares which escrow holds its credentials, and `kakt` reads the escrowed kubeconfig with **your** identity, uses it, and discards it. So any authorized workstation can operate the box, and none of them needs a copy of anything.
@@ -50,8 +50,8 @@ Reading the escrowed kubeconfig gives you **cluster-admin**, because that is wha
 
 | Command | What it does |
 | :- | :- |
-| `kakt box init` | Collect the credentials a box is built with, one guided step each |
-| `kakt box init` | Create your box: its GitOps repository, with no clusters |
+| `kakt box init` | Collect the credentials a box is built with, one guided step each, then create your box: its GitOps repository, with no clusters |
+| `kakt tenant add-management` | Declare a box's management cluster: its first, or a replacement |
 | `kakt tenant add-cluster` | Declare an additional managed cluster |
 | `kakt tenant set-gitops-token` | Publish the credential your application builds use |
 | `kakt bootstrap-mgmt` | Create the management cluster, as one step rather than a whole box |
@@ -114,6 +114,8 @@ Removing an **application** is not a command. Delete its directory under `enviro
 | Command | What it does |
 | :- | :- |
 | `kakt escrow init` | Create the escrow project your boxes keep their master keys in |
+| `kakt escrow bind-destination` | Record which escrow project this box's recovery material belongs to |
+| `kakt escrow enroll-provider-credential` | Escrow the cloud credential this box was built with |
 | `kakt escrow verify` | Report which escrow artefacts exist, by fingerprint |
 | `kakt escrow verify-recovery` | Prove the escrowed key decrypts what your cluster actually stored |
 | `kakt escrow enroll-store-credential` | Escrow the object-store credential your management-state backups use |

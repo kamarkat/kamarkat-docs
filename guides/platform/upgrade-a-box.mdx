@@ -10,17 +10,17 @@ Each cluster pins its platform version in `registry/clusters/<cluster>/bundle.ya
 
 ## Step 1: Read what the version brings
 
-Each version's release page lists its changes, its security fixes and a **Taking this version** table. Check two of its fields:
+Each version's release notes, on the release for tag `v<version>` on `kamarkat/kamarkat`, list its changes, its security fixes and a **Taking this version** table. Check two of its fields:
 
 - **Minimum version this may be taken from.** The cluster must already run this version or a later one. If it does not, upgrade to an intermediate version first.
-- **Predecessor restorable from this version.** Whether going back restores the cluster's previous state. See [Roll back a platform version](/guides/platform/roll-back-a-version).
+- **Predecessor restorable from this version.** Whether going back restores the cluster's previous state: `yes`, `no`, or `unknown` when it was not declared. Treat `unknown` as `no`. See [Roll back a platform version](/guides/platform/roll-back-a-version).
 
 See [Versions](/versions/overview).
 
 ## Step 2: Check the cluster can take it
 
 ```bash
-kakt proposal preflight --candidate <version> --cluster acme-hub
+kakt proposal preflight --candidate <version> --cluster acme-mgmt-1794447136
 ```
 
 It checks the version's minimum permits the step, that the version is published where your box pulls from, and that the cluster is reconciling now. A check that cannot run reports unverified rather than passing.
@@ -29,13 +29,13 @@ It checks the version's minimum permits the step, that the version is published 
 
 Set both fields to the version you are taking, and nothing else:
 
-```yaml registry/clusters/acme-hub/bundle.yaml
+```yaml registry/clusters/acme-mgmt-1794447136/bundle.yaml
 targetRevision: <version>
 bundleVersion: <version>
 ```
 
 ```bash
-git commit -am "Upgrade acme-hub to <version>" && git push
+git commit -am "Upgrade acme-mgmt-1794447136 to <version>" && git push
 ```
 
 The upgrade carries none of the bundle's content and never touches your
@@ -45,7 +45,7 @@ and reconciles from it.
 ## Step 4: Verify
 
 ```bash
-kakt verify --cluster acme-hub
+kakt verify --cluster acme-mgmt-1794447136
 ```
 
 To decline a version, change nothing. The cluster stays on the version it pins, and a version you did not take is not a version you have to take later: any version may be taken from any earlier one at or above its declared minimum.

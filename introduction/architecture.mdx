@@ -170,7 +170,7 @@ The platform's services are grouped into capabilities. What each one gives you, 
 | `stg` | Supported | Not supported |
 | `prod` | Supported | Not supported |
 
-`hybrid` runs cloud control-plane nodes with worker nodes on your own machines, joining over your tailnet, and it is supported for `dev` only. Staging rehearses production, and production runs on `hetzner`. Unsupported combinations are refused when the cluster is declared and again when the chart renders — see [Providers per environment](/features/workloads/environments#providers-per-environment).
+`hybrid` runs cloud control-plane nodes with worker nodes on your own machines, joining over your tailnet, and it is supported for `dev` only. Staging rehearses production, and production runs on `hetzner`. Supported environment/provider combinations are defined by the platform's workload topology policy. `kakt tenant add-cluster` validates each workload-cluster declaration and refuses unsupported combinations before provisioning begins. The shared management cluster does not declare a workload environment — see [Providers per environment](/features/workloads/environments#providers-per-environment).
 
 ## Connectivity model
 

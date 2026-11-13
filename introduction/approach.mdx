@@ -33,7 +33,7 @@ Your GitOps repository holds declarations, never plaintext credentials. The inst
 </Steps>
 
 <Note>
-Day-0 creates real infrastructure and runs for a few hours. It starts only when you dispatch the workflow, never because a file changed. Day-0 records each phase as it completes. If a run fails, fix the cause and start the workflow again: phases already recorded as complete are skipped, a skipped phase whose result no longer holds runs again, and a phase that is not safe to repeat refuses rather than running twice. The [quickstart](/quickstart/overview) has every command.
+Day-0 creates real infrastructure and runs for a few hours. It starts only when you dispatch the workflow, never because a file changed. Day-0 records each phase as it completes and commits that record to your repository. If a run fails, fix the cause and start the workflow again: recorded phases are skipped, and some of them first re-check their result and run again if it no longer holds. If something a later phase depends on is gone, the run stops and says whether to re-run an earlier phase or tear down and start over. The [quickstart](/quickstart/overview) has every command.
 </Note>
 
 After the install, nothing about how the box runs depends on Kamarkat being reachable. Kamarkat publishes new platform versions; the upgrade automation configured in your repository proposes each one as a pull request; your management cluster applies it once you merge.

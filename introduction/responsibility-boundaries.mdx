@@ -10,7 +10,7 @@ keywords: ["responsibility", "ownership", "shared responsibility", "installation
 
 ### Installation
 
-`kakt` collects the credentials your box is built with, creates your escrow project and your GitOps repository, and declares your management cluster. It keeps the credentials in a local credential store on your machine and sets the ones CI needs as encrypted CI secrets on your repository; the repository itself holds declarations, not plaintext credentials. Day-0 then builds that cluster and brings up the platform on it. You authorize each step: you supply every credential, you commit the declaration, and you start the Day-0 run from your own CI. Nothing is built until you start it.
+`kakt` collects the credentials your box is built with, creates your escrow project and your GitOps repository, and declares your management cluster. It keeps the credentials in a local credential store on your machine and sets the ones CI needs as encrypted CI secrets on your repository; the repository itself holds declarations, not plaintext credentials. Day-0 then builds that cluster and brings up the platform on it. You authorize each step: you supply every credential, you commit the declaration, and you start the Day-0 run from your own CI. No cloud cluster is provisioned until you start the Day-0 bootstrap workflow.
 
 ### Continuing operation
 
@@ -20,7 +20,7 @@ Your management cluster runs the platform's services and reconciles the box from
 
 Kamarkat publishes each platform version as one tested bundle. The upgrade automation configured in your repository proposes it as a pull request, and a pre-flight check in your box judges it against the cluster it targets. Nothing changes until you merge.
 
-Reverting a platform-version declaration changes the desired state that GitOps reconciles. It does not guarantee reversal of database migrations, deleted resources or other stateful changes. Each release page says whether going back restores the previous state; use the supported [rollback](/guides/platform/roll-back-a-version) or recovery procedure for the affected version.
+Reverting a platform-version declaration changes the desired state that GitOps reconciles. It does not guarantee reversal of database migrations, deleted resources or other stateful changes. Use the supported [rollback](/guides/platform/roll-back-a-version) or recovery procedure for the affected version.
 
 ### Your applications
 

@@ -95,7 +95,7 @@ Each `✓` line is a **GitHub Actions secret set on the new repository** — `Se
 | `--bundle-version` | The platform version the box starts on. A released CLI defaults to the version it carries; an unreleased build refuses rather than guess. |
 | `--dry-run` | Render locally and initialize nothing, which is how to see what you will receive. |
 | `--no-prompt` | Never ask: every credential comes from the environment or `~/.kamarkat/`. For automation. |
-| `--out` | The checkout to leave behind. Defaults to `./<repository>`. |
+| `--out` | The checkout to leave behind. Defaults to `./<repository>`. It must be empty or absent — a box is initialized into an empty directory, so running this inside an existing checkout is refused rather than mixing a box into it. |
 
 Pass `--escrow-url`, `--escrow-project-id`, `--escrow-client-id` and `--escrow-client-secret` only to use an escrow this machine did not create, or the credential flags to initialize a box whose secrets are not staged on this machine.
 

@@ -25,7 +25,7 @@ kakt tenant add-cluster \
   --environment stg \
   --tenant acme \
   --bundle-version <version> \
-  --gitops-repo-url https://github.com/acme-inc/acme-gitops
+  --gitops-repo-url https://github.com/acme-inc/acme-gitops-1794447136
 ```
 
 It writes `registry/clusters/acme-stg-01/`, the record of what this cluster is and its claim on your cloud, and two Applications in the management cluster's own directory: `acme-stg-01-infrastructure.yaml`, which creates the cluster, and `acme-stg-01-generated.yaml`, which owns the artifacts the platform writes for it later. Both live there because the management cluster's ArgoCD applies that directory and no other. It refuses a name that is already declared.

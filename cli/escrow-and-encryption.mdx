@@ -39,8 +39,12 @@ kakt escrow init --name acme-escrow
 | `--url` | The escrow's address. Defaults to `https://app.infisical.com` |
 | `--out` | Write the `INFISICAL_ESCROW_*` files here instead of this operator's own store (`~/.kamarkat/infisical`, or `$KAMARKAT_HOME/infisical`) |
 | `--client-id`, `--client-secret` | Use an identity you manage yourself instead of the organisation's automation identity. Passed together |
+| `--gitops-dir` | A box's repository. If it already declares an escrow, that project is prepared rather than a second one created. Defaults to the working directory |
+| `--cluster` | Which management cluster's declaration to read, when the repository holds more than one |
 
-It creates the project **as you**, so you are its admin, then finds or creates your organisation's one automation identity, configures its authentication, issues a client secret for this box, and gives it membership of the project. The four `INFISICAL_ESCROW_*` values are written to `--out`.
+It creates the project **as you**, so you are its admin, then finds or creates your organisation's one automation identity, configures its authentication, issues a client secret for this box, and gives it membership of the project. The `INFISICAL_ESCROW_*` values are written to `--out`, including `INFISICAL_ESCROW_ORG_ID` — the organisation your session belongs to, which a box declares so the administrator it names can be checked inside the organisation that issued them.
+
+Run inside a box's checkout, it also fills that organisation into the box's own declarations — `registry/box.yaml` and each cluster's `values.yaml` — when they record none, and prints the files it changed for you to commit. It corrects only a declaration that already names the escrow project this run authenticated against: one naming another project, or already naming another organisation, is refused rather than claimed, and no project id, address or escrowed material is ever moved.
 
 No roles to choose: the identity gets the organisation role `no-access` and the project role `member`, which is what secret and folder operations need.
 

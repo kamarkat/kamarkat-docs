@@ -95,7 +95,7 @@ Initializing a box happens once. Every change after it is a commit or a pull req
 | `--private-registry` | Your applications run private images, which makes a registry credential required |
 | `--bundle-version` | The platform version the box starts on. A released CLI defaults to the version it carries; an unreleased build has none and refuses rather than guess. `development` reads charts from your current branch |
 | `--dry-run` | Render only; create and push nothing |
-| `--out` | The checkout to leave behind. Defaults to `./<repository>`, and the next command runs inside it |
+| `--out` | The checkout to leave behind. Defaults to `./<repository>`, and the next command runs inside it. Must be empty or absent |
 | `--no-prompt` | Never prompt: every credential comes from the environment or `~/.kamarkat/`, and a missing one stops the run before anything is created |
 | `--no-browser` | Do not open the page that issues each credential; print the address instead. Also `KAKT_NO_BROWSER` |
 
@@ -125,7 +125,7 @@ kakt tenant add-cluster \
   --name acme-02 \
   --tenant acme \
   --bundle-version <version> \
-  --gitops-repo-url https://github.com/acme-inc/acme-gitops
+  --gitops-repo-url https://github.com/acme-inc/acme-gitops-1794447136
 ```
 
 | Flag | Meaning |
@@ -157,7 +157,7 @@ Publishes the credential your application builds use to pin a chart version. Cre
 kakt tenant set-gitops-token --org acme-inc
 ```
 
-The token is read from stdin when `--token` is omitted, which keeps it out of your shell history. `--repo owner/name` publishes on one repository instead of the whole git organization, and `--discover --gitops-repo acme-inc/acme-gitops` finds the repositories whose workflows write to it.
+The token is read from stdin when `--token` is omitted, which keeps it out of your shell history. `--repo owner/name` publishes on one repository instead of the whole git organization, and `--discover --gitops-repo acme-inc/acme-gitops-1794447136` finds the repositories whose workflows write to it.
 
 ### kakt tenant add-management
 

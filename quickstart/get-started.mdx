@@ -52,7 +52,7 @@ That is the whole step. It runs as you, and it:
 - creates the escrow project, **with you as its admin** — because you created it
 - creates your organisation's automation identity if it does not have one, configures its authentication, and issues one client secret
 - gives that identity access to this project
-- writes the four `INFISICAL_ESCROW_*` values to `~/.kamarkat/infisical/`, once for this machine
+- writes the `INFISICAL_ESCROW_*` values to `~/.kamarkat/infisical/`, once for this machine — including `INFISICAL_ESCROW_ORG_ID`, the organisation your session belongs to, which your box declares so that the administrator it names can be checked inside the organisation that issued them
 
 Nothing to do in the Infisical dashboard, and no roles to choose. The identity gets the organisation role `no-access`, because it performs no organisation action, and the project role `member`, which is what reading and writing secrets and creating folders needs — not `admin`.
 
@@ -83,9 +83,10 @@ ls ~/.kamarkat/infisical/
 ```text
 INFISICAL_ESCROW_URL        INFISICAL_ESCROW_CLIENT_ID
 INFISICAL_ESCROW_PROJECT_ID INFISICAL_ESCROW_CLIENT_SECRET
+INFISICAL_ESCROW_ORG_ID
 ```
 
-There is nothing to export. The store belongs to you rather than to a checkout, so every command reads it from any directory — `kakt box init` picks these up without flags. Set `KAMARKAT_HOME` if this machine keeps state somewhere other than your home directory, and the environment still wins where it is set, which is how CI supplies the same four values.
+There is nothing to export. The store belongs to you rather than to a checkout, so every command reads it from any directory — `kakt box init` picks these up without flags. Set `KAMARKAT_HOME` if this machine keeps state somewhere other than your home directory, and the environment still wins where it is set, which is how CI supplies the same values.
 
 **Back up `INFISICAL_ESCROW_CLIENT_SECRET` somewhere outside this machine.** It was issued once and cannot be read back, so the copy in that directory is the only one; losing the directory means issuing a new secret. It is what your box's automation authenticates with — your own access comes from `kakt login`, so you do not need it to operate the box day to day.
 

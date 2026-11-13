@@ -96,7 +96,7 @@ Reports each artifact by fingerprint, never by value. For each managed cluster, 
 
 A box built before this was in place has coordinates but no administrator, no binding and no escrowed credential — so every escrow command fails closed until you do three things. There is no migration to run:
 
-1. **Declare** `platformAdminIdentity` and `escrow.organizationId` in the management cluster's `values.yaml`, and commit.
+1. **Declare** `platformAdminIdentity` in the management cluster's `values.yaml`, and commit. For `escrow.organizationId`, run `kakt escrow init --gitops-dir . --name <project name>` inside the checkout: it reads the organisation from your session and fills it into `registry/box.yaml` and each cluster's `values.yaml`, naming the files to commit. It writes only into a declaration that already names the escrow project it authenticated against.
 2. **Log in** and check `kakt whoami` against what you declared.
 3. **Enrol the provider credential**, which also binds the destination:
 

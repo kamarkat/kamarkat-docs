@@ -1,14 +1,44 @@
 ---
 title: "BYOC architecture"
-description: "Your box runs in your own cloud account and reconciles from your own repository. Kamarkat publishes versions; nothing connects inward."
+description: "Your box runs in your own cloud account and reconciles from your own repository. Kamarkat publishes versions; no Kamarkat component connects into your box."
 keywords: ["architecture", "byoc", "management cluster", "managed cluster", "bundle", "deployment boundaries"]
 ---
 
 import { BoundaryStack } from "/snippets/boundary-stack.jsx";
 
+## From installer to running platform
+
+```mermaid
+flowchart LR
+  K["kakt<br/>on your machine"]
+  subgraph G["Your git organization"]
+    R["GitOps repository"]
+    CI["Day-0 workflow<br/>in your CI"]
+  end
+  E["Escrow<br/>your secret manager"]
+  subgraph C["Your cloud account"]
+    M["Management cluster<br/>platform services"]
+    W["Managed clusters<br/>your applications"]
+  end
+
+  K -- "creates and declares" --> R
+  K -- "creates" --> E
+  R --> CI
+  CI -- "builds once" --> M
+  M -- "reconciles from" --> R
+  M -- "provisions and delivers to" --> W
+  M -. "recovery material" .-> E
+```
+
+Three facts carry the rest of this page:
+
+1. **The executable starts the setup.** `kakt` creates your escrow project and your GitOps repository, and declares the management cluster. Day-0, run once from your repository's own CI, builds that cluster.
+2. **Everything runs in accounts you own.** The repository is in your git organization, the clusters are in your cloud account, and the escrow is in your secret manager. Every credential is one you supply, kept on your machine or as encrypted CI secrets on your repository, and Kamarkat's own services receive none of them.
+3. **GitOps runs it afterwards.** Once Day-0 hands over, the GitOps engine on your management cluster reconciles the box from your repository. Every later change, including a platform upgrade, is a commit.
+
 ## Architecture overview
 
-A Kamarkat deployment lives entirely in accounts you own: a git organization that holds the desired state, and a cloud account that runs the box. The box is a management cluster, which runs the platform's services, plus the managed clusters it creates, where your applications run. Kamarkat delivers the platform into the box, but holds no credential to it and never connects into it.
+A Kamarkat deployment lives entirely in accounts you own: a git organization that holds the desired state, and a cloud account that runs the box. The box is a management cluster, which runs the platform's services, plus the managed clusters it creates, where your applications run. Kamarkat delivers the platform into the box, but holds no credential to it and no Kamarkat component connects into it.
 
 Kamarkat's side is small: a release pipeline publishes bundle versions to a registry, and your box pulls them.
 
@@ -16,15 +46,15 @@ Kamarkat's side is small: a release pipeline publishes bundle versions to a regi
 
 ```text
 ┌─ Agentic operations ──────────────────────────────────────────────────┐
-│  Agents · MCP registry · Skills registry                             │
-│  Engineers and AI agents, working through the same contracts         │
+│  Agents · MCP registry · Skills registry                              │
+│  Engineers and AI agents, working through the same contracts          │
 └───────────────────────────────────────────────────────────────────────┘
 ┌─ Integrated cloud-native platform OS ─────────────────────────────────┐
 │  GitOps · Identity · Secrets · Databases · Gateway · Networking       │
 │  Observability · Application delivery · Cluster lifecycle             │
 └───────────────────────────────────────────────────────────────────────┘
 ┌─ Business-owned infrastructure ───────────────────────────────────────┐
-│  Management cluster · Workload clusters · Cloud infrastructure        │
+│  Management cluster · Managed clusters · Cloud infrastructure         │
 │  Storage · Networking                                                 │
 └───────────────────────────────────────────────────────────────────────┘
 ```
@@ -114,7 +144,7 @@ Select any part to read about it.
 
 - **Control plane nodes** run Kubernetes on every cluster. On a box with cloud workers they carry nothing else; a box declared with no cloud workers — `--workers 0`, where capacity comes from your own machines — runs with a schedulable control plane instead, and the platform's workloads do run there.
 - **The management cluster's workers** run the platform's services, grouped into [capabilities](/features/capabilities/overview). Your applications are delivered to managed clusters rather than to the management cluster.
-- **A managed cluster's workers** run your applications. A box may have **none** — a box is created with no clusters at all, its management cluster is declared next, and workload clusters are added when you declare them — in which case the box is complete with one cluster: see [Deploying applications](/features/workloads/deploying-applications). The management cluster creates each managed cluster, then delivers its platform and your apps to it; the managed cluster reads its secrets and identities from the management cluster and reports its telemetry back.
+- **A managed cluster's workers** run your applications. A box may have **none** — a box is created with no clusters at all, its management cluster is declared next, and managed clusters are added when you declare them — in which case the box is complete with one cluster: see [Deploying applications](/features/workloads/deploying-applications). The management cluster creates each managed cluster, then delivers its platform and your apps to it; the managed cluster reads its secrets and identities from the management cluster and reports its telemetry back.
 
 To see every component on each node type, open any version under [Releases](/versions/lines/0-1).
 
@@ -140,16 +170,22 @@ The platform's services are grouped into capabilities. What each one gives you, 
 | `stg` | Supported | Not supported |
 | `prod` | Supported | Not supported |
 
-`hybrid` runs cloud control-plane nodes with worker nodes on your own machines, joining over your Tailscale tailnet, and it is supported for `dev` only. Staging rehearses production, and production runs on `hetzner`. Unsupported combinations are refused when the cluster is declared and again when the chart renders — see [Providers per environment](/features/workloads/environments#providers-per-environment).
+`hybrid` runs cloud control-plane nodes with worker nodes on your own machines, joining over your tailnet, and it is supported for `dev` only. Staging rehearses production, and production runs on `hetzner`. Unsupported combinations are refused when the cluster is declared and again when the chart renders — see [Providers per environment](/features/workloads/environments#providers-per-environment).
 
 ## Connectivity model
 
-| Direction | Purpose |
-| :- | :- |
-| Kamarkat → your tenant and box | Published bundle versions. Your upgrade automation proposes them, and the artefacts are mirrored into infrastructure you control. |
-| Kamarkat → your box | Nothing. No Kamarkat component opens a connection into a box, holds a credential for one, or queries one. |
+Four kinds of connection cross the edge of your accounts. Each has a different direction and runs under different credentials.
 
-Stopping using Kamarkat stops nothing running: your box holds everything it needs.
+| Connection | Direction | Credentials |
+| :- | :- | :- |
+| **Published artefacts** | Your machine, your CI and your clusters download from Kamarkat's public release page and registry: the `kakt` CLI, the pinned Day-0 workflow, the bundle chart and the platform's images | None. The artefacts are public |
+| **Provider API calls** | `kakt` and Day-0 call your cloud provider, your git host and your escrow secret manager to build and run the box | Yours, supplied by you |
+| **Upgrade proposals** | The upgrade automation configured in your repository reads which bundle versions are published, and opens a pull request in your repository | Whatever you grant that automation. It never merges a platform upgrade on its own |
+| **Support reporting** | Nothing, until you enrol. An enrolled box sends an allowlisted set of cluster facts outward. `kakt support scope` lists every field, and `kakt support preview` shows the exact payload | The enrolment certificate. Removing it unenrols the box |
+
+**Inbound to your box:** nothing. No Kamarkat component opens a connection into a box, holds a credential for one, or queries one.
+
+Stopping using Kamarkat stops nothing that is running: your box does not need Kamarkat to be reachable to keep serving. Building new clusters and taking upgrades still pull the published artefacts from the registry each cluster's `bundle.yaml` names.
 
 ## Delivery and upgrades
 
@@ -163,16 +199,16 @@ See [The Bundle](/features/box/bundle), [Versioning](/versions/overview) and [De
 
 ## Data residency
 
-Nothing your box stores is sent to Kamarkat. Workload data, application logs, database contents, secret material and end-user identifiers stay in accounts you control.
+Nothing your box stores is sent to Kamarkat. Support reporting, if you enrol, sends only the allowlisted cluster facts described [above](#connectivity-model). Workload data, application logs, database contents, secret material and end-user identifiers stay in accounts you control.
 
-Within the box, a managed cluster **reports its telemetry to the management cluster**, which is where metrics, logs and dashboards are aggregated — that is the hub-and-spoke design, not an exception to it.
+Within the box, a managed cluster **reports its telemetry to the management cluster**, which is where metrics, logs and dashboards are aggregated. That is how the box is designed, not an exception to it.
 
 Three destinations are outside the clusters, and all three are yours:
 
 | Destination | What goes there | Who owns it |
 |---|---|---|
 | Object storage | database backups and management-state archives | your storage account |
-| Escrow secret manager | the recovery artefacts a box cannot keep itself ([Escrow](/documentation/escrow/overview)) | your Infisical organization |
+| Escrow secret manager | the recovery artefacts a box cannot keep itself ([Escrow](/documentation/escrow/overview)) | your escrow secret manager account |
 | Alert endpoint, if you configure one | alert notifications and a heartbeat | the provider you point it at |
 
-So data residency is a property of where **you** put those destinations. The platform sends nothing anywhere you have not configured, and never to Kamarkat.
+So data residency is a property of where **you** put those destinations. The platform sends nothing anywhere you have not configured, and nothing to Kamarkat unless you enrol support reporting.

@@ -26,15 +26,20 @@ This quickstart follows the cloud path. The hybrid path adds a `TS_AUTHKEY` secr
 
 ## How it fits together
 
+The quickstart follows the same four phases as [the install journey](/introduction/welcome#from-download-to-running-platform).
+
 <Steps>
-  <Step title="Prerequisites">
-    Prepare a cloud account, a git organization, a domain and an escrow, and install the `kakt` CLI.
+  <Step title="Download">
+    Prepare a cloud account, a git organization, a domain and an escrow account, and install the `kakt` CLI. See [Prerequisites](/quickstart/prerequisites).
   </Step>
-  <Step title="Build your first cluster">
-    Sign in with `kakt login`, create the escrow project, create your box and declare its management cluster, and run Day-0 from that repository's own CI. Day-0 builds that cluster. You then declare a managed cluster with a commit, and the management cluster provisions it.
+  <Step title="Connect">
+    Sign in with `kakt login` and create the escrow project with `kakt escrow init`. `kakt box init` then collects every credential your box is built with. See [Get started](/quickstart/get-started) and [Initialize a box](/quickstart/initialize-a-box).
   </Step>
-  <Step title="Run your first app">
-    Declare the application in your GitOps repository, supply its secrets, and let its build publish and pin its chart.
+  <Step title="Initialize">
+    `kakt box init` creates your GitOps repository. Declare the management cluster with `kakt tenant add-management`, commit it, and run Day-0 from that repository's own CI. See [Build the management cluster](/quickstart/build-the-management-cluster).
+  </Step>
+  <Step title="Build">
+    Declare a managed cluster with a commit, and the management cluster provisions it. Then declare your application, supply its secrets, and let its build publish and pin its chart. See [Add a managed cluster](/quickstart/add-a-managed-cluster) and [Declare an app](/quickstart/declare-an-app).
   </Step>
 </Steps>
 

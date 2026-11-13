@@ -1,48 +1,47 @@
 ---
 title: "What problem Kamarkat solves"
-description: "Assembling a cloud-native platform, operating it continuously, and standardizing how agents work with it — three connected problems with one answer."
-keywords: ["platform assembly", "cloud-native complexity", "agentic operations", "internal developer platform", "operational overhead"]
+description: "Building a product should not require building an entire infrastructure platform first."
+keywords: ["platform assembly", "platform maintenance", "cloud-native complexity", "internal developer platform", "operational overhead", "agentic operations"]
 ---
 
-Every business building cloud-native products ends up building a platform. Usually without deciding to, and now with a third problem the first two never had.
+> Building a product shouldn't require building an entire infrastructure platform first.
 
-## Three connected challenges
+Every business that ships cloud-native software ends up with a platform underneath it. Usually nobody decided to build one. It accumulates, one tool at a time, and it becomes a second product that the team maintains alongside the one its customers pay for.
 
-### Infrastructure assembly
+That second product costs you three ways.
+
+## Integration
 
 A complete cloud-native platform is a dozen technologies that have to agree with each other: a cluster and its networking, delivery, a secret store, certificates, DNS, a database, an identity provider, a gateway, dashboards. Each has its own configuration surface, its own dependencies and its own release cadence.
 
 The integration is the work. Installing the components is the easy half, and the half that looks finished.
 
-### Continuous operational complexity
+## Maintenance
 
-The platform does not stop needing attention once it exists. Deployments, incidents, security updates, platform changes and infrastructure maintenance all compete with building the product — and the competition is permanent, not a phase.
+The platform does not stop needing attention once it exists. Deployments, incidents, security updates, platform changes and infrastructure maintenance all compete with building the product. The competition is permanent, not a phase.
 
-### Fragmented agentic operations
+Each component also upgrades on its own schedule. The failures that cost the most happen between components, so every upgrade is a fresh integration test you run in production.
 
-This one is new, and it is where most platforms have nothing to offer.
+## Inconsistency
 
-AI agents are becoming part of how teams operate infrastructure. An agent pointed at an independently assembled platform meets inconsistent tools, conventions, permissions and workflows — each component with its own interface, its own idea of identity, its own notion of what an operation is.
+A platform assembled piece by piece has no single way to be operated. Each component brings its own interface, its own idea of identity and its own notion of what an operation is. Every engineer who touches it has to learn each one.
 
-So every business ends up doing the same undifferentiated work twice: once to assemble its platform, and again to establish how agents understand and operate it.
+AI agents inherit the same problem. An agent pointed at an independently assembled platform meets inconsistent tools, conventions, permissions and workflows, and improvises across them. So a business ends up doing the same undifferentiated work twice: once to assemble its platform, and again to teach agents how to operate it.
 
 ## Kamarkat's answer
 
-A standardized cloud-native operating foundation where the infrastructure and platform services are already integrated, and where agents interact with platform capabilities through the same operational contracts engineers use.
+Install the platform instead of assembling it. Kamarkat ships the infrastructure and platform services already integrated, tested as one versioned set, and installed through one CLI into a cloud account you own.
 
-| You provide | Kamarkat provides |
-|---|---|
-| Your cloud account and your domain | The provisioning, lifecycle and reconciliation that run on them |
-| Your requirements and configuration | An integrated platform whose components are versioned and tested as one set |
-| Your application logic | The routing, identity, database, secrets and observability it connects to |
-| Your operational judgement | A platform agents can discover and operate through declared, authorized capabilities |
+- **Integration** is done before you install. A new cluster arrives with its networking, delivery and registration configured, and an application's chart gets its routing, login, database and secrets.
+- **Maintenance** of the platform simplifies into coordinated version changes. Kamarkat publishes the whole platform as one tested version, and your own upgrade automation proposes it as one change for you to review. Upgrades can still need attention, and some cannot be undone; each release says which.
+- **Inconsistency** is addressed by design: Kamarkat establishes a consistent operating model. Every cluster, capability and application is declared and reconciled the same way, and the agentic layer, in development, is designed to work through the same contracts.
 
-The division is deliberate: the business keeps what distinguishes it, and stops rebuilding the foundation every business needs.
+You keep what distinguishes your business: your code, your data and your decisions. [Welcome](/introduction/welcome#from-download-to-running-platform) sets out what you provide and what the platform supplies.
 
 ## What this does not claim
 
 Infrastructure still needs operating, and agents do not change who is accountable for it. What changes is how much of the platform you assemble, how consistent it is to operate, and whether an agent working on it is improvising against a stack nobody standardized.
 
-<Card title="How and why Kamarkat's approach works" icon="diagram-project" href="/introduction/approach">
-  Why a box, a bundle, GitOps, a golden path and agentic operations are one OS.
+<Card title="How Kamarkat works" icon="diagram-project" href="/introduction/approach">
+  What the installer coordinates, what you receive, and why it holds together.
 </Card>

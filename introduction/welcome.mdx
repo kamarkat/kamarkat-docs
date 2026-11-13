@@ -1,39 +1,116 @@
 ---
 title: "Welcome to Kamarkat"
 sidebarTitle: "What's Kamarkat"
-description: "An agentic cloud-native platform OS: infrastructure, application services and intelligent operations as one integrated platform, on infrastructure you own."
-keywords: ["agentic platform", "cloud-native platform OS", "kamarkat", "MCP registry", "platform agents", "gitops", "kubernetes", "business-owned infrastructure"]
+description: "Your own enterprise-grade cloud platform, installed rather than assembled: one CLI, one tested platform, in a cloud account you own."
+keywords: ["kamarkat", "cloud platform", "platform installer", "kakt", "byoc", "gitops", "kubernetes", "business-owned infrastructure", "platform OS"]
 ---
 
-**Kamarkat — Agentic Cloud-Native Platform OS for Businesses**
+## Your own enterprise-grade cloud platform. Installed, not assembled.
 
-## Your entire cloud-native platform. One OS. Built for humans and AI agents.
+Kamarkat brings the cloud-native infrastructure and application services your product needs together in one integrated platform. You install it with one CLI, `kakt`, in your own cloud account.
 
-Kamarkat is an open-source, agentic cloud-native platform OS that brings infrastructure, application services and intelligent operations together in one integrated platform.
+One installer. One tested platform. Your infrastructure, credentials and data remain yours.
 
-From Kubernetes and GitOps to identity, secrets, databases, networking and observability, the infrastructure your applications depend on works as a coordinated system.
+Kamarkat is built for startups and engineering teams that want a production-capable cloud foundation without assembling and maintaining an internal platform from scratch.
 
-With integrated AI agents, an MCP registry and reusable operational skills, Kamarkat gives businesses a consistent way to understand, manage and evolve their platform — all on infrastructure they own.
+<Info>
+**Where it runs today:** Hetzner Cloud (`hetzner`). A `hybrid` mode, with worker nodes on your own machines, is supported for development boxes only. See [Supported topology](/introduction/architecture#supported-topology).
+</Info>
 
-<CardGroup cols={3}>
-  <Card title="One integrated cloud-native platform" icon="layer-group">
-    Infrastructure and application services arrive pre-integrated and versioned together, not assembled from independent tools.
+<CardGroup cols={2}>
+  <Card title="Get started" icon="rocket" href="/quickstart/overview">
+    From an empty cloud account to an application serving on your domain.
   </Card>
-  <Card title="Intelligent operations" icon="robot">
-    Engineers and AI agents work through the same platform contracts, the same tools and the same reusable skills.
-  </Card>
-  <Card title="Ownership and control" icon="key">
-    Your cloud account, your clusters, your repository, your credentials, your data. The platform runs inside your infrastructure.
+  <Card title="What you need" icon="list-check" href="/quickstart/prerequisites">
+    The accounts, tools and credentials to have ready.
   </Card>
 </CardGroup>
 
+## From download to running platform
+
+<Steps>
+  <Step title="Download">
+    Get the `kakt` executable for your machine. It carries the platform version your box starts on.
+  </Step>
+  <Step title="Connect">
+    Sign in to your escrow and authorize your cloud and git accounts. `kakt box init` asks for each credential in turn and opens the page that issues it. It keeps what you enter in a local credential store on your machine, and sets the ones your CI needs as encrypted CI secrets on your repository.
+  </Step>
+  <Step title="Initialize">
+    `kakt` creates your GitOps repository and declares your management cluster. Day-0 then builds that cluster from your repository's own CI, and the platform comes up on it.
+  </Step>
+  <Step title="Build">
+    Declare a managed cluster and your applications. Your management cluster provisions the cluster and deploys your apps with their routing, login, database and secrets already wired.
+  </Step>
+</Steps>
+
+Your GitOps repository contains declarations, not plaintext credentials.
+
+<Note>
+`kakt` is the one entry point, but installing is not a single command today. You run a handful of `kakt` commands, commit once, and start the Day-0 workflow, which runs for a few hours. [Get started](/quickstart/overview) walks through every step.
+</Note>
+
+| You provide | The platform supplies |
+| :- | :- |
+| A cloud account, and the authorization to build in it | Infrastructure provisioning and cluster lifecycle |
+| A git organization, and the authorization to write to it | The GitOps foundation every change goes through |
+| A domain, and the configuration only you can choose | Networking, DNS, certificates and the gateway |
+| Your application code and your business data | Standardized delivery, and the capabilities you select |
+| Your operational and release decisions | Versioned platform components, pre-flight checks on upgrades, and the `kakt` CLI |
+
+## Install, operate, own
+
+<CardGroup cols={3}>
+  <Card title="Install" icon="download" href="/introduction/approach">
+    Infrastructure and application services arrive pre-integrated and versioned together, not assembled from independent tools.
+  </Card>
+  <Card title="Operate" icon="gears" href="/introduction/architecture">
+    Your GitOps repository is the only source of desired state. Every change, including a platform upgrade, is a commit you review.
+  </Card>
+  <Card title="Own" icon="key" href="/introduction/responsibility-boundaries">
+    Your cloud account, your clusters, your repository, your credentials, your data. Every credential is one you supply, and Kamarkat's own services receive none of them.
+  </Card>
+</CardGroup>
+
+## Why Kamarkat
+
+| | Hosted platform | Assembling it yourself | Kamarkat |
+| :- | :- | :- | :- |
+| **Where it runs** | The vendor's infrastructure | Your cloud account | Your cloud account |
+| **Who holds the credentials** | The vendor | You | You |
+| **Integration work** | Done by the vendor | Yours, per component | Done before you install |
+| **How changes arrive** | The vendor applies them | You track each component | One tested version, proposed to your repository for you to merge |
+| **What it is built from** | The vendor's stack | Whatever you choose | Open-source components you can inspect |
+| **How you set it up** | Sign up | Many tools, each configured by hand | One CLI |
+
+## What arrives integrated
+
+| | |
+|---|---|
+| **Cluster lifecycle** | Declare a cluster and the platform provisions it, brings up its networking, storage and delivery, registers it, scales it and removes it |
+| **GitOps delivery** | Your repository is the desired state; platform controllers reconcile to it |
+| **Databases** | A database per application, with credentials, backups and recovery procedures. *Selectable, on by default* |
+| **Identity** | An identity provider in your box, and a gateway that fronts your applications with login |
+| **Secrets** | A secret store, delivery into workloads, and recovery material held outside the box |
+| **Networking, DNS, certificates** | Gateway routing, network policy, DNS records, certificates issued and renewed |
+| **Observability** | Metrics, logs, dashboards and alert routing across the box. *Selectable, on by default* |
+| **Agentic operations** | *In development.* Platform agents, a registry of the tools they may use, and reusable skills that carry the platform's own conventions |
+
+Packaging these would be a distribution. **Pre-integrating them is the product:** the gateway knows about your identity provider, an application's chart gets its database and its secrets, a new cluster arrives with its networking and delivery already configured, and one version moves them together.
+
+Before you go further, these pages hold the details an evaluation needs:
+
+- [Capabilities](/features/capabilities/overview): which capabilities run on every box and which you select.
+- [Versioning](/versions/overview) and [Releases](/versions/lines/0-1): the current platform version and every component it installs.
+- [Escrow](/documentation/escrow/overview): how master keys and break-glass access are kept outside the box.
+- [Rollback and reversibility](/documentation/upgrades/rollback-and-reversibility): what an upgrade can and cannot undo.
+
 ## The platform at a glance
 
-Three layers of one product, not three things to buy:
+Architecturally, Kamarkat is a platform OS: three layers of one product, not three things to buy.
 
 ```text
-┌─ Agentic operations ──────────────────────────────────────────────────┐
-│  Agents · MCP registry · Skills registry                             │
+┌─ Agentic operations (in development) ─────────────────────────────────┐
+│  Agents · MCP registry · Skills registry                              │
 │  How engineers and AI agents inspect, investigate and operate         │
 └───────────────────────────────────────────────────────────────────────┘
 ┌─ Integrated cloud-native platform OS ─────────────────────────────────┐
@@ -42,42 +119,27 @@ Three layers of one product, not three things to buy:
 │  Versioned together, reconciled from your repository                  │
 └───────────────────────────────────────────────────────────────────────┘
 ┌─ Business-owned infrastructure ───────────────────────────────────────┐
-│  Management cluster · Workload clusters · Cloud infrastructure        │
+│  Management cluster · Managed clusters · Cloud infrastructure         │
 │  Storage · Networking                                                 │
 └───────────────────────────────────────────────────────────────────────┘
 ```
 
-The agentic layer does not sit beside the platform with its own view of the world. It reads the same platform state engineers do, and when desired state changes, it changes through the same declarative contracts the platform reconciles.
-
-## What arrives integrated
-
-| | |
-|---|---|
-| **Cluster lifecycle** | Declare a cluster and the platform provisions it, brings up its networking, storage and delivery, registers it, scales it and removes it |
-| **GitOps delivery** | Your repository is the desired state; platform controllers reconcile to it |
-| **Databases** | PostgreSQL per application, with credentials, backups and recovery procedures. *Selectable, on by default* |
-| **Identity** | An identity provider in your box, and a gateway that fronts your applications with login |
-| **Secrets** | A secret store, delivery into workloads, and recovery material held outside the box |
-| **Networking, DNS, certificates** | Gateway routing, network policy, DNS records, certificates issued and renewed |
-| **Observability** | Metrics, logs, dashboards and alert routing across the box. *Selectable, on by default* |
-| **Agentic operations** | Platform agents, a registry of the tools they may use, and reusable skills that carry the platform's own conventions |
-
-Packaging these would be a distribution. **Pre-integrating them is the product:** the gateway knows about your identity provider, an application's chart gets its database and its secrets, a new cluster arrives with its networking and delivery already configured, and one version moves them together.
+The agentic layer is designed not to sit beside the platform with its own view of the world. Agents are to read the same platform state engineers do, and change desired state through the same declarative contracts the platform reconciles. [How Kamarkat works](/introduction/approach#one-agentic-operating-experience) describes the design.
 
 ## Where to go next
 
 <CardGroup cols={2}>
   <Card title="What problem Kamarkat solves" icon="circle-question" href="/introduction/the-problem">
-    Platform assembly, continuous operations, and agents meeting an infrastructure nobody standardized.
+    Why building a product should not mean building a platform first.
   </Card>
-  <Card title="How and why Kamarkat's approach works" icon="diagram-project" href="/introduction/approach">
-    Why a box, a bundle, GitOps, a golden path and agentic operations are one OS rather than five products.
+  <Card title="How Kamarkat works" icon="diagram-project" href="/introduction/approach">
+    What the installer coordinates, what you receive, and why it holds together.
   </Card>
   <Card title="Architecture" icon="sitemap" href="/introduction/architecture">
-    The three layers, the clusters, and what runs where.
+    From the installer to the running platform, and what runs where.
   </Card>
-  <Card title="Get started" icon="rocket" href="/quickstart/overview">
-    From an empty cloud account to an application serving on your domain.
+  <Card title="Responsibility boundaries" icon="scale-balanced" href="/introduction/responsibility-boundaries">
+    What Kamarkat handles, and what stays under your control.
   </Card>
 </CardGroup>
 

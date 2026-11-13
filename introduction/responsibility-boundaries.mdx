@@ -1,16 +1,44 @@
 ---
 title: "Responsibility boundaries"
-description: "What Kamarkat provides and what you own, across your repositories, your infrastructure and your applications."
-keywords: ["responsibility", "ownership", "shared responsibility", "gitops repository", "infrastructure"]
+description: "What Kamarkat handles and what stays under your control, from installation through upgrades and recovery."
+keywords: ["responsibility", "ownership", "shared responsibility", "installation", "upgrades", "recovery", "gitops repository", "infrastructure"]
 ---
 
-> Kamarkat provides the platform. You own the box it runs in, and everything you build on it.
+> Kamarkat provides the platform and the tooling that installs it. You own the box it runs in, and everything you build on it.
+
+## What Kamarkat handles, and what stays under your control
+
+### Installation
+
+`kakt` collects the credentials your box is built with, creates your escrow project and your GitOps repository, and declares your management cluster. It keeps the credentials in a local credential store on your machine and sets the ones CI needs as encrypted CI secrets on your repository; the repository itself holds declarations, not plaintext credentials. Day-0 then builds that cluster and brings up the platform on it. You authorize each step: you supply every credential, you commit the declaration, and you start the Day-0 run from your own CI. Nothing is built until you start it.
+
+### Continuing operation
+
+Your management cluster runs the platform's services and reconciles the box from your GitOps repository. It provisions the managed clusters you declare and deploys the applications you declare. You decide what is declared, and you remain responsible for keeping the box healthy: its capacity, its cost and the incidents it raises.
+
+### Platform upgrades
+
+Kamarkat publishes each platform version as one tested bundle. The upgrade automation configured in your repository proposes it as a pull request, and a pre-flight check in your box judges it against the cluster it targets. Nothing changes until you merge.
+
+Reverting a platform-version declaration changes the desired state that GitOps reconciles. It does not guarantee reversal of database migrations, deleted resources or other stateful changes. Each release page says whether going back restores the previous state; use the supported [rollback](/guides/platform/roll-back-a-version) or recovery procedure for the affected version.
+
+### Your applications
+
+The platform renders each application's namespace, gateway route, login, database, secrets and network policy from your declaration. Your code, images, configuration, data and secret values are yours, and so is how you use each capability.
+
+### Recovery
+
+Kamarkat separates recovery material from the infrastructure it protects. Your box's master keys and each cluster's break-glass credential are kept in an escrow you own, outside the box, and `kakt` ships the commands that verify the escrow and recover with what it holds.
+
+The escrow alone does not rebuild a box. Reconstructing a management cluster also needs your GitOps declarations and the management-state archives in your object storage, and it follows the [replacement procedure](/guides/box/replace-a-management-cluster). Application data follows its own recovery procedures, from the database backups you configure. You keep the escrow, the repository and the backups, and you decide when to use them.
+
+## In detail
 
 Kamarkat's part is the bundle: every platform component, its tested versions and defaults, the templates you start from, and the `kakt` CLI. Everything else is yours: your accounts, your GitOps repository, your clusters, your applications, and the use you make of every capability.
 
 Kamarkat is built for teams that have no platform team, so there is no split between a platform team and engineering teams: everything outside the bundle is yours to decide.
 
-You do hold accounts with other providers — your cloud, your git host, your container registry, the secret manager your escrow lives in, and an alert endpoint if you configure one. Each is yours, contracted by you and revocable by you. Kamarkat holds credentials to none of them.
+You do hold accounts with other providers: your cloud, your git host, your container registry, the secret manager your escrow lives in, and an alert endpoint if you configure one. Each is yours, contracted by you and revocable by you. Every credential to them is one you supply, and Kamarkat's own services receive none of them.
 
 Each row links to the page that describes it in detail.
 
@@ -24,6 +52,10 @@ Each row links to the page that describes it in detail.
 | **[Application repositories](/features/workloads/deploying-applications)** | Publishes the `platform-workload` library chart | Own your source, charts, images and CI |
 
 ## Agentic operations layer
+
+<Note>
+The agentic layer is in development. This table records how responsibility is designed to divide once it ships.
+</Note>
 
 | | Kamarkat | You |
 | :- | :- | :- |
@@ -39,7 +71,7 @@ Agentic operations do not add a second authority. An agent works through the sam
 | | Kamarkat | You |
 | :- | :- | :- |
 | **[Cloud account](/features/admin/cloud-account)** | — | Own it, pay for it, hold its credentials |
-| **[Management cluster](/features/capabilities/cluster-lifecycle)** | Ships the platform services it runs | Create it with Day-0, from your own CI |
+| **[Management cluster](/features/capabilities/cluster-lifecycle)** | Ships the platform services it runs, and the `kakt` commands and Day-0 workflow that build it | Authorize the build: supply its credentials, commit its declaration, and run Day-0 from your own CI, under your git organization's CI configuration |
 | **[Managed clusters](/features/capabilities/cluster-lifecycle)** | Ships the cluster template and the platform services | Declare them; your management cluster provisions them |
 | **[Secrets](/features/capabilities/secret-management)** | Ships the secret store and delivery | Supply the secrets only you can choose |
 | **[Escrow](/documentation/escrow/overview)** | Ships the commands that create the escrow project, enrol credentials, and verify and recover from it | Own the escrow and create it before the box; recovery artefacts are written by Day-0 and by the box as it runs |

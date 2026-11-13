@@ -1,38 +1,78 @@
 ---
-title: "How and why Kamarkat's approach works"
-description: "Six properties make Kamarkat an operating system rather than a toolchain: one foundation, one distribution, one source of truth, one golden path, one agentic experience, one ownership model."
-keywords: ["platform OS", "gitops", "bundle", "golden path", "agentic operations", "MCP registry", "skills registry", "ownership"]
+title: "How Kamarkat works"
+description: "What you provide, what the kakt CLI coordinates, and what you receive, then the six properties that make the result one platform rather than a toolchain."
+keywords: ["kakt", "installation", "day-0", "platform OS", "gitops", "bundle", "golden path", "agentic operations", "ownership"]
 ---
+
+> You authorize; `kakt` coordinates; your own management cluster runs the platform from then on.
+
+## How Kamarkat installs and operates your platform
+
+| You provide | `kakt` coordinates | You receive |
+| :- | :- | :- |
+| A cloud account and a token to build in it | Collecting each credential and opening the page that issues it. Values go to a local credential store on your machine, and the ones CI needs become encrypted CI secrets on your repository | A **box**: a management cluster running the platform's services in your account |
+| A git organization and a token to write to it | Creating your GitOps repository from the platform template, with your tenant, domain and region | A **GitOps repository** that is the only source of desired state for the box |
+| A domain whose DNS zone your cloud provider hosts | Declaring the management cluster, and the Day-0 run that builds it from your own CI | **Managed clusters** you add with a commit, which the management cluster provisions |
+| An escrow secret manager account | Creating the escrow project the box keeps its master keys and break-glass credentials in | **Recovery material** held outside the box, under your control |
+
+Your GitOps repository holds declarations, never plaintext credentials. The install runs in four phases, and every command runs under credentials you supply, from your machine or your own CI. The only things fetched from Kamarkat are its published artefacts: the CLI, the pinned Day-0 workflow, the bundle chart and the platform's images.
+
+<Steps>
+  <Step title="Download">
+    Install the `kakt` binary for the platform version you want your box to start on. `kakt bundle-version` prints the version it carries.
+  </Step>
+  <Step title="Connect">
+    `kakt login` signs you in to your escrow, and `kakt escrow init` creates the project your box's master keys live in. `kakt box init` then lists every credential the box needs and walks you through obtaining each one it does not yet have.
+  </Step>
+  <Step title="Initialize">
+    The same `kakt box init` run creates your GitOps repository, with no clusters. `kakt tenant add-management` declares the management cluster, and you commit it. Starting the **Bootstrap cluster** workflow runs Day-0 in that repository's own CI: it builds the management cluster, brings up the platform, and hands over to the GitOps engine.
+  </Step>
+  <Step title="Build">
+    From here the repository is the only authority. Declare a managed cluster with a commit and the management cluster provisions it. Declare an application and it is deployed with its namespace, gateway, login, database, secrets and network policy around it.
+  </Step>
+</Steps>
+
+<Note>
+Day-0 creates real infrastructure and runs for a few hours. It starts only when you dispatch the workflow, never because a file changed. Day-0 records each phase as it completes. If a run fails, fix the cause and start the workflow again: phases already recorded as complete are skipped, a skipped phase whose result no longer holds runs again, and a phase that is not safe to repeat refuses rather than running twice. The [quickstart](/quickstart/overview) has every command.
+</Note>
+
+After the install, nothing about how the box runs depends on Kamarkat being reachable. Kamarkat publishes new platform versions; the upgrade automation configured in your repository proposes each one as a pull request; your management cluster applies it once you merge.
+
+## Why it holds together
 
 "Platform OS" is an architectural claim, not a label. An operating system is what gives everything above it one way to run, one way to be addressed and one way to be operated. Six properties make Kamarkat one.
 
-## One operating foundation
+### One operating foundation
 
-Infrastructure, platform services, applications and operational tooling are delivered through a single operating model. A cluster, a capability, an application and an agent's workflow are not four different kinds of thing managed four different ways — they are declared, reconciled and observed the same way.
+Infrastructure, platform services, applications and operational tooling are delivered through a single operating model. A cluster, a capability, an application and an agent's workflow are not four different kinds of thing managed four different ways. They are declared, reconciled and observed the same way.
 
-## One integrated distribution
+### One integrated distribution
 
 Components are versioned, configured and delivered as a coordinated platform. A release is a **bundle**: every component at a version tested with the others, published as one artefact and adopted as one change.
 
 Nothing is upgraded on its own, because the failures that cost the most happen *between* components rather than inside them.
 
-## One declarative source of truth
+### One declarative source of truth
 
 Your GitOps repository expresses infrastructure and application intent. Platform controllers reconcile to it. There is no second place where state is configured and only that place knows it.
 
 This is what the agentic layer works against too. Inspecting state, investigating an issue or running a diagnostic reads the platform; **changing declared desired state changes a declaration**, and the platform reconciles it like any other. GitOps is authoritative for what the platform should be, not a log that every operational action has to pass through.
 
-## One standardized application golden path
+### One standardized application golden path
 
 An application declaration connects to routing, identity, secrets, databases, networking and observability through platform conventions rather than per-application wiring.
 
-Applications are defined **by environment**. A workload cluster declares the stage it serves, and every application in that environment is delivered to every cluster serving it — so adding a cluster deploys the environment to it, and no application names a destination.
+Applications are defined **by environment**. A managed cluster declares the stage it serves, and every application in that environment is delivered to every cluster serving it. Adding a cluster deploys the environment to it, and no application names a destination.
 
-## One agentic operating experience
+### One agentic operating experience
+
+<Note>
+The agentic layer is in development. This section describes its design, not capabilities available in the current release.
+</Note>
 
 Three elements, and the combination is the point.
 
-**Platform agents** operate against Kamarkat's standardized infrastructure, application and operational model. They inspect platform state, investigate issues, trace dependencies and carry out authorized platform workflows — against the same contracts an engineer uses.
+**Platform agents** operate against Kamarkat's standardized infrastructure, application and operational model. They inspect platform state, investigate issues, trace dependencies and carry out authorized platform workflows, against the same contracts an engineer uses.
 
 **The MCP registry** organizes and exposes the tools and integrations available to agents, so capability is discovered in one place rather than rediscovered per component. An agent asks the platform what it is authorized to use, and the answer is the platform's, not an assumption.
 
@@ -40,38 +80,17 @@ Three elements, and the combination is the point.
 
 What an agent may do is authorized by the platform, not inferred from how it was asked. Capability is something an agent discovers and is granted, so its reach is a property of the platform rather than of a prompt.
 
-> Kamarkat does not simply give AI agents access to infrastructure tools. It provides an integrated platform whose operations and capabilities agents can understand.
-
 Engineers and agents work through one authoritative model. There is no second control system with its own view of the world.
 
-## One ownership model
+### One ownership model
 
-The business controls its infrastructure, platform configuration, applications, credentials and data. The platform's management layer runs **inside** the box, not in a Kamarkat-hosted control plane, so your applications keep serving whether or not Kamarkat is reachable.
-
-## How they fit
-
-<Steps>
-  <Step title="You own the account and the repository">
-    Your cloud account, your git organization. The platform holds no credential to either beyond what you give it.
-  </Step>
-  <Step title="Kamarkat builds a management cluster">
-    Day-0 runs in your own CI and creates the cluster that runs the platform's services. That cluster plus the clusters it manages is your **box**.
-  </Step>
-  <Step title="The box manages its own clusters and capabilities">
-    Declare a workload cluster and the management cluster provisions it, with its networking, storage, delivery and registration already configured.
-  </Step>
-  <Step title="Applications deploy by environment">
-    Your build publishes a chart and pins it. The platform renders the namespace, gateway, login, database, secrets and network policy around it, on every cluster serving that environment.
-  </Step>
-  <Step title="Engineers and agents operate the same platform">
-    Through the same declarations, the same registered tools and the same reusable skills.
-  </Step>
-</Steps>
+You control your infrastructure, platform configuration, applications, credentials and data. The management cluster runs **inside** your box, not in a Kamarkat-hosted service, so your applications keep serving whether or not Kamarkat is reachable.
 
 **Box**, **bundle** and **capabilities** are the three words worth knowing; [Core concepts](/documentation/core-concepts) defines them and the rest.
 
 ## What this does not claim
 
+- Installing is not one command yet. `kakt` is the single entry point, and the install is a short sequence of its commands plus one Day-0 workflow run.
 - Infrastructure still needs operating. The platform reduces how much of it you assemble and maintain; it does not remove the work, and agents do not remove accountability for it.
 - Git is the desired state, not an undo history. Reverting a declaration stops the platform wanting something; it does not recreate infrastructure or data that has already been destroyed.
 - Accepting a release is a decision you control. It is not a guarantee that every upgrade completes without attention.
@@ -79,7 +98,7 @@ The business controls its infrastructure, platform configuration, applications, 
 
 <CardGroup cols={2}>
   <Card title="Architecture" icon="sitemap" href="/introduction/architecture">
-    The three layers, the clusters, and what runs where.
+    From the installer to the running platform, and what runs where.
   </Card>
   <Card title="Get started" icon="rocket" href="/quickstart/overview">
     From an empty cloud account to an application serving on your domain.

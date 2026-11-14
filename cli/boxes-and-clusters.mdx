@@ -1,6 +1,6 @@
 ---
 title: "Boxes and clusters"
-description: "Scaffold a box, create its clusters, check that they converge, and take them down."
+description: "Initialize a box, create its clusters, check that they converge, and take them down."
 keywords: ["kakt box init", "kakt tenant", "verify", "teardown", "reseed", "proposal"]
 ---
 
@@ -31,7 +31,7 @@ Once the credential set is complete, the same command creates the box's reposito
 ```bash
 kakt box init \
   --tenant acme \
-  --box acme-inc \
+  --git-org acme-inc \
   --domain acme.example \
   --region hel1
 ```
@@ -46,7 +46,7 @@ A new box **mints its own identity**, once, from the Unix second it was initiali
 | Repository | `acme-inc/acme-gitops-1794447136` | a box is declared in its own repository, and a replacement box needs its own |
 | First management cluster | `acme-mgmt-1794447136` | the cluster's name keys its objects and its database's archive prefix, which collides between two boxes sharing one object store |
 
-Your git organization and your tenant are **not** renamed: `--box acme-inc` names an organization that exists, and `acme` stays the tenant. There is no flag that sets the three generated names — a chosen suffix would be a second naming scheme, and two boxes could then be given one identity on purpose. All three are written to `registry/box.yaml`, and every later command reads them from there.
+Your git organization and your tenant are **not** renamed: `--git-org acme-inc` names an organization that exists, and `acme` stays the tenant. `--git-org` can be left out, and is then read from the platform credential — one organization is the answer, several is a refusal that lists them, because the repository it would create carries your tenant's name under a timestamped name that cannot be reused. There is no flag that sets the three generated names — a chosen suffix would be a second naming scheme, and two boxes could then be given one identity on purpose. All three are written to `registry/box.yaml`, and every later command reads them from there.
 
 <Note>
 **One tenant may hold several boxes.** That is how a major upgrade works: a replacement box is prepared beside the one still serving, each with its own identity and its own repository. See [Major upgrade](/documentation/upgrades/major-upgrade).

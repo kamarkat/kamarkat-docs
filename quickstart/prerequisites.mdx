@@ -56,11 +56,11 @@ One exception is worth doing first, because it is needed before the repository e
 | :- | :- |
 | `HCLOUD_TOKEN` | Your cloud API token, read and write. Your clusters are created with it. It is enrolled into your box's escrow on the first bootstrap and read from there afterwards, so you supply it once. |
 | `GITOPS_REPO_WRITE_TOKEN` | Write access to your git organization's repositories, plus that organization's **Secrets: write** permission. Day-0 commits what it generates with it, and your application builds inherit it. |
-| `INFISICAL_ESCROW_URL`, `INFISICAL_ESCROW_PROJECT_ID`, `INFISICAL_ESCROW_CLIENT_ID`, `INFISICAL_ESCROW_CLIENT_SECRET` | Your escrow. You create these on the [next page](/quickstart/get-started) — nothing to gather in advance. Scaffolding refuses without them, because an escrow cannot be added after the fact. |
+| `INFISICAL_ESCROW_URL`, `INFISICAL_ESCROW_PROJECT_ID`, `INFISICAL_ESCROW_CLIENT_ID`, `INFISICAL_ESCROW_CLIENT_SECRET` | Your escrow. You create these on the [next page](/quickstart/get-started) — nothing to gather in advance. `kakt box init` refuses without them, because an escrow cannot be added after the fact. |
 
 ### Required for what your box runs
 
-Scaffolding refuses if a capability your box selects has no credential.
+`kakt box init` refuses if a capability your box selects has no credential.
 
 | Secret | What it is for |
 | :- | :- |

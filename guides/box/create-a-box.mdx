@@ -6,34 +6,36 @@ keywords: ["box", "management cluster", "day-0", "bootstrap", "kakt box init", "
 
 > One management cluster per box, built once by Day-0. Everything after it is a commit.
 
-The management cluster runs the platform's services: the GitOps engine, cluster lifecycle, secrets, identity, login and observability. It is the only cluster that needs Day-0. It then creates every managed cluster your repository declares. Scaffolding declares none: your first managed cluster is a commit you make with `kakt tenant add-cluster`.
+The management cluster runs the platform's services: the GitOps engine, cluster lifecycle, secrets, identity, login and observability. It is the only cluster that needs Day-0. It then creates every managed cluster your repository declares. `kakt box init` declares none: your first managed cluster is a commit you make with `kakt tenant add-cluster`.
 
 You create it once per box. A second box is a second GitOps repository, with its own management cluster.
 
 ## Before you start
 
 - **Your accounts and credentials** are ready: see [Prerequisites](/quickstart/prerequisites).
-- **Your escrow** exists: see [Get started](/quickstart/get-started). Scaffolding refuses without it, because an escrow cannot be added afterwards.
+- **Your escrow** exists: see [Get started](/quickstart/get-started). `kakt box init` refuses without it, because an escrow cannot be added afterwards.
 - **The provider suits the environment.** `hybrid` is supported for `dev` only.
 
 <Note>
 Day-0 creates cloud servers, billed to your account, and runs for a few hours. It runs only when you start it, never because a file changed.
 </Note>
 
-## Step 1: Scaffold your GitOps repository
+## Step 1: Initialize your GitOps repository
 
 ```bash
 kakt box init \
   --tenant acme \
-  --box acme-inc \
+  --git-org acme-inc \
   --domain acme.example \
   --region hel1
 ```
 
 <Note>
-Two values are easy to mix up, because `--box` means something different here than it does on the escrow commands.
+`--git-org` and the box's own name are different things, and only one of them is yours to pass.
 
-- `--box acme-inc` is your **git organization** — where the repository is created.
+You can usually leave `--git-org` out: it is read from the platform credential when that credential reaches exactly one git organization. Name it when the credential reaches several — the command then refuses and lists them, because a box's repository carries your tenant's name under a timestamped name that cannot be reused, so creating it in the wrong organization is not something the command can undo.
+
+- `--git-org acme-inc` is your **git organization** — where the repository is created.
 - The **box's own name is generated**, not passed: one timestamp gives the box id, the repository and the first management cluster's name (`acme-1794447136`, `acme-gitops-1794447136`, `acme-mgmt-1794447136`). The box id is the value `kakt escrow verify --box`, `kakt kubeconfig --box` and the other escrow commands take, and the command prints it when the box is created.
 
 The one human this box accepts for escrow-backed operations is taken from your `kakt login` session and printed as it is used. Pass `--platform-admin` only to name somebody else.

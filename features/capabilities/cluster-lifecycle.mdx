@@ -20,7 +20,7 @@ A box comes into existence in two phases.
 
 You supply both. Cloud credentials stay in your box and are never given to Kamarkat.
 
-### 2. Scaffold your GitOps repository
+### 2. Initialize your GitOps repository
 
 `kakt box init` creates the box's own repository in your git organization, with no clusters. It writes only the facts unique to you: your tenant, that git organization, your domain, your region and your box's permanent identity. Its management cluster is declared next, with `kakt tenant add-management`.
 

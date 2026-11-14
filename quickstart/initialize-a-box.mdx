@@ -7,8 +7,10 @@ keywords: ["kakt box init", "initialize a box", "gitops repository", "box identi
 A box outlives every cluster in it, so the box is what you initialize and a cluster is a declaration you add to it afterwards. This page is the first half: the box, with no clusters.
 
 ```bash
-kakt box init --tenant acme --box acme-inc --domain acme.example --region hel1
+kakt box init --tenant acme --git-org acme-inc --domain acme.example --region hel1
 ```
+
+`--git-org` is optional: leave it out and the command reads your git organization from the platform credential, which reaches exactly one in the ordinary case. It refuses and lists them when there are several, rather than choosing.
 
 `kakt box init` initializes the box: it creates the box's repository in your git organization and renders it from the platform template, with **no clusters**. It writes only the facts unique to you: your tenant, that git organization, your domain, your region, and the identity it mints for the box. This happens once; every change after it is a commit or a pull request.
 

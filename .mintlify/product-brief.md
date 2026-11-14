@@ -22,8 +22,8 @@ terminal and a cloud console, not a Kubernetes specialist.
 
 ## Jobs to be done
 
-1. Build a box in their own accounts: escrow, scaffold the GitOps repository, run Day-0 (ADR-062,
-   ADR-040; `kakt tenant scaffold`, `kakt verify`).
+1. Build a box in their own accounts: escrow, initialize the GitOps repository, run Day-0 (ADR-062,
+   ADR-040; `kakt box init`, `kakt verify`).
 2. Run their applications on it: declare an app, supply its secrets, publish and pin its chart
    (ADR-073, ADR-088).
 3. Take new platform versions: review and merge the proposal their own Renovate opens; roll back by

@@ -94,7 +94,7 @@ The management cluster watches that path and generates two Applications per clus
 The box has no management cluster holding infrastructure. You create the box, declare the cluster, and build it:
 
 ```bash
-kakt box init --tenant acme --box acme-inc --domain acme.example
+kakt box init --tenant acme --git-org acme-inc --domain acme.example
 git add registry/clusters && git commit -m "Declare acme-mgmt-1794447136" && git push
 ```
 

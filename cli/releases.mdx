@@ -47,18 +47,53 @@ Steps 2, 4 and 5 run only with `--gitops-dir`. Without it the command ends after
 
 ## kakt release promote
 
-Promotes the tenant to a version already published, then syncs and verifies the box. This is for a stable version, which is published when a release is created on GitHub.
+Moves a box to a version already published. This is for a stable version, which
+is published when a release is created on GitHub.
+
+Run it inside the box:
+
+```bash
+cd ../tenant-gitops
+kakt release promote --version 0.1.17
+```
+
+`--gitops-dir` names the box when you are somewhere else. Nothing else is
+needed: promotion rewrites the box's own references and commits them, so it
+needs the box and git and no checkout of the platform.
 
 ```bash
 kakt release promote --version 0.1.17 --gitops-dir ../nutgraf-gitops
 ```
 
-The version must be named and must already be in the registry: promoting first would write a reference to nothing.
+It rewrites **every** reference under `registry/`, not only
+`environmentRevision`: a bundle carries the version twice, and moving one leaves
+the children pinned while the root reports Synced. Then it commits, rebases onto
+the remote and pushes.
+
+**The push is what upgrades the cluster.** Your control plane reconciles the new
+version from git, and the **Bundle sync** workflow in your repository drives that
+convergence and then confirms the box actually reached the version — one job per
+cluster the commit moved. Grant it access with a `KUBECONFIG_<cluster>` secret
+and every promotion is confirmed on the box; without one it reports that the box
+will converge on its own and that nothing was checked.
+
+It refuses rather than half-applying:
+
+| It refuses when | Because |
+| :- | :- |
+| the version is already referenced under `registry/` | a version is published once; a republished tag with different content is the one failure GitOps cannot diagnose |
+| clusters are on different versions | there is no single current version, and picking one silently completes a half-applied promotion in a direction nobody chose |
+| a cluster pulls the bundle from another registry | it would be promoted to a version that registry does not hold, and every Application would stay on the old one |
+| the old version still appears after rewriting | the promotion is incomplete, and nothing is committed |
+| `.state/` would be staged | that is your machine's bootstrap record, not the box's declaration |
+
+Use `--dry-run` to see which files would change and have nothing written.
 
 | Flag | Meaning |
 | :- | :- |
-| `--dry-run` | Say what each step would do; change nothing |
-| `--no-sync` | Promote; do not sync the box |
+| `--version` | The published version to move to. Required |
+| `--gitops-dir` | The box to promote. Defaults to the box you are standing in |
+| `--dry-run` | Say which files would change; write nothing |
 
 ## kakt release sync
 

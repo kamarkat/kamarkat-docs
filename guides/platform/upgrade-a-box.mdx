@@ -10,7 +10,7 @@ Each cluster pins its platform version in `registry/clusters/<cluster>/bundle.ya
 
 ## Step 1: Read what the version brings
 
-Each version's release notes, on the release for tag `v<version>` on `kamarkat/kamarkat`, list its changes, its security fixes and a **Taking this version** table. Check two of its fields:
+Each version has a page listing its changes, its security fixes and what taking it means; the release for tag `v<version>` on `kamarkat/kamarkat` links it. Check two fields:
 
 - **Minimum version this may be taken from.** The cluster must already run this version or a later one. If it does not, upgrade to an intermediate version first.
 - **Predecessor restorable from this version.** Whether going back restores the cluster's previous state: `yes`, `no`, or `unknown` when it was not declared. Treat `unknown` as `no`. See [Roll back a platform version](/guides/platform/roll-back-a-version).

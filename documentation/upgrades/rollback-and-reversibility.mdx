@@ -16,7 +16,7 @@ So the platform promises **declaration rollback** and does not promise operation
 
 ## Reversibility is a property of the version
 
-Each published version's release notes carry a **Taking this version** table. It states the minimum version the release may be taken from, and whether its predecessor can be operationally restored from it: `yes`, `no` or `unknown`. The statement is made when the version is published and is immutable afterwards.
+Each published version's own page states the minimum version the release may be taken from, and whether its predecessor can be operationally restored from it: `yes`, `no` or `unknown`. The statement is made when the version is published. The release for tag `v<version>` links the page.
 
 The platform's maintainers declare reversibility for each release. A release that declares nothing says `unknown` rather than `yes`. Treat `unknown` as `no`.
 

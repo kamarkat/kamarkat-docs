@@ -24,9 +24,22 @@ Revert the commit that upgraded the cluster:
 git revert <commit> && git push
 ```
 
-Or set both fields in `registry/clusters/<cluster>/bundle.yaml` back to the version it ran before, and commit.
+That is the whole rollback: the commit moved every reference the version appears
+in, so reverting it moves them all back together.
+
+Where there is no single commit to revert, name the version instead and let the
+command find every reference:
+
+```bash
+kakt release promote --version <the version it ran before>
+```
 
 ## Step 2: Verify
+
+The push rolls the cluster back the same way it rolled forward: your control
+plane reconciles it, and the **Bundle sync** workflow confirms the cluster
+reached the version. Without a `KUBECONFIG_<cluster>` secret it confirms
+nothing, and you check it yourself:
 
 ```bash
 kakt verify --cluster acme-mgmt-1794447136

@@ -25,24 +25,41 @@ kakt proposal preflight --candidate <version> --cluster acme-mgmt-1794447136
 
 It checks the version's minimum permits the step, that the version is published where your box pulls from, and that the cluster is reconciling now. A check that cannot run reports unverified rather than passing.
 
-## Step 3: Change the version
+## Step 3: Take the version
 
-Set both fields to the version you are taking, and nothing else:
-
-```yaml registry/clusters/acme-mgmt-1794447136/bundle.yaml
-targetRevision: <version>
-bundleVersion: <version>
-```
+Run this in your box's checkout:
 
 ```bash
-git commit -am "Upgrade acme-mgmt-1794447136 to <version>" && git push
+kakt release promote --version <version>
 ```
 
-The upgrade carries none of the bundle's content and never touches your
-`values.yaml`. Your management cluster pulls the bundle chart at the new version
-and reconciles from it.
+A cluster records the version in **three** places — `targetRevision` and the
+`bundleVersion` value in `bundle.yaml`, and `environmentRevision` in
+`values.yaml` — and this rewrites every one of them, then commits and pushes.
 
-## Step 4: Verify
+That matters more than it looks. `targetRevision` decides which chart is pulled
+and `bundleVersion` tells that chart which version it is, so moving one and not
+the other leaves the root Application Synced while every child stays on the
+previous release. And `environmentRevision` is what your box reports as the
+version it runs, so a box that moved the first two and not the third upgrades
+while continuing to say it did not.
+
+It refuses rather than half-applying: a version already referenced under
+`registry/`, clusters on different versions, a cluster pulling the bundle from
+another registry, or the old version still appearing after the rewrite each stop
+it before anything is committed. `--dry-run` lists what would change and writes
+nothing.
+
+## Step 4: The push upgrades the cluster
+
+Your management cluster reconciles the new version from git. The **Bundle sync**
+workflow in your repository drives that convergence and then confirms the
+cluster actually reached the version — one run per cluster the commit moved.
+
+It confirms nothing unless you have granted it access. With a
+`KUBECONFIG_<cluster>` secret on the repository — the cluster's own name,
+upper-cased with hyphens turned into underscores — every upgrade is checked on
+the box. Without one the run says so, and you check it yourself:
 
 ```bash
 kakt verify --cluster acme-mgmt-1794447136

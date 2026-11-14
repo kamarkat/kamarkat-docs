@@ -74,7 +74,7 @@ Commit and push.
 ## Step 4: Build it
 
 ```bash
-gh workflow run bootstrap-cluster -f cluster=acme-mgmt-02
+git add registry/clusters && git commit -m "Declare acme-mgmt-02" && git push
 ```
 
 Before provisioning anything, this establishes that the box has no other management cluster holding infrastructure. If the predecessor still owns resources, it refuses and names them — nothing is half-built. One bootstrap runs per box at a time, so a second dispatch waits rather than racing the first.

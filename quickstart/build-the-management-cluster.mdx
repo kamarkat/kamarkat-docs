@@ -31,13 +31,13 @@ declared management cluster acme-mgmt-1794447136:
 [box] ✓ INFISICAL_ADMIN_EMAIL set on acme-inc/acme-gitops-1794447136
 [box] ✓ INFISICAL_ADMIN_PASSWORD set on acme-inc/acme-gitops-1794447136
 
-Commit and push, then create it:
-  gh workflow run bootstrap-cluster -f cluster=acme-mgmt-1794447136
+Commit and push to build it:
+  git add registry/clusters && git commit -m "Declare acme-mgmt-1794447136" && git push
 ```
 
 `--provider`, `--region`, `--bundle-version` and `--workers` override what the box declares, for this cluster only. Everything else — the domain, the escrow, the administrator — belongs to the box and is not a per-cluster choice.
 
-## Step 2: Commit it
+## Step 2: Commit it — this builds it
 
 ```bash
 git add registry/clusters
@@ -45,27 +45,42 @@ git commit -m "Declare management cluster acme-mgmt-1794447136"
 git push
 ```
 
-<Note>
-**Committing declares the cluster. It does not build one.** Nothing provisions a server until you dispatch the workflow below, which costs money and takes hours — so a declaration is safe to review, amend and re-push first.
-</Note>
+<Warning>
+**The push builds the cluster.** Day-0 starts as soon as the declaration lands on
+`main`, and it provisions real servers — it costs money and takes hours. Review
+the declaration before you push; it is a file, and nothing has been created yet.
+</Warning>
 
-## Step 3: Let Day-0 build it
+Git is the source of truth. The run reads this cluster's shape — its provider,
+region, worker count and whether it accepts on-prem nodes — from the
+`registry/clusters/<name>/values.yaml` you just committed, so what gets built is
+what the repository says and there is nowhere else to state it.
 
-Day-0 runs as the **Bootstrap cluster** workflow in your GitOps repository, on your git organization's runners, under the [secrets stored there](/features/admin/git-connection#where-the-secrets-live). It is pinned to the platform version your box was initialized on, so a later change to the platform cannot change how your repository bootstraps.
+Three things it will not do, each reported in the run rather than passing
+quietly:
 
-```bash
-gh workflow run bootstrap-cluster.yml --repo acme-inc/acme-gitops-1794447136 \
-  -f cluster=acme-mgmt-1794447136
-```
-
-You can also start it from **Actions** › **Bootstrap cluster** › **Run workflow**.
-
-| Input | Meaning |
+| It does not build | Because |
 | :- | :- |
-| `cluster` | The cluster to build, as named under `registry/clusters/`. Required — a box holds several clusters over its life, so this is never assumed |
-| `provider`, `region` | Where it runs. Default to what your box declares |
-| `workers` | Cloud worker nodes; defaults to the cluster's `values.yaml` |
-| `on-prem`, `tailnet` | Accept nodes on your own premises, joining over your tailnet |
+| a cluster your push only **edited** | every change after Day-0 is reconciled by that cluster's own control plane |
+| a cluster that has been built before | Day-0 writes `registry/clusters/<name>/generated/`, and that directory is your repository's own record that the cluster exists |
+| a **managed** cluster | one declares an `environmentSlug`, and your management cluster provisions it from git — see [Add a managed cluster](/quickstart/add-a-managed-cluster) |
+
+## Step 3: Day-0 builds it
+
+Day-0 runs as the **Bootstrap cluster** workflow in your GitOps repository, on
+your git organization's runners, under the [secrets stored
+there](/features/admin/git-connection#where-the-secrets-live). It is pinned to
+the platform version your box was initialized on, so a later change to the
+platform cannot change how your repository bootstraps.
+
+Open **Actions** › **Bootstrap cluster** to watch it. The run that matters is
+the one your push started.
+
+You can also start it by hand, from **Actions** › **Bootstrap cluster** › **Run
+workflow** or with `gh workflow run bootstrap-cluster.yml`, naming the cluster.
+That is for resuming a build that stopped part way, or for replacing a
+management cluster whose declaration is already committed — the shape still
+comes from the declaration, so the only thing you supply is which cluster.
 
 ## Step 4: Follow the run
 

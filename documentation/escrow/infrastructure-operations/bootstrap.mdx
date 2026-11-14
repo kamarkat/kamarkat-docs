@@ -81,7 +81,7 @@ own names.
 A box is built by dispatching its own workflow, which runs in your organization under your secrets:
 
 ```bash
-gh workflow run bootstrap-cluster -f cluster=acme-mgmt-02
+git add registry/clusters && git commit -m "Declare acme-mgmt-02" && git push
 ```
 
 The cluster must be declared first, with [`kakt tenant add-management`](/cli/boxes-and-clusters#kakt-tenant-add-management).

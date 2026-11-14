@@ -199,7 +199,7 @@ Committing declares it. Create it by dispatching the repository's own workflow
 with the new name:
 
 ```bash
-gh workflow run bootstrap-cluster -f cluster=acme-mgmt-02
+git add registry/clusters && git commit -m "Declare acme-mgmt-02" && git push
 ```
 
 Both declarations can exist at once, which is what makes a replacement
@@ -286,7 +286,7 @@ kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm
 kakt tenant add-management --name acme-mgmt-02
 
 # 4. build it
-gh workflow run bootstrap-cluster -f cluster=acme-mgmt-02
+git add registry/clusters && git commit -m "Declare acme-mgmt-02" && git push
 ```
 
 The repository, the box's identity, its escrow scope and every past incarnation's

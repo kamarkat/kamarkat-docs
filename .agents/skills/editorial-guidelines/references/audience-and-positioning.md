@@ -23,6 +23,24 @@ Engineers, tech leads, and operators who install, integrate, and run workloads o
 - Standardized application delivery and service consumption.
 - System behavior, observability, and diagnostic workflows.
 
+### Operating Audience: The Kamarkat Platform Team
+
+A small number of pages address the people who publish the platform rather than
+the people who run a box — the release procedure is the clearest case. These are
+platform documentation and they belong on this site; they are not tenant pages
+and must not be written as though a tenant would run them.
+
+- **Say so in the first line.** Such a page opens by stating that its commands
+  are for the platform team and that a tenant never runs them.
+- **Section 4 still applies.** No internal ADR numbers, no platform repository
+  file paths, no ticket IDs, no design history — the audience is narrower, the
+  prohibition is not.
+- **Section 5 applies unchanged.** A platform operation is a `kakt` command for
+  this audience too. The release procedure is not `gh`, and it is not
+  `scripts/release.sh`.
+- **The product story does not change.** These pages describe the same platform
+  with the same vocabulary; a different reader is not a different product.
+
 ### The Unified Audience Rule
 - **Do not assume specialist expertise**: Do not assume readers are Kubernetes internals specialists or dedicated platform engineers.
 - **Do not dumb down technical material**: Explain technical concepts clearly when they matter, with sufficient depth and precision for a CTO or staff engineer to evaluate them rigorously.

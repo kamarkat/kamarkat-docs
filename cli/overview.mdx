@@ -143,16 +143,24 @@ Removing an **application** is not a command. Delete its directory under `enviro
 
 [Support →](/cli/support)
 
+### Moving your box between versions
+
+| Command | What it does |
+| :- | :- |
+| `kakt promote` | Move your box onto a published platform version |
+
+[Upgrade a box →](/guides/platform/upgrade-a-box)
+
 ### Platform releases
 
-For the platform team, which publishes the versions your box installs. You do not run these.
+For the platform maintainers, who publish the versions your box installs. You do
+not run these, and they do not touch your box: a release ends when the version
+exists in the registry.
 
 | Command | What it does |
 | :- | :- |
 | `kakt release check` | Rehearse the next version, and check every component behind its latest release has a reason |
-| `kakt release publish` | Publish the next version, promote the tenant to it and verify the box reached it |
-| `kakt release promote` | Promote the tenant to a version already published |
-| `kakt release sync` | Sync the box to a promoted version and verify it reached it |
+| `kakt release publish` | Publish the next version to the registry |
 | `kakt release docs` | Add published versions to the release pages, and render every release page |
 
 [Releases →](/cli/releases)

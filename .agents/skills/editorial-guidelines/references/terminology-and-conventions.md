@@ -58,10 +58,24 @@ Customer documentation never cites internal platform architecture decision recor
 
 ---
 
-## 5. Interface Contract: Only the CLI, Never a Platform Script
+## 5. Interface Contract: the CLI Performs Every Platform Operation
 
-Every documented procedure must be a supported CLI command.
-- **Never document platform scripts**: Never instruct readers to run scripts that ship in the GitOps repository (`./scripts/anything.sh` must not appear in documentation).
-- **Why this rule exists**: Two interfaces mean two contracts. A script in a tenant repository is an unversioned copy that ages independently, while the CLI carries the platform version. Documenting scripts creates conflicting operational contracts.
-- **Permitted external CLIs**: `git`, `gh`, and `kubectl` are allowed as standard prerequisites installed by the reader.
-- **Handling gaps**: If a procedure can only be accomplished via an unversioned script, that is a gap in the CLI. Report the gap; do not document around it.
+Every platform operation in documentation is a `kakt` command. No `gh`, `kubectl`, `helm`, `curl`, or script performs or inspects platform state on a documented page.
+
+- **The test — who owns the outcome?** If the platform owns it, it is a `kakt` command. If no such command exists, that is a gap in the CLI, not a licence to reach for another tool.
+- **There is no permitted-tool list.** A tool being commonly installed does not make it a vehicle for a platform step. This is precisely how the rule has been bypassed before: the stable release procedure was performed with `gh release create`, which no rule forbade because `gh` was listed as permitted, and the step was therefore left undocumented rather than built.
+- **Never document scripts.** No script path appears on any page — `./scripts/anything.sh` — whether it ships in a tenant's repository or in the platform's own. Two interfaces mean two contracts: a script is unversioned relative to the bundle, while the CLI carries the platform version.
+- **Why this rule exists**: the CLI is the platform's supported surface. Every operation documented through another tool is an operation the platform does not own, cannot version, and cannot change without breaking a reader who followed the page.
+
+### Two exceptions, and no others
+
+- **Obtaining the CLI**, which cannot be done with the CLI. The published install methods only.
+- **`git` against the reader's own repository.** Committing and pushing a declaration is the tenant's act and the platform's contract — the push is what builds. `kakt` renders declarations; it does not commit them.
+
+### Handling a gap
+
+When a procedure needs a step that has no `kakt` command:
+1. Say on the page that the step exists and is not yet a command.
+2. Record the gap against the platform repository.
+
+Do not document the external command, and **do not omit the step**. An omitted step makes the whole procedure silently not work, which is the failure this rule exists to prevent — and omission is what the previous wording encouraged, because "do not document around it" was the only instruction it gave.

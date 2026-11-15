@@ -17,6 +17,11 @@ Each command runs from the root of a `kamarkat` checkout (the platform repositor
 
 Rehearses the next version and checks every component behind its latest release has a reason. Nothing is pushed, so the version stays free.
 
+Because it spends nothing, it chooses a version when you do not: the next
+candidate, or the next **patch** when the newest published version is stable. It
+says which one it took. Publishing a stable version still requires `--version`,
+since that number is consumed.
+
 ```bash
 kakt release check
 ```
@@ -65,12 +70,21 @@ what the release means — and a version is consumed the moment it is published,
 so a guess spends a number meant for something else. Run `kakt release check
 --version 0.2.8` first to rehearse it.
 
+**It publishes a commit, not your working tree.** A candidate packages the tree
+you have; a stable version is built by the run, from the commit the release
+names. So the release names your current commit, and the command refuses a
+checkout that is not exactly what the run would build — uncommitted changes are
+listed by name, and a commit that is not on the remote is refused because there
+would be nothing for the release to point at. This is what keeps the version you
+rehearsed and the version you published the same one.
+
 The steps differ from a candidate's only at publication:
 
 1. **Decide** nothing — you named the version.
-2. **Create the release**, then **follow the run that publishes it**. The command
-   waits, and fails if the run fails. An existing release for that version is
-   refused: a version is published once.
+2. **Check the checkout**: clean, and its commit present on the remote.
+3. **Create the release** naming that commit, then **follow the run that
+   publishes it**. The command waits, and fails if the run fails. An existing
+   release for that version is refused: a version is published once.
 
 Nothing is packaged on your machine. The run builds the charts, the CLI binaries
 and their checksums, writes the release body, and updates the Homebrew tap — so a

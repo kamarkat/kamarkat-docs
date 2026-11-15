@@ -11,10 +11,10 @@ Your escrow holds what your box cannot be rebuilt without: master keys, trust ro
 Every command here reads the escrow from four values. On the machine that ran `kakt escrow init` they are already in `~/.kamarkat/infisical/` and nothing needs exporting. Anywhere else — another workstation, or CI — supply them:
 
 ```bash
-export INFISICAL_ESCROW_URL=https://app.infisical.com
-export INFISICAL_ESCROW_PROJECT_ID=<project-id>
-export INFISICAL_ESCROW_CLIENT_ID=<machine-identity-client-id>
-export INFISICAL_ESCROW_CLIENT_SECRET=<machine-identity-client-secret>
+export ESCROW_PROVIDER_URL=https://app.infisical.com
+export ESCROW_PROVIDER_PROJECT_ID=<project-id>
+export ESCROW_PROVIDER_CLIENT_ID=<machine-identity-client-id>
+export ESCROW_PROVIDER_CLIENT_SECRET=<machine-identity-client-secret>
 ```
 
 `--box` is the box id minted when your box was initialized, such as `acme-1794447136`. `registry/box.yaml` records it.

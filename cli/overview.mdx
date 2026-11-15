@@ -45,7 +45,7 @@ Run `kakt <command> --help` for the complete flag set of any command. This page 
 
 A command that reaches a management cluster — `kakt kubeconfig`, `kakt teardown` — does not read a kubeconfig off your disk. The box's repository declares which escrow holds its credentials, and `kakt` reads the escrowed kubeconfig with **your** identity, uses it, and discards it. So any authorized workstation can operate the box, and none of them needs a copy of anything.
 
-Automation does not log in. Set the machine identity instead, which every command prefers when it is present: `INFISICAL_ESCROW_URL`, `INFISICAL_ESCROW_PROJECT_ID`, `INFISICAL_ESCROW_CLIENT_ID`, `INFISICAL_ESCROW_CLIENT_SECRET`.
+Automation does not log in. Set the machine identity instead, which every command prefers when it is present: `ESCROW_PROVIDER_URL`, `ESCROW_PROVIDER_PROJECT_ID`, `ESCROW_PROVIDER_CLIENT_ID`, `ESCROW_PROVIDER_CLIENT_SECRET`.
 
 <Note>
 Reading the escrowed kubeconfig gives you **cluster-admin**, because that is what the credential is. Being logged in is an authorization boundary at the credential, not per-person RBAC inside the cluster — day-to-day access is OIDC through your box's own identity provider, where you authenticate as yourself to the API server.

@@ -77,7 +77,7 @@ Automation authenticates as itself and never borrows your session.
 
 | | Human | Machine |
 |---|---|---|
-| Credential | your `kakt login` session | `INFISICAL_ESCROW_CLIENT_ID` / `_CLIENT_SECRET` in the environment |
+| Credential | your `kakt login` session | `ESCROW_PROVIDER_CLIENT_ID` / `_CLIENT_SECRET` in the environment |
 | Selected | whenever a session exists | when there is no session, or with `KAKT_IDENTITY=machine` |
 | Administrator check | applies | does not apply |
 
@@ -111,12 +111,12 @@ Infisical's default client-secret TTL is `0`, which never expires — and that i
 If you do set one, add a **Credential Expiration** alert on the identity. Infisical checks once a day and can notify from 1 to 90 days ahead, by email, Slack, PagerDuty or webhook.
 </Warning>
 
-**Rotating it.** Create the new client secret first, update both places that hold it — your repository's `INFISICAL_ESCROW_CLIENT_SECRET` and the box's `hub-operator` Secret — confirm the box still reconciles, then revoke the old secret. In that order: revoking first leaves the running box unable to escrow anything it generates.
+**Rotating it.** Create the new client secret first, update both places that hold it — your repository's `ESCROW_PROVIDER_CLIENT_SECRET` and the box's `hub-operator` Secret — confirm the box still reconciles, then revoke the old secret. In that order: revoking first leaves the running box unable to escrow anything it generates.
 
 **If it leaks.** Revoke the credential, or delete the identity to revoke everything it issued. Deleting the credential or the identity takes effect immediately; revoking an access token alone can leave it usable for up to 12 minutes if Infisical's cache is briefly unavailable. Then rotate as above, because the box needs a working identity.
 
 <Note>
-**A wrong secret locks the identity, it does not just fail.** Infisical's default lockout blocks an auth method after three failed logins within 30 seconds, for five minutes. So a mistyped `INFISICAL_ESCROW_CLIENT_SECRET` in CI fails, the retry fails too, and the symptom reads like an outage rather than a bad credential. Fix the value and wait out the five minutes, or clear the lockout on the identity's auth method.
+**A wrong secret locks the identity, it does not just fail.** Infisical's default lockout blocks an auth method after three failed logins within 30 seconds, for five minutes. So a mistyped `ESCROW_PROVIDER_CLIENT_SECRET` in CI fails, the retry fails too, and the symptom reads like an outage rather than a bad credential. Fix the value and wait out the five minutes, or clear the lockout on the identity's auth method.
 </Note>
 
 **Consider an alert on auth-method changes.** Infisical can notify when an auth method or client secret on an identity is added, updated or revoked. For the credential that reaches every box's recovery material, that is the tamper signal — and nothing in the platform provides it.

@@ -31,8 +31,8 @@ What this box is built with. Present values are left alone.
   ✓ S3_SECRET_ACCESS_KEY           present    backups of the platform database
   ✓ GRAFANA_IRM_ALERTMANAGER_URL   present    paging on this box's critical and warning alerts through your IRM
   ✓ GRAFANA_IRM_HEARTBEAT_URL      present    being paged when this box's hub stops reporting (ADR-078 add.5 §5)
-  ✓ ZITADEL_SMTP_URL               present    the identity provider sending verification and password-reset mail
-  ✓ INFISICAL_ESCROW_* (4)         present    where this box's master keys are kept (4/4)
+  ✓ IDENTITY_PROVIDER_SMTP_URL               present    the identity provider sending verification and password-reset mail
+  ✓ ESCROW_PROVIDER_* (4)         present    where this box's master keys are kept (4/4)
 [box] template: manifests/tenants/gitops-template (the working directory)
 [box] rendered acme-gitops-1794716111 into acme-gitops-1794716111
 [box] authenticating as the platform (personal access token)
@@ -42,13 +42,13 @@ What this box is built with. Present values are left alone.
 [box] ✓ GRAFANA_IRM_ALERTMANAGER_URL set on acme-inc/acme-gitops-1794716111
 [box] ✓ GRAFANA_IRM_HEARTBEAT_URL set on acme-inc/acme-gitops-1794716111
 [box] ✓ HCLOUD_TOKEN set on acme-inc/acme-gitops-1794716111
-[box] ✓ INFISICAL_ESCROW_CLIENT_ID set on acme-inc/acme-gitops-1794716111
-[box] ✓ INFISICAL_ESCROW_CLIENT_SECRET set on acme-inc/acme-gitops-1794716111
-[box] ✓ INFISICAL_ESCROW_PROJECT_ID set on acme-inc/acme-gitops-1794716111
-[box] ✓ INFISICAL_ESCROW_URL set on acme-inc/acme-gitops-1794716111
+[box] ✓ ESCROW_PROVIDER_CLIENT_ID set on acme-inc/acme-gitops-1794716111
+[box] ✓ ESCROW_PROVIDER_CLIENT_SECRET set on acme-inc/acme-gitops-1794716111
+[box] ✓ ESCROW_PROVIDER_PROJECT_ID set on acme-inc/acme-gitops-1794716111
+[box] ✓ ESCROW_PROVIDER_URL set on acme-inc/acme-gitops-1794716111
 [box] ✓ S3_ACCESS_KEY_ID set on acme-inc/acme-gitops-1794716111
 [box] ✓ S3_SECRET_ACCESS_KEY set on acme-inc/acme-gitops-1794716111
-[box] ✓ ZITADEL_SMTP_URL set on acme-inc/acme-gitops-1794716111
+[box] ✓ IDENTITY_PROVIDER_SMTP_URL set on acme-inc/acme-gitops-1794716111
 [box] ! acme-inc is on the free plan: an organisation secret reaches only PUBLIC
 [box]   repositories, so publishing one would arrive empty in every private
 [box]   repository's build. Setting it per repository instead.

@@ -21,7 +21,7 @@ kakt kubeconfig --cluster acme-mgmt-1794447136 --gitops-dir . --out acme-mgmt-17
 kubectl --kubeconfig acme-mgmt-1794447136.kubeconfig get nodes
 ```
 
-The read runs with your own [`kakt login`](/cli/signing-in) session, so it is attributed to you and needs no credential copied onto your machine. Elsewhere, pass `--box acme-1794447136` with the four `INFISICAL_ESCROW_*` values in the environment.
+The read runs with your own [`kakt login`](/cli/signing-in) session, so it is attributed to you and needs no credential copied onto your machine. Elsewhere, pass `--box acme-1794447136` with the four `ESCROW_PROVIDER_*` values in the environment.
 
 The escrow holds one kubeconfig per cluster, so pass the cluster you need.
 

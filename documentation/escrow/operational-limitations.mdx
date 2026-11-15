@@ -36,7 +36,7 @@ The same applies to your automation credential, with one detail worth knowing: d
 
 Infisical blocks an auth method after three failed logins within 30 seconds, for five minutes. That default applies whether or not you configured it.
 
-**What this means for you:** a mistyped `INFISICAL_ESCROW_CLIENT_SECRET` in CI does not simply fail — the retry fails too, and the run reads like an escrow outage rather than a bad credential. Check the value before concluding anything is wrong with the escrow, and expect a five-minute wait after fixing it.
+**What this means for you:** a mistyped `ESCROW_PROVIDER_CLIENT_SECRET` in CI does not simply fail — the retry fails too, and the run reads like an escrow outage rather than a bad credential. Check the value before concluding anything is wrong with the escrow, and expect a five-minute wait after fixing it.
 
 Related: the platform sets no client-secret TTL and assumes none, so if you give that secret an expiry, add a Credential Expiration alert with it — nothing in the platform warns you as the date approaches. See [Operating the machine identity](/documentation/escrow/platform-administrator#operating-the-machine-identity).
 

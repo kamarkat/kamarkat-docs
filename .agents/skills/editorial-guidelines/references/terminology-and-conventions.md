@@ -67,10 +67,15 @@ Every platform operation in documentation is a `kakt` command. No `gh`, `kubectl
 - **Never document scripts.** No script path appears on any page — `./scripts/anything.sh` — whether it ships in a tenant's repository or in the platform's own. Two interfaces mean two contracts: a script is unversioned relative to the bundle, while the CLI carries the platform version.
 - **Why this rule exists**: the CLI is the platform's supported surface. Every operation documented through another tool is an operation the platform does not own, cannot version, and cannot change without breaking a reader who followed the page.
 
-### Two exceptions, and no others
+### Three exceptions, and no others
 
-- **Obtaining the CLI**, which cannot be done with the CLI. The published install methods only.
+- **Obtaining the CLI**, which cannot be done with the CLI. The published install methods only — the package manager, the release asset and its checksum, and the published installer, whose URL is a script path and is the one that may appear despite the clause above. It is a release artefact rather than a script shipped in a repository, and there is no CLI to install the CLI with.
 - **`git` against the reader's own repository.** Committing and pushing a declaration is the tenant's act and the platform's contract — the push is what builds. `kakt` renders declarations; it does not commit them.
+- **What the reader owns, acted on with whatever tool fits.** Their repository, their CI, their cluster, their container registry, their application's own build. Starting a workflow in their repository, following a run, reading their own pods, packaging and pushing their own application chart.
+
+  **Named as a category, not a tool list.** A list is what this rule removed: `gh` was "permitted", so `gh release create` performed a platform operation that nothing forbade. The exception is the *ownership*, so it covers `helm push` of the reader's chart for the same reason it covers `git push` of their declaration, and covers neither when the artefact is the platform's.
+
+  The test decides every case. `gh run watch` on their repository is theirs; `gh release create` on the platform's is a platform operation and a CLI gap. `kubectl get pods` in their cluster is theirs; `kubectl apply` of a platform resource is not. `helm push` of their application chart is theirs; `helm push` of a platform chart is not. What makes the difference is who owns the outcome, never which binary is invoked.
 
 ### Handling a gap
 

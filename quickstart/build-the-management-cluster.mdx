@@ -77,9 +77,14 @@ quietly:
 
 Day-0 runs as the **Bootstrap cluster** workflow in your GitOps repository, on
 your git organization's runners, under the [secrets stored
-there](/features/admin/git-connection#where-the-secrets-live). It is pinned to
-the platform version your box was initialized on, so a later change to the
-platform cannot change how your repository bootstraps.
+there](/features/admin/git-connection#where-the-secrets-live).
+
+The workflow holds no platform logic and no version of its own. It reads the
+version the cluster's own `bundle.yaml` pins, fetches that release of the
+platform CLI, verifies it against the checksum that release published, and runs
+it. So a change to the platform cannot alter how your repository bootstraps: the
+version is the one your repository declares, and it changes when you accept an
+upgrade, not when the platform publishes one.
 
 Open **Actions** › **Bootstrap cluster** to watch it. The run that matters is
 the one your push started.

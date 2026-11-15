@@ -22,17 +22,27 @@ It renders `registry/clusters/acme-mgmt-1794447136/` from the box's own declarat
 It also creates the one credential you are never asked for: this box's own Infisical administrator. The password is generated, written to your escrow, and set on the repository, in that order. A later run reads the escrowed one back rather than minting a second over the live instance.
 
 ```text
-box acme-1794447136
-declared management cluster acme-mgmt-1794447136:
-  registry/clusters/acme-mgmt-1794447136/bundle.yaml
-  registry/clusters/acme-mgmt-1794447136/values.yaml
-  …
-[box] generated this box's Infisical administrator (you@acme.example) and escrowed it
-[box] ✓ INFISICAL_ADMIN_EMAIL set on acme-inc/acme-gitops-1794447136
-[box] ✓ INFISICAL_ADMIN_PASSWORD set on acme-inc/acme-gitops-1794447136
+acme-gitops-1794716111 % kakt tenant add-management
+
+box acme-1794716111
+declared management cluster acme-mgmt-1794716111:
+  registry/clusters/acme-mgmt-1794716111/bundle.yaml
+  registry/clusters/acme-mgmt-1794716111/generated.yaml
+  registry/clusters/acme-mgmt-1794716111/root.yaml
+  registry/clusters/acme-mgmt-1794716111/values.yaml
+  registry/clusters/acme-mgmt-1794716111/workload-clusters.yaml
+
+[box] generated this box's Infisical administrator (arun4devinfra@gmail.com) and escrowed it
+[box] ✓ INFISICAL_ADMIN_EMAIL set on acme-inc/acme-gitops
+[box] ✓ INFISICAL_ADMIN_PASSWORD set on acme-inc/acme-gitops
 
 Commit and push to build it:
-  git add registry/clusters && git commit -m "Declare acme-mgmt-1794447136" && git push
+  git add registry/clusters && git commit -m "Declare acme-mgmt-1794716111" && git push
+
+The push starts Day-0 in your repository, which reads this cluster's shape
+from the declaration you just committed. It costs money and takes hours, so
+review the declaration before you push -- and only a cluster this push ADDS is
+built, so editing one that exists changes nothing here.
 ```
 
 `--provider`, `--region`, `--bundle-version` and `--workers` override what the box declares, for this cluster only. Everything else — the domain, the escrow, the administrator — belongs to the box and is not a per-cluster choice.

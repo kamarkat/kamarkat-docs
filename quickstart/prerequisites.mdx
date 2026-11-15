@@ -86,14 +86,21 @@ One exception is worth doing first, because it is needed before the repository e
 | `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Backups of the platform database. |
 | `GHCR_USERNAME`, `GHCR_TOKEN` | Pulling your own private images. The platform's images are public. |
 
-### Supplied for you
+### Handled for you, and not stored here
 
-You are not asked for these, and you do not need to invent them.
+Your box runs its own secret store, separate from your escrow, and it has an
+administrator account. You are never asked for it and there is no repository
+secret to set.
 
-| Secret | Where it comes from |
-| :- | :- |
-| `INFISICAL_ADMIN_EMAIL` | The account you signed in with. Your box runs its own Infisical, separate from your escrow, and this is the address its administrator account is created for. Set `INFISICAL_ADMIN_EMAIL` only to name somebody else. |
-| `INFISICAL_ADMIN_PASSWORD` | Generated, written to your escrow, and set on your repository in one step. It is recovered from the escrow rather than from memory, which is also what lets a second run re-enter an Infisical the first one created. |
+`kakt box init` creates that account for the address you signed in with, with a
+generated password, and writes both to your escrow. Every bootstrap — including
+a re-run, and a rebuild after you lose a management cluster — reads that same
+credential back from the escrow, which is what lets a second run re-enter a
+secret store the first one created.
+
+It is kept only in your escrow because a repository secret cannot be read back:
+a second copy there could drift from the real one with nothing able to detect it.
+`kakt escrow verify` reports what your escrow holds.
 
 ### Optional
 

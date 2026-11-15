@@ -20,22 +20,41 @@ Everything below belongs to you. Kamarkat never receives any of it: the credenti
 
 You need `git`, `kubectl` and the GitHub CLI `gh`, plus the `kakt` CLI.
 
-The `kakt` binary is published with each platform release. Use the version you want your box to start on:
+The `kakt` binary is published with each platform release. Install it with
+Homebrew:
 
 ```bash
-export KAKT_VERSION=<version>
-curl -fsSL -o kakt \
-  "https://github.com/kamarkat/kamarkat/releases/download/v${KAKT_VERSION}/kakt-linux-amd64"
-chmod +x kakt && sudo mv kakt /usr/local/bin/
+brew install kamarkat/tap/kakt
 kakt bundle-version
 ```
+
+Without Homebrew, the installer detects your operating system and architecture,
+verifies the download against the checksum the release publishes, and installs
+to a directory you own:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kamarkat/kamarkat/main/scripts/install.sh | sh
+```
+
+Pass `--version 0.2.7` to install a specific one, or `--bin-dir` to choose where
+it goes. To read the script before running it, open that URL first.
 
 `kakt bundle-version` prints the platform version the binary carries.
 
 You sign in with it on the next page: `kakt login` opens your escrow secret manager in the browser, where you create the account if you do not have one. It is how every command that reaches an escrow authenticates, and the only credential you keep on your own machine.
 
 <Note>
-The example downloads `kakt-linux-amd64`. Each release also publishes `kakt-linux-arm64`, `kakt-darwin-amd64` and `kakt-darwin-arm64`: use the one for your machine. To build from source instead: `go install github.com/kamarkat/kamarkat/cmd/kakt@v<version>`.
+**Installing by hand instead.** Each release publishes `kakt-linux-amd64`, `kakt-linux-arm64`, `kakt-darwin-amd64` and `kakt-darwin-arm64`, with a `SHA256SUMS` file to check them against:
+
+```bash
+export KAKT_VERSION=<version>
+base="https://github.com/kamarkat/kamarkat/releases/download/v${KAKT_VERSION}"
+curl -fsSL -O "${base}/kakt-linux-amd64" -O "${base}/SHA256SUMS"
+shasum -a 256 -c SHA256SUMS --ignore-missing
+chmod +x kakt-linux-amd64 && sudo mv kakt-linux-amd64 /usr/local/bin/kakt
+```
+
+**Do not build it with `go install`.** The version a release carries is injected at build time, so a build from source reports `development` — and a `development` binary reads platform content from your working directory rather than from itself, and creates a box that carries no bootstrap workflow. Use a published binary.
 </Note>
 
 ## Step 3: Gather your credentials

@@ -15,12 +15,19 @@ The binary carries the platform version it was built for. A box starts on the ve
 ## Install it
 
 ```bash
-export KAKT_VERSION=<version>
-curl -fsSL -o kakt \
-  "https://github.com/kamarkat/kamarkat/releases/download/v${KAKT_VERSION}/kakt-linux-amd64"
-chmod +x kakt && sudo mv kakt /usr/local/bin/
+brew install kamarkat/tap/kakt
 kakt bundle-version
 ```
+
+Without Homebrew:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kamarkat/kamarkat/main/scripts/install.sh | sh
+```
+
+Both install a published binary and verify it against the checksum its release
+publishes. [Prerequisites](/quickstart/prerequisites) covers installing by hand,
+and why not to build it from source.
 
 ## Every command
 

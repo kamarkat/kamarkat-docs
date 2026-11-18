@@ -36,9 +36,9 @@ Recovery material has three different lifetimes, so it lives at three different 
 
 | Scope | Path | Lifetime |
 |---|---|---|
-| **Box** | `/hub-operator/<boxId>` | permanent, for the life of the box |
-| **Cluster incarnation** | `/hub-operator/<boxId>/clusters/<clusterName>` | as long as that cluster's recovery point matters |
-| **Workload cluster identity** | `/hub-operator/<boxId>/clusters/<cluster>` | outlives every management cluster |
+| **Box** | `/boxes/<boxId>` | permanent, for the life of the box |
+| **Cluster incarnation** | `/boxes/<boxId>/clusters/<clusterName>` | as long as that cluster's recovery point matters |
+| **Workload cluster identity** | `/boxes/<boxId>/clusters/<cluster>` | outlives every management cluster |
 
 The split exists because of succession. When you replace a management cluster, `boxId` stays and `clusterName` changes — so the successor writes its own admin kubeconfig and encryption key under its own name and **cannot overwrite its predecessor's**, which is exactly the moment both are needed. The box-scoped artifacts are shared because they belong to the box, not to any cluster in it.
 

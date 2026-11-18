@@ -16,9 +16,11 @@ Escrow breaks that circle by keeping a small number of artifacts somewhere the b
 
 ## What belongs there
 
-Only what satisfies one test: **it must be readable when the management cluster is unavailable.** That is master keys, the identity provider's key, admin kubeconfigs, at-rest encryption keys, your workload clusters' certificate authorities, the key your management-state backups are encrypted with, and the credentials that reach your cloud account and your backup bucket.
+Only what satisfies one test: **it must be readable when the management cluster is unavailable, or does not exist yet.** That is master keys, the identity provider's key, admin kubeconfigs, at-rest encryption keys, your workload clusters' certificate authorities, the key your management-state backups are encrypted with, and the credentials that reach your cloud account and your backup bucket.
 
-What does **not** belong there is everything else — and that is most things. Your applications' secrets, their database credentials, the values the platform's controllers read: those live in the box's own self-hosted Infisical and arrive in Kubernetes as ordinary Secrets. Mirroring them into escrow would copy your entire secret estate to a second place for no recovery benefit. See [Artifacts and scopes](/documentation/escrow/artifacts-and-scopes) for the exact list and the reasoning per artifact.
+The second half of that test — *or does not exist yet* — is what the credentials a box is **built** with answer to. A first bootstrap has no cluster and therefore no secret store, so the values it needs cannot come from the store it is about to create: the cloud token that provisions the servers, the object-storage key the databases archive to, the registry credential that pulls your images, where alerts page you, and outbound mail. Those are escrowed for the same reason recovery material is, one step earlier. They used to be repository secrets, and a repository secret cannot be read back — so the copy nobody could compare was also the copy nobody could verify.
+
+What does **not** belong there is everything else — and that is most things. Your applications' secrets, their database credentials, the values the platform's controllers read once the box is running: those live in the box's own self-hosted Infisical and arrive in Kubernetes as ordinary Secrets. Mirroring them into escrow would copy your entire secret estate to a second place for no recovery benefit. See [Artifacts and scopes](/documentation/escrow/artifacts-and-scopes) for the exact list and the reasoning per artifact.
 
 ## Who accesses it
 
@@ -34,7 +36,7 @@ Two things are worth being precise about from the start, because they are easy t
    registry/clusters/<c>/
      values.yaml
        escrow.url          ───────▶  the escrow project
-       escrow.projectId              /hub-operator/<boxId>/
+       escrow.projectId              /boxes/<boxId>/
        escrow.organizationId           provider-credential-hetzner ──▶ servers, LBs,
        platformAdminIdentity           backup-store-credential          volumes, networks
                                        zitadel-masterkey

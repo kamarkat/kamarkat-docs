@@ -58,6 +58,8 @@ It needs an **organisation admin**: a member can create an identity but cannot g
 
 Records this box's escrow coordinates inside that escrow, so a declaration and its escrow can be checked against each other afterwards.
 
+You do not normally run this. `kakt box init` establishes the binding when it escrows the box's provider credential — the first authorized write records it. Reach for this command when `kakt escrow verify` reports a binding that is missing, or one pointing at a project the declaration no longer names.
+
 ```bash
 kakt escrow bind-destination --gitops-dir . --cluster acme-mgmt-1794447136
 ```
@@ -87,8 +89,18 @@ kakt escrow verify --box acme-1794447136 --cluster acme-02 --workload
 
 Pass `--management` for the management cluster, where every artefact applies, and `--workload` for a managed cluster, where the management-cluster-only artefacts do not.
 
+It also reports your box's **binding** — the record, inside the escrow, that this escrow is the one your box belongs to. It is box-scoped, so the line is the same under either flag, and it is printed in full rather than fingerprinted: a URL and a project id are names, not secrets, and seeing *where* a box is bound is the point.
+
+```text
+  present  escrow-destination       bound to https://app.infisical.com 7f3c…
+  MISSING  escrow-destination       this escrow is not established as box acme-1794447136's — nothing
+                                    can be escrowed or recovered until it is
+```
+
+A missing binding is counted with the absent artefacts and exits non-zero, because nothing can be escrowed or recovered without it: Day-0's first privileged read refuses an escrow that was never bound. [`kakt escrow bind-destination`](#kakt-escrow-bind-destination) establishes it.
+
 <Tip>
-Run this after Day-0. An escrow cannot be added to a box afterwards, so the one time to find out it is empty is before you need it.
+Run this after Day-0. An escrow cannot be added to a box afterwards, so the one time to find out it is empty is before you need it. Run it **before** Day-0 too, for the binding: that is the one entry a bootstrap refuses to start without.
 </Tip>
 
 ### kakt escrow verify-recovery
@@ -139,16 +151,6 @@ The credential arrives on stdin, never an argument, and is never printed back. R
 It is escrowed under the **box**, not the cluster. The credential buys and destroys the box's infrastructure and outlives any cluster in it, so a successor management cluster finds the same one.
 </Note>
 
-### kakt escrow migrate-paths
-
-Copies a box's admin kubeconfig and both at-rest encryption key generations onto the per-cluster paths a cluster now has.
-
-```bash
-kakt escrow migrate-paths --box acme-1794447136 --cluster acme-mgmt-1794447136 --cluster acme-02
-```
-
-It copies and never generates, derives or rotates. It refuses to overwrite a destination holding different bytes, reads every destination back and compares it with its source before reporting an artefact migrated, and leaves the old copies in place.
-
 ## Management-state backups
 
 Your box's management state is backed up to object storage you own, encrypted under a customer-supplied key. Both the key and the store credential live in the escrow rather than in the box's own secret store, because they have to work when the management cluster that wrote the backups is gone.
@@ -166,6 +168,30 @@ kakt escrow enroll-store-credential --box acme-1794447136 < credential.ini
 ```
 
 The credential is yours and is never generated here. It arrives on stdin, so it is not in a command argument, a shell history or a process list, and it is never printed back. Enrolment is one-time: a credential already escrowed is left alone unless `--rotate` is given.
+
+### kakt escrow enroll-registry-credential, enroll-alert-destination, enroll-mail-transport, enroll-tailnet-authkey
+
+The remaining credentials a box is built with, each read from stdin and preserved in the escrow under the box.
+
+```bash
+printf 'username=%s\ntoken=%s\n' "$GHCR_USER" "$GHCR_PAT" |
+  kakt escrow enroll-registry-credential --box acme-1794447136
+
+printf 'alertmanager_url=%s\nheartbeat_url=%s\n' "$ALERTMANAGER" "$HEARTBEAT" |
+  kakt escrow enroll-alert-destination --box acme-1794447136
+
+kakt escrow enroll-mail-transport  --box acme-1794447136 < smtp-url.txt
+kakt escrow enroll-tailnet-authkey --box acme-1794447136 < authkey.txt
+```
+
+`kakt box init` runs all of these for you from the values it collects, so you reach for them
+directly only to add a capability later or to rotate one with `--rotate`. Each is one-time by
+default: a credential already escrowed is left alone, because an ordinary re-run must never
+overwrite one by accident.
+
+None of them is a repository secret any more. A repository secret cannot be read back, so
+the copy there could never be compared with the one in use — and Day-0 in your CI reads these
+from the escrow, which is the only store that answers before the box has one of its own.
 
 ### kakt escrow deliver-backup-credentials
 

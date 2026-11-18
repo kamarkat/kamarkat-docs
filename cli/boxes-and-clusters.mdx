@@ -90,7 +90,7 @@ Initializing a box happens once. Every change after it is a commit or a pull req
 | `--provider` | `hetzner` (default), or `hybrid` for nodes on your own machines |
 | `--region` | The cloud region your clusters run in. Defaults to `hel1` |
 | `--resume` | Continue the box in this checkout, reusing the identity it declares. Mints nothing and renames nothing |
-| `--workers` | Cloud worker nodes a cluster of this box starts with. Defaults to 2. Pass `0` to run on nodes on your own premises alone, which then have to be there |
+| `--workers` | Cloud worker nodes a cluster of this box starts with. Defaults to 2. A management cluster runs on its cloud workers, so it needs at least one: a box with none is refused before anything is provisioned, because the control plane keeps its taint and no platform workload can schedule |
 | `--private` | Create the repository private. Default `true` |
 | `--private-registry` | Your applications run private images, which makes a registry credential required |
 | `--bundle-version` | The platform version the box starts on. A released CLI defaults to the version it carries; an unreleased build has none and refuses rather than guess. `development` reads charts from your current branch |
@@ -310,7 +310,7 @@ kakt bootstrap-mgmt --name acme-mgmt-1794447136 --provider hetzner --region hel1
 This gives you a reconciled management cluster and no assurance about anything else. A box is bootstrapped when Day-0 has run every step in order, not when this command exits.
 </Warning>
 
-Notable flags: `--workers` (pass `0` to run on your own premises alone), `--on-prem` with `--tailnet-name` to accept nodes that join over your tailnet, `--oidc-issuer-url` with `--oidc-client-id` to name the identity provider the API server accepts tokens from, `--dry-run` to validate prerequisites and render manifests without provisioning, and `--gating` to choose whether boundaries activate in phase order or reconcile concurrently.
+Notable flags: `--workers` (how many cloud workers the management cluster runs on), `--oidc-issuer-url` with `--oidc-client-id` to name the identity provider the API server accepts tokens from, `--dry-run` to validate prerequisites and render manifests without provisioning, and `--gating` to choose whether boundaries activate in phase order or reconcile concurrently.
 
 ### kakt init-secrets
 
@@ -330,7 +330,7 @@ kakt configure-github-access --org-url https://github.com/acme-inc
 
 ### kakt configure-tailscale
 
-Supplies the auth key and hostname a control plane uses to join your tailnet, for boxes that accept nodes on your own premises. It runs before a managed cluster is provisioned on that path.
+Supplies the auth key and hostname a control plane uses to join your tailnet, for a managed cluster that accepts nodes on your own premises. It runs before that cluster is provisioned.
 
 ```bash
 kakt configure-tailscale
@@ -380,7 +380,7 @@ Lists the machines your management cluster holds for a managed cluster alongside
 kakt cluster match-inventory --cluster acme-02
 ```
 
-Read-only. It changes nothing in either the cluster or the provider, and unresolved rows stay unresolved — nothing here adopts or remediates. `--hcloud-token` is taken explicitly, or from `HCLOUD_TOKEN`, rather than read from the cluster, because during a reconstruction the cluster's own copy is itself restored state.
+Read-only. It changes nothing in either the cluster or the provider, and unresolved rows stay unresolved — nothing here adopts or remediates. The provider credential comes from your box's escrow rather than from the cluster, because during a reconstruction the cluster's own copy is itself restored state. There is no `--hcloud-token` flag.
 
 ## Repair
 
@@ -497,7 +497,7 @@ If anything could not be done, the command says what and exits non-zero — incl
 | `--gitops-dir` | The box's repository, which declares its escrow and its box id |
 | `--destroy-managed` | Also destroy these managed clusters first, through the management cluster, before it is destroyed itself (comma-separated) |
 | `--timeout` | How long to wait for each managed cluster's own deletion (default 30m) |
-| `--kubeconfig` | Use this kubeconfig instead of the escrowed one, for a box that never finished bootstrapping and so escrowed none. Requires `HCLOUD_TOKEN` |
+| `--kubeconfig` | Use this kubeconfig instead of the escrowed one, for a box that never finished bootstrapping and so escrowed none. The provider credential still comes from the escrow, which holds it from the moment the box was initialized |
 | `--infrastructure-only` | Destroy the provider infrastructure of a box whose Kubernetes API cannot be reached, naming the clusters to destroy. The workload clusters named are destroyed first and the management cluster last. The cluster's own cleanup is reported as not done |
 | `--managed-cluster` | A managed cluster this box declares, repeatable. For when the management cluster can no longer be asked for its list. It feeds the ordering check; it does not authorize deleting that cluster |
 | `--dns-only` | Release this box's DNS records and nothing else |

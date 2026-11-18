@@ -52,7 +52,7 @@ What this box is built with. Present values are left alone.
 [box] ✓ GITOPS_REPO_WRITE_TOKEN set on acme-inc/acme-gitops-1794447136
 [box] ✓ GRAFANA_IRM_ALERTMANAGER_URL set on acme-inc/acme-gitops-1794447136
 [box] ✓ GRAFANA_IRM_HEARTBEAT_URL set on acme-inc/acme-gitops-1794447136
-[box] ✓ HCLOUD_TOKEN set on acme-inc/acme-gitops-1794447136
+[box] ✓ escrowed this box's hetzner credential and bound acme-1794447136 to its escrow
 [box] ✓ ESCROW_PROVIDER_CLIENT_ID set on acme-inc/acme-gitops-1794447136
 [box] ✓ ESCROW_PROVIDER_CLIENT_SECRET set on acme-inc/acme-gitops-1794447136
 [box] ✓ ESCROW_PROVIDER_PROJECT_ID set on acme-inc/acme-gitops-1794447136
@@ -110,7 +110,7 @@ Once the set is complete, the same run initializes the box:
 [box] authenticating as the platform (personal access token)
 [box] created acme-inc/acme-gitops-1794447136
 [box] pushed to https://github.com/acme-inc/acme-gitops-1794447136
-[box] ✓ HCLOUD_TOKEN set on acme-inc/acme-gitops-1794447136
+[box] ✓ escrowed this box's hetzner credential and bound acme-1794447136 to its escrow
 …
 acme-inc/acme-gitops-1794447136 is a box, with no clusters.
 
@@ -120,7 +120,11 @@ acme-inc/acme-gitops-1794447136 is a box, with no clusters.
   checkout           acme-gitops-1794447136
 ```
 
-Each `✓` line is a **GitHub Actions secret set on the new repository** — `Settings › Secrets and variables › Actions`, or `gh secret list --repo <repository>`. That is where your box is built from: the workflow that creates a management cluster runs in this repository, on your runners, under these secrets, and the platform keeps no copy of any of them. They are not consumed by Day-0 and then spent — a replacement management cluster reads the same secrets later. See [Where the secrets live](/features/admin/git-connection#where-the-secrets-live) for who reads which, and when.
+Most `✓` lines are a **GitHub Actions secret set on the new repository** — `Settings › Secrets and variables › Actions`, or `gh secret list --repo <repository>`. That is where your box is built from: the workflow that creates a management cluster runs in this repository, on your runners, under these secrets, and the platform keeps no copy of any of them. They are not consumed by Day-0 and then spent — a replacement management cluster reads the same secrets later. See [Where the secrets live](/features/admin/git-connection#where-the-secrets-live) for who reads which, and when.
+
+**Your cloud credential is the exception.** It goes to your escrow, not to the repository, and the line that reports it says so. It is the credential that creates *and destroys* this box's infrastructure, so every later command — a bootstrap, a teardown, an inventory — reads it from the escrow and from nowhere else. A token that happened to be set in an environment would authenticate perfectly and answer about a different cloud project: an inventory that comes back empty, a teardown that deletes nothing and reports success. There is no `HCLOUD_TOKEN` secret on your repository, and nothing reads one.
+
+That same write **binds your box to its escrow**: it is the box's first privileged write, so it records, inside the escrow, that this escrow is the one your box belongs to. Afterwards a project nobody established is not treated as your escrow, and a declaration edited without a deliberate rebind is refused instead of followed. [`kakt escrow verify`](/cli/escrow-and-encryption#kakt-escrow-verify) reports both.
 
 <Note>
 **Keep the box id.** Every escrow command takes it, and it is minted rather than chosen. `registry/box.yaml` records all three names, so any command run inside the checkout reads them — you need the id by hand only for break-glass access from somewhere else.

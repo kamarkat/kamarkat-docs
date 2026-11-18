@@ -8,7 +8,9 @@ keywords: ["cloud account", "HCLOUD_TOKEN", "hetzner", "hybrid", "dns zone"]
 
 ## What it is
 
-The cloud account is where your management cluster and managed clusters run, and what your cloud provider bills you for. Its API token is stored as the `HCLOUD_TOKEN` secret on your GitOps repository, where Day-0 reads it, and then held by your management cluster, which creates every later cluster with it.
+The cloud account is where your management cluster and managed clusters run, and what your cloud provider bills you for. Its API token is escrowed when your box is initialized, and read from the escrow by every command that creates or destroys infrastructure. Your management cluster holds a copy of its own, which is what creates every later cluster.
+
+It is **not** a repository secret. The credential that can destroy everything your box owns answers only for the cloud project that issued it, so a copy that something else could supply — a repository secret, a shell variable — is a way for a box to be operated against the wrong account while every call succeeds.
 
 | Provider | What it runs |
 | :- | :- |
@@ -27,11 +29,14 @@ Your box creates DNS records and proves domain ownership for its certificates th
 
 ### 3. Store the token on your GitOps repository
 
-`kakt box init` stores it for you, prompting with echo disabled if you did not export it. To set it yourself:
+`kakt box init` escrows it for you, prompting with echo disabled if you did not export it. To change it later — a rotation at your provider, or a box created before it was escrowed:
 
 ```bash
-gh secret set HCLOUD_TOKEN --repo acme-inc/acme-gitops-1794447136
+kakt escrow enroll-provider-credential --gitops-dir . \
+  --cluster acme-mgmt-1794447136 --provider hetzner --rotate < token
 ```
+
+It is read from stdin rather than a flag, so the value never reaches your shell history or the process list. `--rotate` is required to replace a credential that is already escrowed; revoke the old one at your provider afterwards.
 
 ## What you need to know
 

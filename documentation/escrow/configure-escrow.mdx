@@ -31,15 +31,21 @@ kakt whoami
 
 Confirm the `identity` line matches what you declared. If it does not, every command in the next steps will refuse and tell you both values.
 
-## 3. Bind the box to its escrow
+## 3. The box binds itself
+
+Nothing to run. `kakt box init` escrows this box's provider credential, and the first
+authorized write to an escrow records the box's coordinates **inside the escrow they
+name** — so a declaration and its escrow can be checked against each other afterwards.
 
 ```bash
-kakt escrow bind-destination --gitops-dir . --cluster acme-mgmt-1794447136
+kakt escrow verify --gitops-dir .    # reports the binding, among the rest
 ```
 
-Full flags: [`kakt escrow bind-destination`](/cli/escrow-and-encryption#kakt-escrow-bind-destination).
-
-This records the declared coordinates **inside the escrow they name**, so a declaration and its escrow can be checked against each other afterwards.
+The binding used to be a step you performed, and it was the step a box most often
+arrived without: the platform already had everything needed to establish it, and asked
+anyway. [`kakt escrow bind-destination`](/cli/escrow-and-encryption#kakt-escrow-bind-destination)
+remains for the case it is actually for — a binding that is missing or points at the
+wrong project, which `kakt escrow verify` reports.
 
 <Warning>
 The binding is a consistency check, not an independent security pin. Both values come from the project your repository names, so someone who can edit the declaration **and** write to the project they redirect it to can place a matching record there.

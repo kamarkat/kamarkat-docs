@@ -64,9 +64,9 @@ Or in the browser: **Settings › Secrets and variables › Actions**. Both show
 
 So these are not "Day-0 secrets" that stop mattering afterwards. They are what the box is built from, every time a management cluster is built — and a box whose repository has lost one cannot create a replacement management cluster until it is set again.
 
-Two behave differently, and both are deliberate:
+Two things are worth separating out, and both are deliberate:
 
-- **`HCLOUD_TOKEN` is read from Actions for the first enrolment only.** After it is enrolled into your escrow, every command reads the escrowed copy — a token exported in a shell authenticates against whichever cloud project issued it, which is how a box gets built against the wrong account.
+- **Your cloud token is not among them.** It is escrowed when the box is initialized, and every command that creates or destroys infrastructure reads it from the escrow and from nowhere else — a token exported in a shell authenticates against whichever cloud project issued it, which is how a box gets built against, or torn down in, the wrong account. There is no `HCLOUD_TOKEN` secret on your repository and nothing reads one. See [Cloud account](/features/admin/cloud-account).
 - **`GITOPS_REPO_WRITE_TOKEN` keeps earning its place after Day-0.** Your management cluster's ArgoCD reads the repository with it, and the organization-level copy is what your application builds pin their versions with.
 
 ### What is not on the repository

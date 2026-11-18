@@ -6,11 +6,19 @@ keywords: ["escrow artifacts", "allowlist", "master keys", "admin kubeconfig", "
 
 > A short list, and it stays short. Each entry is here because a box cannot be rebuilt without it.
 
-Escrow is an allowlist, not a mirror. Every artifact below answers one question — *is this readable when the management cluster is unavailable?* — and anything that answers "it doesn't need to be" is not here.
+Escrow is an allowlist, not a mirror. Every artifact below answers one question — *is this readable when the management cluster is unavailable, or does not exist yet?* — and anything that answers "it doesn't need to be" is not here.
+
+The second clause admits the credentials a box is **built** with, not just the ones it is
+rebuilt from. `kakt box init` enrols them, and the only secrets left on your repository
+are the four that say where this escrow is, plus `GITOPS_REPO_WRITE_TOKEN` — which stays
+because your own application builds read it from your git organization, and a build
+cannot read an escrow.
 
 ## Box-scoped
 
-Path: `/hub-operator/<boxId>`. Permanent, shared by every management cluster the box ever has, because they belong to the box rather than to any cluster in it.
+Path: `/boxes/<boxId>`. Permanent, shared by every management cluster the box ever has, because they belong to the box rather than to any cluster in it.
+
+The root is `boxes` because one escrow project serves every box in your organization, and because these artifacts are the **box's** — not any component's. It used to be `/hub-operator/`, which named one of the readers: a controller that is not installed yet when the cloud token, the master keys and the store credential are written, and that reads only some of them afterwards.
 
 | Artifact | What it protects | Why it must outlive the cluster |
 |---|---|---|
@@ -18,13 +26,17 @@ Path: `/hub-operator/<boxId>`. Permanent, shared by every management cluster the
 | `zitadel-masterkey` | the box's identity provider | without it, a restored identity database is unreadable and nobody can log in to the box they just rebuilt |
 | `infisical-admin-credential` | the administrator of the box's own secret store | it is generated once, and a rebuilt box restores a database that already holds that account — a successor needs the password its predecessor was created with |
 | `backup-ssec-key` | the management-state backups | the archive is encrypted with it. Kept outside the box because a key stored in what it protects protects nothing |
-| `backup-store-credential` | reaching the backup bucket | the credential that reaches the backups cannot live in the database those backups restore |
+| `backup-store-credential` | reaching the backup bucket, and archiving to it | the credential that reaches the backups cannot live in the database those backups restore. One authority, two renderings: `kakt escrow deliver-backup-credentials` writes it as the keys CloudNativePG archives with and the INI Velero restores with |
+| `registry-credential` | pulling your own private images | a first bootstrap pulls your images before it has a secret store to read a credential from. The platform's own images are public, so a box without this one still builds |
+| `alert-destination` | where this box's alerts page you | the box cannot be the authority for where its own failures are reported: the moment that matters is the moment it is not answering |
+| `mail-transport-url` | outbound mail for identity and alerts | the identity provider needs it while it is being created, which is before anything in the box can hold it |
+| `tailnet-authkey` | admitting nodes on your own premises | the control plane joins the tailnet during its own first boot, from cloud-init, with no cluster yet to read a Secret from |
 | `provider-credential-hetzner` | your cloud account | first bootstrap has no cluster yet, and teardown and inventory must work when the cluster cannot be reached |
 | `escrow-destination` | the box's binding to this escrow | records which project this box was established in, so a declaration and its escrow can be checked against each other |
 
 ## Cluster-incarnation-scoped
 
-Path: `/hub-operator/<boxId>/clusters/<clusterName>`. Kept for as long as that cluster's recovery point matters, then retired with it.
+Path: `/boxes/<boxId>/clusters/<clusterName>`. Kept for as long as that cluster's recovery point matters, then retired with it.
 
 | Artifact | What it protects | Why it is per cluster |
 |---|---|---|
@@ -34,7 +46,7 @@ Path: `/hub-operator/<boxId>/clusters/<clusterName>`. Kept for as long as that c
 
 ## Workload-cluster-scoped
 
-Path: `/hub-operator/<boxId>/clusters/<cluster>`, under the **workload cluster's** own name — never under whichever management cluster currently manages it. That is what makes management transferable.
+Path: `/boxes/<boxId>/clusters/<cluster>`, under the **workload cluster's** own name — never under whichever management cluster currently manages it. That is what makes management transferable.
 
 | Artifact | What it protects |
 |---|---|

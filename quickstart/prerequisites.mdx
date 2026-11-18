@@ -59,7 +59,7 @@ chmod +x kakt-linux-amd64 && sudo mv kakt-linux-amd64 /usr/local/bin/kakt
 
 ## Step 3: Gather your credentials
 
-Day-0 runs under secrets stored on your GitOps repository. [`kakt box init`](/quickstart/initialize-a-box) collects them for you — one step each, opening the page that issues the credential and waiting while you create it — and stores them on the repository it creates. So this is what to expect to be asked for, not a list to assemble in advance.
+Day-0 runs under secrets your box keeps in its escrow. Five values are the exception and live on the GitOps repository: the four that say where that escrow is, and the git token, because your own application builds read it too and GitHub is where they look. [`kakt box init`](/quickstart/initialize-a-box) collects them for you — one step each, opening the page that issues the credential and waiting while you create it — and stores them on the repository it creates. So this is what to expect to be asked for, not a list to assemble in advance.
 
 One exception is worth doing first, because it is needed before the repository exists.
 
@@ -73,7 +73,7 @@ One exception is worth doing first, because it is needed before the repository e
 
 | Secret | What it is |
 | :- | :- |
-| `HCLOUD_TOKEN` | Your cloud API token, read and write. Your clusters are created with it. It is enrolled into your box's escrow on the first bootstrap and read from there afterwards, so you supply it once. |
+| `HCLOUD_TOKEN` | Your cloud API token, read and write. Your clusters are created with it. `kakt box init` escrows it, and every command that creates or destroys infrastructure reads it from there — so you supply it once, and never as a repository secret. |
 | `GITOPS_REPO_WRITE_TOKEN` | Write access to your git organization's repositories, plus that organization's **Secrets: write** permission. Day-0 commits what it generates with it, and your application builds inherit it. |
 | `ESCROW_PROVIDER_URL`, `ESCROW_PROVIDER_PROJECT_ID`, `ESCROW_PROVIDER_CLIENT_ID`, `ESCROW_PROVIDER_CLIENT_SECRET` | Your escrow. You create these on the [next page](/quickstart/get-started) — nothing to gather in advance. `kakt box init` refuses without them, because an escrow cannot be added after the fact. |
 
@@ -83,8 +83,8 @@ One exception is worth doing first, because it is needed before the repository e
 
 | Secret | What it is for |
 | :- | :- |
-| `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Backups of the platform database. |
-| `GHCR_USERNAME`, `GHCR_TOKEN` | Pulling your own private images. The platform's images are public. |
+| `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Backups of the platform database — an object-storage key for the region your box runs in. Escrowed, not stored on the repository. |
+| `GHCR_USERNAME`, `GHCR_TOKEN` | Pulling your own private images. The platform's images are public. Escrowed, not stored on the repository. |
 
 ### Handled for you, and not stored here
 
@@ -108,7 +108,22 @@ a second copy there could drift from the real one with nothing able to detect it
 | :- | :- |
 | `GRAFANA_IRM_ALERTMANAGER_URL`, `GRAFANA_IRM_HEARTBEAT_URL` | Where critical and warning alerts page you, and a heartbeat that pages when the management cluster stops reporting. Metrics, logs and dashboards run in the box without them. |
 | `IDENTITY_PROVIDER_SMTP_URL` | Outbound mail for identity messages and alert email. |
-| `TS_AUTHKEY` | Only if the box accepts nodes on your own premises, which join over your tailnet. |
+| `TS_AUTHKEY` | Only if a managed cluster of this box accepts nodes on your own premises, which join over your tailnet. |
+
+All of these are escrowed too. Only the five above are repository secrets.
+
+### Where each one ends up
+
+Worth being exact about, because it decides what a rebuilt box can still reach.
+
+| Kept on the repository | Kept in the escrow |
+| :- | :- |
+| `ESCROW_PROVIDER_URL`, `ESCROW_PROVIDER_PROJECT_ID`, `ESCROW_PROVIDER_CLIENT_ID`, `ESCROW_PROVIDER_CLIENT_SECRET` — where the escrow is. CI has to know this much before it can read anything else | everything else your box runs on: the cloud token, the object-storage key, your registry credential, the alert destinations, outbound mail, the tailnet key |
+| `GITOPS_REPO_WRITE_TOKEN` — your application builds read it from your organization, and they cannot read an escrow | |
+
+A repository secret cannot be read back once set, so a copy there is a copy nothing
+can compare — which is why these moved. The escrow is also the only place that
+still answers when the management cluster is gone, or does not exist yet.
 
 <Tip>
 Export each value as an environment variable of the same name in the shell you will run `kakt box init` in. It reads them from there and stores them on your repository. It never prints or keeps them.

@@ -58,11 +58,15 @@ This destroys infrastructure in your cloud account. There is no undo.
 Its cluster list dies with it, so name the clusters to destroy. They go first and the management cluster last, in one run:
 
 ```bash
-export HCLOUD_TOKEN=...   # only if this box escrowed no provider credential
-
 kakt teardown --name acme-mgmt-1794447136 --gitops-dir . --confirm \
   --infrastructure-only acme-mgmt-1794447136,acme-stg-01
 ```
+
+The provider credential comes from the box's escrow, where it was put when the box
+was initialized — so a teardown works from any authorized workstation, and setting
+`HCLOUD_TOKEN` has no effect. A box whose escrow holds none refuses rather than
+reporting a teardown that deleted nothing; enrol it first with
+[`kakt escrow enroll-provider-credential`](/cli/escrow-and-encryption#kakt-escrow-enroll-provider-credential).
 
 Between the two the provider is asked again. If anything of `acme-stg-01` survived, `acme-mgmt-1794447136` is left standing deliberately — it is the only thing that could still finish the job — and the run exits non-zero saying what remains.
 

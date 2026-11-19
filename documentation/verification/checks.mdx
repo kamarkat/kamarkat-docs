@@ -69,6 +69,7 @@ Your own box is the authority for which of them apply to it. The command explain
 | Check | Asserts |
 |---|---|
 | `workload-cluster-lifecycle` | a managed cluster exists because its claim does, and the two agree |
+| `managed-cluster-registered` | a provisioned managed cluster is registered with your management cluster, so the platform can deploy to it at all |
 | `management-cluster-capacity` | your management cluster has somewhere to run the platform it hosts |
 | `kubelet-reachability` | the API server can reach every node, which several platform features require |
 | `home-host-disk-headroom` | an on-premises host has the disk headroom its nodes need |

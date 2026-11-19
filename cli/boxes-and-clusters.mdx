@@ -294,9 +294,24 @@ backups are preserved throughout. Application declarations under
 `environments/` belong to the environment, not to the cluster, so they are
 untouched by a replacement.
 
+## Day-0
+
+### kakt bootstrap
+
+Builds the cluster a declaration in your GitOps repository names, from the platform version this executable carries. This is the command your own CI runs: it reads the declaration, provisions the cluster, reconciles the platform onto it, and reports the outcome.
+
+```bash
+kakt bootstrap --cluster acme-mgmt-1794447136
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--cluster` | The cluster to build, as its declaration names it |
+| `--gitops-dir` | The box's repository, holding its declarations and its state. Defaults to the working directory |
+
 ## Day-0, one step at a time
 
-Day-0 runs as a workflow in your GitOps repository and calls these for you. Run them directly only when you are working on a box deliberately.
+These are the steps `kakt bootstrap` performs. Run them directly only when you are working on a box deliberately.
 
 ### kakt bootstrap-mgmt
 
@@ -342,17 +357,72 @@ Values default to `~/.kamarkat/tailscale/authkey` and `~/.kamarkat/tailscale/hos
 
 ### kakt verify
 
-Polls the invariants a cluster must satisfy before it serves — nodes Ready, secret stores valid, secrets synced, Applications Synced and Healthy, pods Running — until they all hold or the budget elapses. It reports which invariant is outstanding and what it is waiting on, so a cluster that is still settling reads differently from one that is stuck.
+Answers one of two questions about a cluster, depending on `--accept`.
+
+Without it, the command polls the invariants a cluster must satisfy before it serves: nodes Ready, secret stores valid, secrets synced, Applications Synced and Healthy, pods Running. It waits until they hold or the budget elapses, and reports which invariant is outstanding, so a cluster that is still settling reads differently from one that is stuck.
+
+With `--accept`, the command converges the cluster and then runs every check that applies to it, reporting one verdict for the cluster. See [Verification](/documentation/verification/overview) for what acceptance establishes and what it does not.
 
 ```bash
+# has it settled?
 kakt verify --cluster acme-mgmt-1794447136 --timeout 15m
+
+# does it do its job?
+kakt verify --cluster acme-mgmt-1794447136 --accept
+
+# one managed cluster, reached through the management cluster that owns it
+kakt verify --cluster acme-01 --accept
+
+# investigate one behaviour, or see what would run
+kakt verify --cluster acme-mgmt-1794447136 --accept --only=public-api-endpoints
+kakt verify --cluster acme-mgmt-1794447136 --accept --explain
 ```
 
 | Flag | Meaning |
 | :- | :- |
 | `--cluster` | The cluster to verify. Its kubeconfig comes from the box's escrow, read with your own `kakt login` session |
+| `--accept` | Assess acceptance after convergence, rather than convergence alone |
+| `--only` | The checks to run, comma separated. [What is checked](/documentation/verification/checks) lists every accepted name. Valid only with `--accept` |
+| `--explain` | Report what a full assessment would run, and run none of it. Valid only with `--accept` |
 | `--kubeconfig` | Where to reach it, when that is not where Day-0 put it |
 | `--timeout` | How long to wait before reporting what is outstanding. Defaults to 15m |
+
+| Exit | Verdict | Meaning |
+| :- | :- | :- |
+| `0` | `accepted` | every applicable required check passed |
+| `0` | `incomplete` | the cluster is accepted, and another cluster you declared is still pending |
+| non-zero | `failed` | a required check failed, or applied and could not run |
+
+`--only` reports `selected validation passed — complete cluster acceptance not assessed`. A subset establishes the behaviour it ran and accepts nothing. `--explain` changes nothing and reports no pass, and it prints every check with the declaration that makes it apply to this box, which is the authoritative list for a given box.
+
+### kakt promote
+
+Moves this box onto a published platform version by writing that version into the declaration its clusters read. It changes your repository and nothing else: the box reconciles the new version once the change is committed and pushed.
+
+```bash
+kakt promote --version 0.3.30
+kakt promote --version 0.3.30 --dry-run
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--version` | The published version to move this box to |
+| `--dry-run` | Say what would change, and write nothing |
+| `--gitops-dir` | The box's repository. Defaults to the working directory |
+
+[Upgrade a box](/guides/platform/upgrade-a-box) covers it as a task, including what to check afterwards.
+
+### kakt sync
+
+Drives a version your repository has already promoted onto the box, and reports whether every application reached it. Use it when a promotion is committed and you want the box moved and checked in one step rather than waiting for the next reconciliation.
+
+```bash
+kakt sync --version 0.3.30
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--version` | The promoted version the box should reach |
 
 ### kakt bundle-version
 

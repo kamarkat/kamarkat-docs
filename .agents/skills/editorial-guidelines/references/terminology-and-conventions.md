@@ -52,6 +52,14 @@ Name the platform capability, never the third-party open-source project behind i
 
 ---
 
+## 3a. Identifiers a Reader Types Are Governed by This Reference
+
+Everything in §1 and §3 applies to values, not only to prose: a flag's accepted values, check and profile names, state names, directory names in a customer repository, and any output a page reproduces. A reader types these, so they are documentation.
+
+When an identifier cannot be written in the product's vocabulary, the identifier changes. Three check names once had to be renamed in the platform because they carried `fleet` and `hub`, which this reference forbids; the documentation was not written around them. Enumerating such a set on a page is the cheapest way to find the ones that break the rules.
+
+See [Content Placement & Cross-Referencing](./content-placement-and-cross-referencing.md) §5.
+
 ## 4. No Internal References
 
 Customer documentation never cites internal platform architecture decision records (ADRs), internal file paths of the platform repository, internal ticket IDs, or design history. Describe only the current, supported design, never what it replaced.

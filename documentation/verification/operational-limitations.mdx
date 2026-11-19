@@ -1,0 +1,37 @@
+---
+title: "Operational limitations"
+description: "Seven operating details worth knowing before you treat an assessment as a guarantee: what a subset establishes, what acceptance creates, and what a report does not watch."
+keywords: ["limitations", "acceptance", "canary", "subset", "unverified", "retention", "Day-0 duration"]
+---
+
+> Seven details that shape how you use verification. Each one is a boundary of what an assessment establishes.
+
+## A subset establishes only what it ran
+
+A run restricted to named checks runs those and no others. Its verdict says `selected validation passed — complete cluster acceptance not assessed`, and that wording is load-bearing. The run cannot accept the cluster, cannot replace a full assessment's evidence, and cannot move your box's verdict. A behaviour nobody executed stays unknown no matter how green the line looks.
+
+## Explaining asserts nothing
+
+Asking the command to explain itself reads your declarations and reports what a full assessment would do. It probes no surface, creates nothing, and changes nothing. It also never reports that anything passed, because it ran no check.
+
+## Acceptance creates and removes short-lived resources
+
+Asserting a behaviour sometimes requires exercising it. An assessment may request a certificate it then deletes, or ask for a secret to be delivered and remove it afterwards. Those resources are uniquely named, carry nothing sensitive, and are cleaned up by the run that made them.
+
+What an assessment never does is alter production material. It does not rotate a signing key, replace a certificate your workloads use, write to a database, repair a controller, or reset any part of a build. If a check cannot assert a behaviour without mutating something you depend on, it reports `unverified` instead.
+
+## A report is evidence, not a watch
+
+An assessment describes one cluster, on one platform version, at one moment. Nothing updates it afterwards. A cluster accepted yesterday can break today through a change outside the platform, such as an expired credential at a provider or a DNS record edited by hand. Continuous observation is what your observability capability and convergence checks are for.
+
+## A pending managed cluster is not covered
+
+Your box's verdict reads `incomplete` while any cluster you declared is still being built. The management cluster's acceptance is real and its evidence is complete; the pending cluster has no evidence at all. Nothing in an `incomplete` verdict says anything about the cluster that is pending, and treating `incomplete` as "almost accepted" is the one misreading to avoid.
+
+## Day-0 takes longer, and fails more often
+
+A run that asserts behaviour spends minutes probing real surfaces, where a run that only reconciles finishes sooner. Runs also fail that previously reported success over an unasserted box. Both are intended. A failed assessment keeps everything the run built and everything it committed, so correcting the defect and assessing again does not rebuild your infrastructure.
+
+## Report retention is yours to set
+
+An assessment run in your CI publishes its report as a run artifact and a job summary, and your CI keeps it for as long as you have configured. The platform does not hold a copy anywhere outside your infrastructure. A report you need months from now is one you archive on purpose.

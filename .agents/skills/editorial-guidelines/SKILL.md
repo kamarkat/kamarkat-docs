@@ -31,6 +31,7 @@ The complete editorial guidelines are structured into modular reference document
 | [Product Mental Model & Concepts](./references/product-mental-model.md) | **When explaining platform architecture or behavior.** Covers foundational invariants (integration is the product, declarative desired state, business ownership), precise concept definitions (`Box`, `Tenant`, `Managed Cluster`, `Cell`, `GitOps repository`, `Bundle`, `Capability`, `Day-0`, `Support Agent`, `Escrow`), and protected architectural distinctions. |
 | [Terminology Rules & Constraints](./references/terminology-and-conventions.md) | **When drafting or reviewing terminology.** Covers the hard constraints replacement table (Avoid vs. Use Instead), the "Tenant, not organization" rule, capability naming over vendor names, prohibition of internal references (ADRs, internal paths), and the interface contract: every platform operation is a `kakt` command, with no permitted-tool list and only three exceptions. |
 | [Writing & Narrative Standards](./references/writing-and-narrative-standards.md) | **When drafting and polishing prose.** Covers the 5-step narrative hierarchy ($\text{Problem} \to \text{Platform Value} \to \text{Operating Model} \to \text{Ownership} \to \text{Mechanism}$), tone and voice (second person, active voice, present tense), sentence construction, what to avoid (no filler, no bullet-dumping, no em-dash overuse), and architectural diagram standards. |
+| [Content Placement & Cross-Referencing](./references/content-placement-and-cross-referencing.md) | **Before deciding where a page goes, and whenever a change touches more than one page.** Covers what each section is for, the documentation subject pattern, the one-home-per-fact rule, how to link a command or a value list instead of restating it, which section a reader's intent belongs to, and the checklist for a multi-page change. |
 | [Evidence & Review Criteria](./references/evidence-and-review-criteria.md) | **Before finalizing or publishing documentation.** Covers the technical accuracy and evidence verification rules, what this skill must not become (anti-patterns), and the 10-point semantic review checklist. |
 
 ---
@@ -38,6 +39,7 @@ The complete editorial guidelines are structured into modular reference document
 ## Pre-Publication Checklist
 
 Before completing any documentation change, ensure:
+0. **Placement**: Each fact is on the one page that owns it, every other page links to it, and the change leaves no duplicated table and no orphaned link. See [Content Placement & Cross-Referencing](./references/content-placement-and-cross-referencing.md).
 1. **Audience Alignment**: The practical business value is clear to a startup CEO, and the architectural foundation is credible to a CTO.
 2. **Product Identity**: Kamarkat is presented as an integrated platform OS delivered via a single executable, not a collection of open-source tools.
 3. **Agentic Integration**: Agents are bounded participants within the platform operating model, never an independent control system.

@@ -52,6 +52,12 @@ A cell groups your clusters for policy, and is not a cluster. It holds no comput
 
 You can add on-premises worker nodes to a managed cluster serving dev at any point in its life. They run workloads and burst capacity, never cluster-machinery state, so replacing one is a capacity operation rather than a recovery. A management cluster takes none: it runs on its cloud workers.
 
+### A cluster passes through six states
+
+A cluster you declared is not yet a cluster you have. Your management cluster takes it through **claimed**, **provisioned** and **registered** before anything you declared for it is deployed, and **registered** is the state most easily mistaken for finished: until your management cluster can deploy to the cluster, that cluster has nodes and no platform services, and nothing reports a problem because nothing was asked of it.
+
+[Cluster states](/documentation/verification/cluster-states) defines all six, and what each one means for what you can assert about a cluster.
+
 ### Managed clusters are not workflows
 
 A workflow provisions once and then stops caring; a controller does not. That is why managed clusters are declarations reconciled continuously, not jobs run by CI.

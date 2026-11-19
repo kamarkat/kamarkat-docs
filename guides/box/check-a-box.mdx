@@ -6,18 +6,39 @@ keywords: ["verify", "health", "kakt verify", "escrow verify", "converge"]
 
 > A cluster is healthy when every invariant holds. `kakt verify` tells you which one does not.
 
-Run this after any change you are waiting on — a new cluster, a platform upgrade, a resize — or whenever something looks wrong.
+Run this after any change you are waiting on: a new cluster, a platform version, a resize, or whenever something looks wrong.
 
-## Check a cluster
+## Check that a cluster settled
 
 ```bash
 kakt verify --cluster acme-mgmt-1794447136
-kakt verify --cluster acme-01
 ```
 
 It checks that nodes are Ready, secret stores valid, secrets synced, Applications Synced and Healthy, and pods Running, and waits up to `--timeout` (15 minutes by default) for them all to hold. It then reports which invariant is outstanding and what it is waiting on, so a cluster still settling reads differently from one that is stuck.
 
-It reads the cluster's kubeconfig from the box's escrow, using your own `kakt login` session — or the working copy at `~/.kamarkat/run/kubeconfig/<cluster>.kubeconfig` while a bootstrap is still in progress. Pass `--kubeconfig` to point elsewhere.
+Run this while you wait for a change. It tells you the cluster stopped moving, which is not the same as the cluster doing its job.
+
+## Check that a cluster does its job
+
+```bash
+kakt verify --cluster acme-mgmt-1794447136 --accept
+```
+
+`--accept` converges the cluster first, then runs every check that applies to it: your public hostnames, your certificates, your secret delivery, your policies. It reports one verdict for the cluster and exits non-zero when a required check failed or could not run.
+
+Run this before you rely on the result, and read [Verification](/documentation/verification/overview) for what a verdict establishes.
+
+## Check a managed cluster
+
+```bash
+kakt verify --cluster acme-01 --accept
+```
+
+The same command. The platform reads your declarations to find the cluster, and reaches a managed cluster through the management cluster that owns it.
+
+A managed cluster is assessable once your management cluster can deploy to it. Before that, the assessment reports which [state](/documentation/verification/cluster-states) the cluster reached instead of running checks against nothing, and your box reads `incomplete` rather than accepted.
+
+Both forms read the cluster's kubeconfig from the box's escrow, using your own `kakt login` session, or the working copy at `~/.kamarkat/run/kubeconfig/<cluster>.kubeconfig` while a bootstrap is in progress. Pass `--kubeconfig` to point elsewhere.
 
 ## Check what a rebuild needs
 

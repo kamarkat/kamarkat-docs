@@ -84,6 +84,17 @@
             ]
           },
           {
+            "group": "Verification",
+            "pages": [
+              "documentation/verification/overview",
+              "documentation/verification/core-concepts",
+              "documentation/verification/cluster-states",
+              "documentation/verification/checks",
+              "documentation/verification/acceptance-report",
+              "documentation/verification/operational-limitations"
+            ]
+          },
+          {
             "group": "Platform upgrades",
             "pages": [
               "documentation/upgrades/overview",

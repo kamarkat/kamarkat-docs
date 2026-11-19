@@ -1,0 +1,82 @@
+---
+title: "Cluster states"
+description: "Declared, claimed, provisioned, registered, converged, accepted. Six states a cluster moves through, what makes each one true, and which of them verification can assert."
+keywords: ["declared", "claimed", "provisioned", "registered", "converged", "accepted", "pending", "managed cluster"]
+---
+
+> A cluster you declared is not a cluster you have. Six things become true in order, and each one stalls on its own.
+
+Verification asserts against a cluster's current state, so the states need names. A management cluster and a managed cluster pass through the same six. Your Day-0 run builds the management cluster. Your management cluster builds every managed cluster you declare.
+
+## The six states
+
+| State | True when | Who makes it true |
+|---|---|---|
+| **Declared** | your GitOps repository holds the cluster's declaration | you |
+| **Claimed** | your management cluster holds the cluster's claim on your cloud account | your management cluster, reconciling your repository |
+| **Provisioned** | the claim reports the cluster is ready | your cloud account, through your management cluster |
+| **Registered** | your management cluster can deploy to the cluster | the platform, once the cluster answers |
+| **Converged** | everything you declared for that cluster is Synced and Healthy on it | the cluster itself |
+| **Accepted** | every applicable required check passed | you, by running `kakt verify --accept` |
+
+The order carries weight. A cluster cannot converge before it is registered, because until then the platform has sent it nothing.
+
+## Declared is a fact about your repository
+
+A managed cluster becomes declared when you commit its declaration. Nothing is created at that moment.
+
+Your GitOps repository is the authority for which clusters your box has, so the platform reads that list from your repository rather than from your management cluster. The difference matters. Asking your management cluster reports what it managed to create, and verification needs to know what you asked for. A cluster you declared that was never built has to show up as missing, and it only can when the list comes from your repository.
+
+## Registered is the state people miss
+
+**Provisioned** means the machines exist and the claim reports ready. **Registered** means your management cluster holds that cluster as somewhere it can deploy.
+
+Until a cluster is registered, your management cluster sends it no workloads. Not fewer workloads. None. Everything waits, and it waits quietly:
+
+- the cluster has nodes, and no platform services
+- your management cluster reports nothing wrong, because nothing was asked of it
+- your declarations for that cluster sit unreconciled
+
+A managed cluster that looks finished can be hours away from useful. Verification separates the two states for that reason.
+
+## Pending means one of three things
+
+A cluster you declared that is not yet assessable is **pending**. The report always names which.
+
+| Pending reason | What it tells you |
+|---|---|
+| `not claimed` | you committed the declaration, and your management cluster has not created the claim yet |
+| `provisioning` | the claim exists and does not report ready. Your cloud account is still working, or has stopped |
+| `not registered` | the cluster is provisioned and is not yet somewhere the platform can deploy. Its workloads do not exist, so nothing on it can be asserted |
+
+Pending is neither a pass nor a failure. You asked for the cluster, so it cannot be inapplicable. Nothing about it is established, so it cannot be accepted.
+
+## A pending managed cluster does not fail your box
+
+Your management cluster builds managed clusters continuously, not as part of the run that declared them. A cluster takes longer to build than a Day-0 run takes to finish, and reconciliation carries on after that run exits.
+
+Building a management cluster therefore does not wait for a managed one, and acceptance follows the same rule. Your management cluster is accepted on its own evidence. Each managed cluster is accepted on its own, once it is ready to be.
+
+One thing this must never do is read as complete. A box whose management cluster is accepted and whose managed cluster is pending reports `incomplete`, with the reason, every time.
+
+## What changes once a cluster is registered
+
+Registration is the point where failure becomes meaningful rather than premature.
+
+| | Pending | Registered |
+|---|---|---|
+| Its checks | do not run | run, and must pass |
+| Cannot be reached | pending, with the reason | **failed**. The platform could deploy to it, and now cannot |
+| Effect on your box's verdict | `incomplete` | `accepted` or `failed` |
+
+Verification of a cluster you name explicitly fails when that cluster is not registered. You asked about it, so being unable to assess it is an answer you need rather than a line to suppress.
+
+## A managed cluster is reached through the cluster that owns it
+
+You name a cluster and the platform resolves the rest. It reads your declarations to find which cluster you named, works out whether it is your management cluster or a managed one, and for a managed cluster reaches it through the management cluster that owns it. It confirms it reached the cluster you named before any check runs, so a result is never attributed to the wrong cluster.
+
+That resolution is also why a managed cluster has to be registered before it can be assessed. Until then there is nothing to reach.
+
+## Seeing where a cluster is
+
+[`kakt verify`](/cli/boxes-and-clusters#kakt-verify) reports the state each cluster you declared has reached, and explains what a full assessment would run against it without running any of it. [Check a box](/guides/box/check-a-box) covers it as a task.

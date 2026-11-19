@@ -1,0 +1,54 @@
+---
+title: "Acceptance report"
+description: "What an assessment records, where it lands, and how to read an omission. A report is evidence about one version at one moment, not a live health signal."
+keywords: ["acceptance report", "evidence", "inapplicable", "unverified", "pending", "verdict", "CI artifact"]
+---
+
+> An assessment is evidence. It names the cluster, the version, the moment, and every check that did not run.
+
+A verdict on its own is not evidence. A report is what lets you answer, a week later, whether a cluster was accepted, on which platform version, and what nobody checked.
+
+## What a report records
+
+| Field | Why it is there |
+|---|---|
+| The cluster assessed, and whether it is your management cluster or a managed one | a result belongs to one cluster |
+| The management cluster that owns it, for a managed cluster | the assessment reached it through that cluster |
+| The platform version and the committed revision assessed | a verdict about one version says nothing about the next |
+| When the assessment ran, and its run identity | evidence is a point in time, not a state |
+| The convergence result | acceptance follows convergence, and the two are reported separately |
+| Every check: its scope, whether it applied, and its result | so a pass can be distinguished from an absence |
+| The counts: applied, passed, failed, pending, unverified, inapplicable | the shape of the assessment at a glance |
+| The reason for every omission | an omission without a reason is indistinguishable from a pass |
+| The verdict | one line, for the cluster and for your box |
+
+## Where it lands
+
+An assessment run by your Day-0 pipeline publishes its report through your CI: as a run artifact, and as a summary on the job. An assessment you run on your workstation writes it beside the run.
+
+Your CI holds it for as long as you configure it to. That retention is yours to set, and it is finite, so a report you intend to keep is one you archive deliberately.
+
+## Reading an omission
+
+Three results mean a check did not establish anything, and they mean different things.
+
+**`inapplicable`** means your declarations give the check no subject. A check for the database capability on a box that declares no database is inapplicable, and the report names the declaration that makes it so. This is the only omission that is expected.
+
+**`pending`** belongs to a cluster, not a check. You declared the cluster, and it is not yet assessable. The report names which of the three [pending reasons](/documentation/verification/cluster-states) applies. Your box's verdict is `incomplete` while any declared cluster is pending.
+
+**`unverified`** means the check applies and could not run. A credential was missing, its subject could not be reached, or a prerequisite never arrived. This is not a pass, and a cluster with an unverified required check is not accepted. Treat it exactly as you would a failure: something is unestablished that should have been.
+
+## What a report does not tell you
+
+A report describes the cluster at the moment it was assessed, on the version it was assessed against. It is not a health signal and does not update itself. A cluster accepted on Tuesday can be broken on Wednesday by a change neither you nor the platform made, which is what convergence checks and your observability are for.
+
+Treat a report the way you treat a test run: evidence that something held once, against a named version, with its omissions written down.
+
+## Using it in a release decision
+
+Two questions a report answers that a pipeline status does not:
+
+1. **Was every behaviour you depend on asserted?** Read the applied count against the inapplicable list. A long inapplicable list on a box with many capabilities enabled is worth a second look.
+2. **Was anything left unestablished?** Any `unverified` count above zero means a required behaviour was not checked, whatever the verdict line says.
+
+A full assessment with zero failures, zero unverified checks and an inapplicable list you recognise is the evidence worth acting on.

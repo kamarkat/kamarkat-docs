@@ -1,0 +1,76 @@
+---
+title: "Overview"
+description: "A green pipeline is not a working box. Verification asserts the behaviours your business depends on, per cluster, and tells you which cluster is accepted and which is not."
+keywords: ["verification", "acceptance", "kakt verify", "convergence", "accepted", "box verdict"]
+---
+
+> Your controllers report on themselves. Verification reports on your box.
+
+A build that finishes, a pipeline that goes green and a cluster whose every application reads Healthy are three facts about reconciliation. None of them says your identity endpoint answers, your certificates can be issued, or your hostnames point at the cluster you are running now.
+
+Verification closes that gap. It runs the assertions the platform ships for the behaviours a box exists to provide, against one cluster at a time, and tells you plainly whether that cluster is **accepted**.
+
+## What this solves
+
+A box can satisfy every controller and still fail its users. Three ways that happens, all seen in practice:
+
+- A DNS record outlives the cluster it pointed at, so a hostname resolves to infrastructure you replaced.
+- A certificate issuer loses the ability to sign, and nothing notices until an existing certificate expires.
+- A route is declared and dropped when the gateway programs it, so one path returns 404 while the rest of the host answers.
+
+No controller is unhealthy in any of those cases. Nothing is still moving, so waiting longer tells you nothing. The only way to know is to assert the behaviour from outside.
+
+## Two claims
+
+| | Convergence | Acceptance |
+|---|---|---|
+| Asks | has the cluster stopped moving? | does the cluster do its job? |
+| Command | `kakt verify --cluster <name>` | `kakt verify --cluster <name> --accept` |
+| Takes | seconds | minutes |
+
+Convergence is the right question while you wait for a change to settle. Acceptance is the right question before you rely on the result. [Core concepts](/documentation/verification/core-concepts) defines both, and the four results a check can report.
+
+## Who does what
+
+| | Kamarkat | You |
+|---|---|---|
+| Ship the assertions, and carry them in the executable | ✅ | |
+| Decide which of them apply, by what you declare | | ✅ |
+| Run an assessment | | ✅ |
+| Provide the evidence an assessment produces | ✅ | |
+| Decide what a failed assessment means for your release | | ✅ |
+
+The platform never assesses your box on its own schedule or reports the result anywhere outside it. An assessment runs when you run it, or when your own Day-0 run finishes, and its evidence stays in your infrastructure and your CI.
+
+## One cluster at a time
+
+Acceptance is per cluster, never per box. Your management cluster is accepted on its own evidence. Each managed cluster is accepted on its own, once it is ready to be assessed.
+
+Your box's verdict is the sum, and it hides nothing:
+
+| Verdict | Meaning |
+|---|---|
+| `accepted` | every cluster you declared is accepted |
+| `incomplete` | your management cluster is accepted, and a managed cluster is still pending |
+| `failed` | an applicable required check failed, or could not run |
+
+A managed cluster that is still being built never fails your box, and never disappears from the verdict either.
+
+## The pages that follow
+
+<CardGroup cols={2}>
+  <Card title="Core concepts" icon="book" href="/documentation/verification/core-concepts">
+    Convergence against acceptance, checks and their scope, how applicability is decided, and the four results.
+  </Card>
+  <Card title="Cluster states" icon="timeline" href="/documentation/verification/cluster-states">
+    Declared, claimed, provisioned, registered, converged, accepted, and the three reasons a cluster is pending.
+  </Card>
+  <Card title="What is checked" icon="list-check" href="/documentation/verification/checks">
+    Every check an assessment can run, what each asserts, and the name to select it by.
+  </Card>
+  <Card title="Acceptance report" icon="file-lines" href="/documentation/verification/acceptance-report">
+    What an assessment records, where it lands, and how to read an omission.
+  </Card>
+</CardGroup>
+
+[What is checked](/documentation/verification/checks) lists every check and the name that selects it. [Operational limitations](/documentation/verification/operational-limitations) covers what an assessment does not establish, which is worth reading before you treat one as a guarantee.

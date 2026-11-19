@@ -135,6 +135,20 @@ This is break-glass access. Normal access is through your own identity provider,
 
 The escrow holds one kubeconfig per cluster, so pass the cluster you need. Without `--out` it prints to stdout. `--box` overrides the declaration, which matters for a successor management cluster: it reads its predecessor's artefacts under the box they share, while the declaration names only the current cluster.
 
+### kakt escrow clean
+
+Forgets this workstation's escrow configuration and its binding to a box. Local only: it removes what this machine remembers and changes nothing in the escrow, in your repository, or in any cluster.
+
+```bash
+kakt escrow clean
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--yes` | Do not ask for confirmation |
+
+Run it when a workstation should stop pointing at a box, or before pointing it at a different one. Your session is separate: [`kakt logout`](/cli/signing-in) removes that.
+
 ### kakt escrow enroll-provider-credential
 
 Puts the cloud credential this box was built with into its escrow, so lifecycle commands can reach the provider from any authorized workstation.

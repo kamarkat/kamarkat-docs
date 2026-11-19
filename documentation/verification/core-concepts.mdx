@@ -1,0 +1,104 @@
+---
+title: "Core concepts"
+description: "Convergence and acceptance are two different claims. One says a cluster settled, the other says it does its job. This page defines both, and the four results a check can report."
+keywords: ["verification", "convergence", "acceptance", "kakt verify", "check", "applicability", "inapplicable", "unverified"]
+---
+
+> Settled is not working. A cluster can reconcile everything it was given and still answer nothing on the internet.
+
+This page covers the ideas verification rests on. Boxes, management clusters and managed clusters are defined in [Core concepts](/documentation/core-concepts) and are not repeated here.
+
+## Two claims
+
+Verification answers two separate questions, and you choose which one you are asking.
+
+| | Convergence | Acceptance |
+|---|---|---|
+| The question | has the cluster stopped moving? | does the cluster do its job? |
+| The subject | the cluster's own reported state | the behaviour your business depends on |
+| A passing example | every application reports Synced and Healthy | your identity endpoint serves the right issuer |
+| How long it takes | seconds, once the cluster has settled | minutes, because it probes real surfaces |
+| Command | `kakt verify --cluster <name>` | `kakt verify --cluster <name> --accept` |
+
+Convergence is necessary and not sufficient. Every controller reports success while a DNS record still points at a cluster you replaced last month, a certificate issuer has been unable to sign for a fortnight, or a route was dropped when the gateway programmed it. None of those is a convergence failure. Nothing is still moving, so waiting longer surfaces nothing.
+
+Acceptance asserts what convergence cannot observe. It is the claim worth acting on.
+
+## Checks
+
+Acceptance runs a set of **checks**, one per concern. Each check encodes a failure that once reported healthy while being broken, which is the only reason a check earns its place in the platform.
+
+A check declares three things about itself:
+
+- **Scope**, the cluster it is about.
+- **Requirements**, what you must declare for it to have a subject.
+- **Severity**, whether a failure blocks acceptance or is advisory.
+
+You never name checks to get a full assessment. Name one to investigate a specific behaviour, and read the verdict accordingly: a named subset establishes the behaviour it ran and nothing else.
+
+## Scope
+
+| Scope | The subject | What it asserts, for example |
+|---|---|---|
+| `management` | your management cluster | your public hostnames answer, and resolve to this box |
+| `managed` | one managed cluster | workloads there reach only what you declared |
+| `every-cluster` | the same property, for each cluster your box has | every database is backed up, wherever it runs |
+| `path` | one route that spans two clusters | a hostname your management cluster publishes reaches a workload on a managed cluster |
+
+Two of those scopes are easy to confuse, and the difference decides what runs on a box with no managed cluster. An `every-cluster` check asserts one property repeatedly, so it has subjects as soon as your management cluster exists. A `path` check asserts a single route through two clusters, so it has no subject until both exist.
+
+Scope is a property of the assertion, not of the cluster you happen to point at. A check never substitutes one cluster for another to produce a result.
+
+## Applicability
+
+A check applies when your declarations give it a subject. The platform reads that from your GitOps repository and your cluster's values, never from what happens to be running.
+
+| Your declarations say | Result |
+|---|---|
+| no managed cluster | `managed` and `path` checks are **inapplicable**, and `every-cluster` checks still run |
+| a managed cluster, still being built | that cluster is **pending** |
+| a capability is off | its checks are **inapplicable** |
+| a capability is on, and it is unhealthy | its checks **fail** |
+| the subject exists, and something it needs is missing | the check **fails** |
+
+The last row carries the most weight. A missing resource never makes a check inapplicable, because a missing resource is often the defect the check exists to find.
+
+## The four results
+
+Every check reports exactly one result.
+
+| Result | Meaning |
+|---|---|
+| `passed` | it ran, and every assertion held |
+| `failed` | it ran, and an assertion did not hold |
+| `inapplicable` | your declarations give it no subject, and the report records why |
+| `unverified` | it applies, and it could not run |
+
+`unverified` is not a pass. A cluster with an unverified required check is not accepted, because nobody established the thing that check asserts. Missing credentials, an unreachable subject and a prerequisite that never arrived all produce this result.
+
+Two rules follow from the same principle:
+
+- A check that applies and runs zero assertions does not pass. An empty check reads exactly like a working one, so the platform treats it as unverified.
+- An assessment where no check applies fails. That means the selection is wrong, not that your cluster is simple.
+
+## Accepted
+
+A cluster is **accepted** when it has converged, and every applicable required check passed, assessed against that cluster's confirmed identity, in one complete run.
+
+Three results are never acceptance, however green they look.
+
+1. A successful build. Your infrastructure exists. Nothing has asked whether it works.
+2. A successful convergence check. The cluster settled. See the first table.
+3. A successful subset. The behaviour you named works. Everything the run did not execute stays unknown, and the verdict says so.
+
+## Your box's verdict
+
+Each cluster carries its own result. Your box's verdict is the sum of them, with nothing hidden.
+
+| Verdict | Meaning |
+|---|---|
+| `accepted` | every cluster you declared is accepted |
+| `incomplete` | your management cluster is accepted, and a managed cluster is still pending |
+| `failed` | an applicable required check failed, or could not run |
+
+A pending managed cluster never turns an accepted management cluster into a failure. It never disappears from the verdict either. [Cluster states](/documentation/verification/cluster-states) defines what pending means, and [Acceptance report](/documentation/verification/acceptance-report) shows how a run records all of it.

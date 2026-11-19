@@ -1,0 +1,107 @@
+---
+title: "What is checked"
+description: "Every check an assessment can run, what each one asserts, and the name to pass to --only. The authoritative list for your box is the one your executable prints."
+keywords: ["checks", "only", "public-api-endpoints", "certificate-issuers", "secrets-resolve", "sandbox-containment", "support agent"]
+---
+
+> Each check exists because something once reported healthy while being broken. This is the list, and the name to type.
+
+These are the names [`kakt verify`](/cli/boxes-and-clusters#kakt-verify) selects a check by, one or several at a time. The names are stable, and this list is what the platform ships at this version.
+
+Your own box is the authority for which of them apply to it. The command explains itself on request, printing every check with the declaration that makes it apply or not apply, and [Check a box](/guides/box/check-a-box) covers running it.
+
+## Public surface and routing
+
+| Check | Asserts |
+|---|---|
+| `public-api-endpoints` | every hostname your box publishes answers, serves the right identity metadata, and resolves to this box |
+| `tenant-ingress` | the public path to an application reaches that application, end to end |
+| `untrusted-preview-origin` | session previews are served from a separate registrable domain, so a preview cannot act as your application |
+
+## Certificates and trust
+
+| Check | Asserts |
+|---|---|
+| `certificate-issuers` | your box's own certificate issuers exist and can sign |
+| `seeded-credential-sources` | a credential the platform seeds carries every key its consumer reads |
+
+## Secrets
+
+| Check | Asserts |
+|---|---|
+| `secrets-resolve` | every declared secret resolves to a real secret, because one that cannot produces nothing and reports no error |
+| `workload-configuration-and-secrets` | an application's configuration and secrets reach it in the form it consumes |
+
+## Identity and access
+
+| Check | Asserts |
+|---|---|
+| `oauth-clients` | every application's clients exist in the identity provider, not only in your declarations |
+| `tenant-authentication` | an unauthenticated call is refused, and never served |
+| `viewer-audience-declared` | a box that provisions a viewer identity declares the audience that identity is valid for |
+
+## Declarations and reconciliation
+
+| Check | Asserts |
+|---|---|
+| `sync-divergence` | no reconciliation is retrying forever against a revision you have already replaced |
+| `generated-artifacts-reconciled` | the artifacts the platform generates and commits are applied, not merely committed |
+| `application-source-fields` | no application declares two sources at once, which reconciles to neither |
+
+## Policy and isolation
+
+| Check | Asserts |
+|---|---|
+| `policy-selects-nothing` | no network policy selects zero workloads, which reports healthy while protecting nothing |
+| `environment-isolation` | one environment's secrets cannot resolve against another's store |
+| `credit-authority-isolation` | the credit capability's isolation holds where it is enabled |
+| `observability-tenant-scoping` | collection stays scoped to platform namespaces and carries a real cluster identity |
+
+## Observability
+
+| Check | Asserts |
+|---|---|
+| `alert-credentials` | every cluster's alerting has the credentials it needs to reach you |
+| `collection-floor` | the minimum collection every cluster must have is in place |
+
+## Clusters and capacity
+
+| Check | Asserts |
+|---|---|
+| `workload-cluster-lifecycle` | a managed cluster exists because its claim does, and the two agree |
+| `management-cluster-capacity` | your management cluster has somewhere to run the platform it hosts |
+| `kubelet-reachability` | the API server can reach every node, which several platform features require |
+| `home-host-disk-headroom` | an on-premises host has the disk headroom its nodes need |
+| `hybrid-provider` | on-premises capacity is wired as declared, where you use it |
+
+## Backups and recovery
+
+| Check | Asserts |
+|---|---|
+| `management-state-backup-coverage` | the management-state backup covers what it must, and excludes what it must not |
+| `root-of-trust-backup` | every database on the box is backed up, wherever it runs |
+
+## Sandboxes
+
+| Check | Asserts |
+|---|---|
+| `sandbox-containment` | every sandbox is contained by default |
+| `sandbox-runtime` | the sandboxed runtime is in force where it is offered |
+
+## Support agent
+
+The support agent reports nothing until you enrol it. These checks hold whether or not you have.
+
+| Check | Asserts |
+|---|---|
+| `support-agent-rbac` | its access is what it claims, asserted rather than reviewed |
+| `support-agent-allowlist` | it can emit only the categories you were shown |
+| `support-agent-independence` | it cannot read your observability data |
+| `support-agent-no-ingress` | nothing reaches inward to it |
+| `support-agent-single-container` | it is one container, and holds no cluster token |
+| `support-agent-degrades-alone` | its failing to report affects nothing else |
+| `support-agent-targets-resolve` | every target it collects from exists |
+
+## Choosing a name is not accepting a cluster
+
+A run restricted to named checks reports `selected validation passed — complete cluster acceptance not assessed`. It establishes the behaviour it ran, and nothing else. Only a full assessment accepts a cluster. See [Operational limitations](/documentation/verification/operational-limitations).

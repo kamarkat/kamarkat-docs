@@ -63,6 +63,7 @@ To eliminate this vulnerability, Kamarkat isolates storage credentials inside a 
 - The workload container holds **zero object storage credentials**.
 - The sync sidecar holds the cloud storage secret and listens strictly on loopback interfaces (`127.0.0.1:7070` for session storage and `127.0.0.1:7071` for shared storage).
 - The agent runtime issues local HTTP requests (`POST /checkpoint` or `POST /refresh`) to request saves and updates.
+- Whereas outbound API requests route through the **vault proxy** (`agent-vault`) for bearer token injection, object storage operations use AWS SigV4 request signatures, which cannot be injected after the fact by an egress proxy. The dedicated **sync sidecar** (`workspace-sync`) holds the storage secret, signs requests directly, and manages snapshots.
 
 ## Turn synchronization (Turn Sync)
 

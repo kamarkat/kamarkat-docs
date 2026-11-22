@@ -45,18 +45,20 @@ The agentic layer adheres strictly to three architectural boundaries:
       <div className="arch-box"><span className="arch-icon"><Icon icon="server" /></span><span><strong>Pack server</strong><span className="arch-muted">Always running. Serves definitions and tools; runs no user code</span></span></div>
     </div>
     <div className="arch-inline-wire"><span className="arch-wire"></span><span className="arch-wire-label">On each prompt, strictly on demand</span></div>
-    <span className="arch-label">Sandbox</span>
+    <span className="arch-label">Sandbox pod</span>
     <div className="arch-row">
       <div className="arch-box"><span className="arch-icon"><Icon icon="gears" /></span><span><strong>Execution engine</strong><span className="arch-muted">Runs the pack's Star, Composite or Acrylic graph</span></span></div>
-      <div className="arch-box"><span className="arch-icon"><Icon icon="screwdriver-wrench" /></span><span><strong>Tools and skills</strong><span className="arch-muted">Pulled from the pack server</span></span></div>
-      <div className="arch-box"><span className="arch-icon"><Icon icon="rotate" /></span><span><strong>Sync sidecar</strong><span className="arch-muted">Holds the storage credential; the workload holds none</span></span></div>
+      <div className="arch-box"><span className="arch-icon"><Icon icon="screwdriver-wrench" /></span><span><strong>Tools and skills</strong><span className="arch-muted">Pulled from pack server; holds no secrets</span></span></div>
+      <div className="arch-box"><span className="arch-icon"><Icon icon="rotate" /></span><span><strong>Sync sidecar</strong><span className="arch-muted">Loopback persistence (7070/7071) to object storage</span></span></div>
+      <div className="arch-box"><span className="arch-icon"><Icon icon="shield-halved" /></span><span><strong>Vault proxy</strong><span className="arch-muted">MITM egress proxy (14321); injects auth into API calls</span></span></div>
     </div>
   </div>
-  <div className="arch-inline-wire"><span className="arch-wire"></span><span className="arch-wire-label">Checkpoints and refreshes at turn boundaries</span></div>
+  <div className="arch-inline-wire"><span className="arch-wire"></span><span className="arch-wire-label">Checkpoints to storage &nbsp;•&nbsp; Injected authentication on egress</span></div>
   <div className="arch-group">
-    <span className="arch-label">Your object storage</span>
+    <span className="arch-label">External services and storage</span>
     <div className="arch-row">
-      <div className="arch-box"><span className="arch-icon arch-icon-neutral"><Icon icon="floppy-disk" /></span><span><strong>Workspaces</strong><span className="arch-muted">Session and app-shared checkpoints</span></span></div>
+      <div className="arch-box"><span className="arch-icon arch-icon-neutral"><Icon icon="floppy-disk" /></span><span><strong>Your object storage</strong><span className="arch-muted">Session and app-shared checkpoints</span></span></div>
+      <div className="arch-box"><span className="arch-icon arch-icon-neutral"><Icon icon="cloud" /></span><span><strong>Model providers & APIs</strong><span className="arch-muted">LLM gateways, search tools and git providers</span></span></div>
     </div>
   </div>
 </div>
@@ -64,7 +66,7 @@ The agentic layer adheres strictly to three architectural boundaries:
 1. **You author an agent pack**: You organize agent topologies, prompts, and tools into a standardized pack directory and commit it to your repository.
 2. **Standing pack servers serve the catalog**: A standing, stateless pack server inside the cluster runs continuously to serve definitions, agent DAGs, and tool binaries. They do not run user code or hold user sessions.
 3. **Sandboxes provision strictly on demand**: Attaching a pack in the UI attaches its badge without consuming cluster compute. When you submit your prompt, the platform provisions an isolated Sandbox Pod, mounts your persistent workspace, pulls tools from the pack server, and executes the turn.
-4. **Platform sidecars persist workspace state**: As agents execute turns, native sidecars capture file changes to your object storage and provide zero-downtime atomic refreshes for shared workspaces.
+4. **Platform sidecars protect credentials**: As agents execute turns, native sidecars mediate all sensitive access: the **sync sidecar** captures workspace changes to customer object storage on loopback, while the **vault proxy** intercepts outbound requests to inject model and API credentials without exposing raw keys to the workload.
 5. **Idle sandboxes clean up and resurrect transparently**: After 15 minutes of inactivity, the platform terminates the pod after a teardown checkpoint. Sending a new message later spins up a fresh sandbox and mounts your persistent workspace right back up.
 6. **The platform routes agent collaboration**: When agents need capabilities from another pack, the platform coordinates requests over the open A2A protocol.
 

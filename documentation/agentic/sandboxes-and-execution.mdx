@@ -71,9 +71,44 @@ Sandboxes execute on your managed clusters under restricted security contexts:
 | :--- | :--- | :--- |
 | **User privilege** | `runAsNonRoot: true` (UID 1000) | Prevents in-sandbox processes from executing as root or escalating privileges. |
 | **Linux capabilities** | `capabilities: { drop: ["ALL"] }` | Strips all Linux capabilities from the container. |
-| **Credential containment** | No cloud credentials injected | Workload containers hold no cloud provider or object storage keys. |
-| **Storage isolation** | Mediated loopback sidecars | Access to object storage is mediated exclusively through local sidecars on loopback. |
-| **Egress gating** | Strict network boundaries | Outbound network requests pass through platform egress proxies, restricting traffic to declared endpoints. |
+| **Credential containment** | No cloud credentials injected | Workload containers hold no cloud provider keys or external API tokens. |
+| **Storage isolation** | Mediated loopback sync sidecar | Access to object storage is mediated exclusively through `workspace-sync` on loopback. |
+| **Egress gating** | MITM vault proxy | Outbound network requests pass through `agent-vault`, which injects authentication tokens on matching domains. |
+
+### The dual-sidecar containment architecture
+
+To maintain strict credential isolation, two platform sidecars run inside the sandbox pod alongside the workload container:
+
+<div className="arch-sys not-prose">
+  <div className="arch-group arch-group-managed">
+    <span className="arch-label">Sandbox pod</span>
+    <div className="arch-row">
+      <div className="arch-box"><span className="arch-icon"><Icon icon="gears" /></span><span><strong>Workload container</strong><span className="arch-muted">Agent engine and tools. Holds zero cloud keys or API tokens</span></span></div>
+    </div>
+    <div className="arch-inline-wire"><span className="arch-wire"></span><span className="arch-wire-label">Loopback HTTP (7070 / 7071) &nbsp;•&nbsp; Outbound proxy (14321)</span></div>
+    <div className="arch-row">
+      <div className="arch-box"><span className="arch-icon"><Icon icon="rotate" /></span><span><strong>Sync sidecar (workspace-sync)</strong><span className="arch-muted">Holds S3/MinIO keys; handles checkpoints and refreshes</span></span></div>
+      <div className="arch-box"><span className="arch-icon"><Icon icon="shield-halved" /></span><span><strong>Vault proxy (agent-vault)</strong><span className="arch-muted">Holds API tokens; injects auth into outbound LLM/Git/search calls</span></span></div>
+    </div>
+  </div>
+  <div className="arch-inline-wire"><span className="arch-wire"></span><span className="arch-wire-label">S3 SigV4 uploads &nbsp;•&nbsp; Injected bearer authentication</span></div>
+  <div className="arch-group">
+    <span className="arch-label">External services and storage</span>
+    <div className="arch-row">
+      <div className="arch-box"><span className="arch-icon arch-icon-neutral"><Icon icon="floppy-disk" /></span><span><strong>Your object storage</strong><span className="arch-muted">Encrypted workspace snapshots</span></span></div>
+      <div className="arch-box"><span className="arch-icon arch-icon-neutral"><Icon icon="cloud" /></span><span><strong>External APIs & model providers</strong><span className="arch-muted">LLMs, git and search endpoints</span></span></div>
+    </div>
+  </div>
+</div>
+
+1. **Sync sidecar (`workspace-sync`)**:
+   - Listens on `127.0.0.1:7070` (session workspace) and `127.0.0.1:7071` (shared workspace).
+   - Holds the cloud object storage secret directly and signs S3 SigV4 requests.
+   - Saves snapshots and executes atomic directory generation swaps when the agent triggers `/checkpoint` or `/refresh`.
+2. **Vault proxy (`agent-vault`)**:
+   - Listens on local port `14321` as an authenticated egress MITM proxy (`HTTP_PROXY` / `HTTPS_PROXY`).
+   - Reads secrets delivered by the platform (such as LLM gateway keys, GitHub tokens, or search credentials).
+   - Dynamically injects `Authorization: Bearer <token>` and tenant telemetry headers (`X-Scope-OrgID`) into outbound requests before they leave the pod, keeping raw secrets completely hidden from the agent code.
 
 ### Startup validation
 

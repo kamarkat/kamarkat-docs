@@ -25,7 +25,6 @@ kakt tenant add-app \
 | :- | :- |
 | `--env` | The environment the application is declared in |
 | `--app` | The application: the product, and its isolation unit |
-
 | `--owner-email` | Who is paged for it |
 | `--workload` | A deployable inside it. Repeat for each; an application may start with none |
 | `--gitops-dir` | Your GitOps repository. Defaults to the current directory |
@@ -35,8 +34,27 @@ The cluster is checked before anything is written. It must be a cluster your rep
 It then regenerates the hostname aggregate, so the one check that could be forgotten is not left to be remembered. Fill in the quota, hostnames and secret declarations it wrote, then commit.
 
 <Note>
-An application is declared once per environment. Running this against a directory that already exists is refused rather than overwritten — the quota, hostnames and secret declarations already in it are yours, not the template's.
+An application is declared once per environment. Running this against a directory that already exists is refused rather than overwritten — the quota, hostnames and secret declarations already in it are yours, not the template's. To add a workload to an application you have already declared, use [`kakt tenant add-workload`](#kakt-tenant-add-workload).
 </Note>
+
+### kakt tenant add-workload
+
+Adds a deployable to an application that already exists: writes `environments/<env>/<app>/<workload>/Chart.yaml` per workload, from the template your repository keeps.
+
+```bash
+kakt tenant add-workload --env stg --app shop --workload worker
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--env` | The environment the application is declared in |
+| `--app` | The application to add to |
+| `--workload` | A deployable to add. Repeat for each |
+| `--gitops-dir` | Your GitOps repository. Defaults to the current directory |
+
+It asks for nothing else. The cluster the workload runs on comes from which clusters serve that environment, the tenant from your box declaration, and the chart version from the placeholder the template carries until your build pins it.
+
+A workload that already exists is left exactly as it is, **including a chart version a build has pinned** — adding a second workload does not reset the first. An application that is not declared yet is refused, with the command that declares it: a workload is a directory inside an application, and creating the application as a side effect would leave a values file nobody filled in.
 
 ## Hostnames
 

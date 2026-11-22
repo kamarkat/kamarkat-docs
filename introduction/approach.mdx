@@ -66,19 +66,17 @@ Applications are defined **by environment**. A managed cluster declares the stag
 
 ### One agentic operating experience
 
-<Note>
-The agentic layer is in development. This section describes its design, not capabilities available in the current release.
-</Note>
+Agents are a workload the platform runs, under the same contracts as everything else.
 
-Three elements, and the combination is the point.
+**The agent runtime** runs the agents you declare. An agent's definition, prompts, tools and skills are versioned content in your repository; the platform supplies the serving runtime and the execution engine around them.
 
-**Platform agents** operate against Kamarkat's standardized infrastructure, application and operational model. They inspect platform state, investigate issues, trace dependencies and carry out authorized platform workflows, against the same contracts an engineer uses.
+**Sandboxes** give each active session its own isolated compute on a managed cluster, provisioned when work arrives and released when it goes idle. Workload containers hold no cloud or storage credentials.
 
-**The MCP registry** organizes and exposes the tools and integrations available to agents, so capability is discovered in one place rather than rediscovered per component. An agent asks the platform what it is authorized to use, and the answer is the platform's, not an assumption.
+**Workspaces** keep an agent's files across turns and restarts. The platform checkpoints them to object storage you own, at turn boundaries.
 
-**The skills registry** holds reusable operational skills: repeatable workflows and the platform's own conventions, so an agent works in Kamarkat's terms rather than from generic Kubernetes instructions.
+**Agent collaboration** lets one agent call another over an open protocol, through a platform gateway that authenticates each request and tracks every task.
 
-What an agent may do is authorized by the platform, not inferred from how it was asked. Capability is something an agent discovers and is granted, so its reach is a property of the platform rather than of a prompt.
+What an agent may do is authorized by the platform, not inferred from how it was asked. An agent proposes infrastructure changes as declarations in your repository; it has no path to mutate infrastructure directly. [Agentic operations](/documentation/agentic/overview) covers the runtime in full. Capability is something an agent discovers and is granted, so its reach is a property of the platform rather than of a prompt.
 
 Engineers and agents work through one authoritative model. There is no second control system with its own view of the world.
 
@@ -90,7 +88,7 @@ You control your infrastructure, platform configuration, applications, credentia
 
 ## What this does not claim
 
-- Installing is not one command yet. `kakt` is the single entry point, and the install is a short sequence of its commands plus one Day-0 workflow run.
+- Installing is not one command. `kakt` is the single entry point, and the install is a short sequence of its commands plus one Day-0 workflow run.
 - Infrastructure still needs operating. The platform reduces how much of it you assemble and maintain; it does not remove the work, and agents do not remove accountability for it.
 - Git is the desired state, not an undo history. Reverting a declaration stops the platform wanting something; it does not recreate infrastructure or data that has already been destroyed.
 - Accepting a release is a decision you control. It is not a guarantee that every upgrade completes without attention.

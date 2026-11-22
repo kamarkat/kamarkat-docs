@@ -1,6 +1,6 @@
 ---
 title: "Environments"
-description: "An environment is a stage your applications move through, such as dev, stg and prod. Each one is a directory in your GitOps repository, and promotion is a commit."
+description: "An environment is a stage your applications move through, named whatever your process calls it. Each one is a directory in your GitOps repository, and promotion is a commit."
 keywords: ["environments", "dev", "stg", "prod", "promotion", "rollback"]
 ---
 
@@ -8,7 +8,7 @@ keywords: ["environments", "dev", "stg", "prod", "promotion", "rollback"]
 
 ## What it is
 
-An environment is a deployment stage for your applications. Kamarkat recognizes the slugs `dev`, `stg` and `prod`.
+An environment is a deployment stage for your applications. Name it whatever your delivery process calls it — `dev`, `stg`, `prod`, `qa`, `uat`, `sandbox` — as long as it is a usable DNS label: lower-case letters, digits and hyphens, starting and ending with a letter or digit. The name becomes a directory, a label your deployments select on, and a hostname prefix.
 
 Each managed cluster declares the environment it serves (`environmentSlug`), and that single statement decides what runs on it: **every application declared in that environment is deployed to it.** An application declares no cluster. Several clusters may serve one environment, each receiving its own deployment of the environment's applications — which is what lets a replacement cluster be built and verified beside the one it replaces.
 
@@ -49,21 +49,20 @@ To roll back, commit the previous version. Every published version stays in your
 
 ## What you need to know
 
-### Providers per environment
+### Providers, not environment names
 
-Not every provider serves every environment:
+The environment you name is not what decides where a cluster can run. The provider is:
 
-| Environment | `hetzner` | `hybrid` |
-| :- | :- | :- |
-| `dev` | Supported | Supported |
-| `stg` | Supported | Not supported |
-| `prod` | Supported | Not supported |
+| Provider | Where a cluster may be declared |
+| :- | :- |
+| `hetzner` | Any environment, on any box |
+| `hybrid` | Any environment, on a box that is itself `hybrid` |
 
-`hybrid` puts worker nodes on your own machines, joining over your tailnet, and it is supported for `dev` only. Staging rehearses production, and production runs on `hetzner`.
+`hybrid` puts worker nodes on your own machines, joining over your tailnet, with the platform's database on node-local storage. Its capacity is your premises — so a box running in the cloud has none of it, and a `hybrid` cluster declared there would have a tainted control plane as its only node: every workload pends, and the failure surfaces much later as a missing database.
 
-Two things refuse an unsupported combination, so it cannot reach a cluster: the CLI when you declare the cluster, and the bundle chart when it renders.
+The CLI refuses that when you declare the cluster, before a repository, a secret or a server exists.
 
-A box whose `dev` runs on `hybrid` therefore has environments on different providers: its higher environments have cloud nodes and their cost, and do not join your tailnet. Decide this before you [add an environment](/guides/environments/add-an-environment).
+A box whose lower environment runs on `hybrid` therefore has environments on different providers: its higher environments have cloud nodes and their cost, and do not join your tailnet. Decide this before you [add an environment](/guides/environments/add-an-environment).
 
 ### An environment needs its cluster first
 

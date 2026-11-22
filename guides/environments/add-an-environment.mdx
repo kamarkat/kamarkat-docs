@@ -10,7 +10,7 @@ This guide adds `stg` to a box that runs `shop` in `dev`. The order matters: an 
 
 ## Before you start
 
-**Choose the provider.** `hybrid` is supported for `dev` only. If your `dev` runs on `hybrid`, your `stg` and `prod` run on `hetzner`, so your environments are not all the same provider: the new one has cloud nodes and their cost, and no tailnet. See [Environments](/features/workloads/environments#providers-per-environment).
+**Choose the provider.** `hybrid` may only be declared on a box that is itself `hybrid`, because its capacity is your own premises. If your lower environment runs on `hybrid`, a cloud environment beside it has cloud nodes and their cost, and no tailnet, so your environments are not all the same provider. The environment's name is yours to choose. See [Environments](/features/workloads/environments#providers-not-environment-names).
 
 ## Step 1: Declare the cluster
 

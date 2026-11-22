@@ -65,7 +65,7 @@ A release that publishes anything uses up its version, even if it fails part-way
 
 ### Unsupported combinations are refused by the chart
 
-Each bundle declares which combinations of environment and provider it supports, and any other combination is refused when the chart renders — so a version cannot be reached by a cluster it does not support. Which combinations those are is in [Environments](/features/workloads/environments#providers-per-environment).
+Each bundle declares the providers it supports, and a cluster declared on any other is refused before it is provisioned — so a version cannot be reached by a cluster it does not support. Which providers those are, and the one rule that restricts them, is in [Environments](/features/workloads/environments#providers-not-environment-names).
 
 ### Components move only with the bundle
 

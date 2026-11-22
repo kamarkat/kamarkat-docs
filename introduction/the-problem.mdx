@@ -26,7 +26,7 @@ Each component also upgrades on its own schedule. The failures that cost the mos
 
 A platform assembled piece by piece has no single way to be operated. Each component brings its own interface, its own idea of identity and its own notion of what an operation is. Every engineer who touches it has to learn each one.
 
-AI agents inherit the same problem. An agent pointed at an independently assembled platform meets inconsistent tools, conventions, permissions and workflows, and improvises across them. So a business ends up doing the same undifferentiated work twice: once to assemble its platform, and again to teach agents how to operate it.
+AI agents inherit the same problem. An agent pointed at an independently assembled platform meets inconsistent tools, conventions, permissions and workflows, and improvises across them. Running agents in production adds its own layer to assemble: isolated compute, state that survives between turns, credentials kept away from model-driven code, and a governed way for agents to call each other. So a business ends up doing the same undifferentiated work twice: once to assemble its platform, and again to build the runtime its agents need.
 
 ## Kamarkat's answer
 
@@ -34,7 +34,7 @@ Install the platform instead of assembling it. Kamarkat ships the infrastructure
 
 - **Integration** is done before you install. A new cluster arrives with its networking, delivery and registration configured, and an application's chart gets its routing, login, database and secrets.
 - **Maintenance** of the platform simplifies into coordinated version changes. Kamarkat publishes the whole platform as one tested version, and your own upgrade automation proposes it as one change for you to review. Upgrades can still need attention, and some cannot be undone by reverting them.
-- **Inconsistency** is addressed by design: Kamarkat establishes a consistent operating model. Every cluster, capability and application is declared and reconciled the same way, and the agentic layer, in development, is designed to work through the same contracts.
+- **Inconsistency** is addressed by design: Kamarkat establishes a consistent operating model. Every cluster, capability and application is declared and reconciled the same way, and agents run on the platform and act through the same contracts as engineers.
 
 You keep what distinguishes your business: your code, your data and your decisions. [Welcome](/introduction/welcome#from-download-to-running-platform) sets out what you provide and what the platform supplies.
 

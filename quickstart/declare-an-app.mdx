@@ -65,14 +65,21 @@ secrets: []             # secrets you supply; see "Supply secrets"
 
 ## Step 2: Add a directory per workload
 
-Each workload directory holds one chart dependency. Pass `--workload` once per
-workload when you declare the app, or add one later:
+Each workload directory holds one chart dependency. Pass `--workload` once per workload when you declare the app:
 
 ```bash
 kakt tenant add-app --env dev --app shop \
   --owner-email platform@acme.example \
   --workload frontend --workload bff
 ```
+
+To add one to an app you have already declared, use `add-workload`. An app is declared once, so `add-app` refuses a directory that exists — the quota, hostnames and secret declarations in it are yours:
+
+```bash
+kakt tenant add-workload --env dev --app shop --workload worker
+```
+
+It needs nothing else: the cluster, the tenant and the chart version come from what your repository already says. A workload that exists is left alone, including a version your build has pinned.
 
 ```yaml environments/dev/shop/frontend/Chart.yaml
 apiVersion: v2

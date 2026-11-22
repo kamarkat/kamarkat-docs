@@ -11,20 +11,27 @@ Your management cluster runs the platform's services, not your apps. Apps run on
 From the root of your GitOps repository:
 
 ```bash
-kakt tenant add-cluster \
-  --mgmt-cluster acme-mgmt-1794447136 \
-  --name acme-01 \
-  --environment dev \
-  --tenant acme \
-  --bundle-version <version> \
-  --gitops-repo-url https://github.com/acme-inc/acme-gitops-1794447136
+kakt tenant add-cluster --name acme-01 --environment dev
 ```
 
 | Flag | Meaning |
 | :- | :- |
 | `--name` | The cluster's name for its whole life. Your apps name it to run on it. |
 | `--environment` | The stage it serves. An app in `environments/dev/` must run on a cluster that serves `dev`. |
-| `--bundle-version` | Recorded as the version this cluster is declared at. Use the one your management cluster runs — the cluster receives that cluster's platform. |
+
+Everything else — your tenant, your management cluster, your repository, the platform version it is declared at, the provider and the region — is already in your repository's box declaration, and is read from there. The command prints each value it read:
+
+```
+Read from this box's declaration:
+  --mgmt-cluster       acme-mgmt-1794447136
+  --tenant             acme
+  --provider           hetzner
+  --region             hel1
+  --bundle-version     0.3.40
+  --gitops-repo-url    https://github.com/acme-inc/acme-gitops-1794447136
+```
+
+Pass one of those flags only when you mean to override what your box says. The full list is in the [CLI reference](/cli/boxes-and-clusters#kakt-tenant-add-cluster).
 
 <Note>
 A managed cluster is a new set of nodes in your cloud account. On `hetzner` it starts with 2 worker nodes unless you pass `--workers`.

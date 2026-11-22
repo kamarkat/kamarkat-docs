@@ -86,14 +86,10 @@ When it finishes, check the box as in [Check a box](/guides/box/check-a-box).
 Declare each one again, with a new name and the same `--environment` it had before:
 
 ```bash
-kakt tenant add-cluster \
-  --mgmt-cluster acme-mgmt-02 \
-  --name acme-stg-02 \
-  --environment stg \
-  --tenant acme \
-  --bundle-version <version> \
-  --gitops-repo-url https://github.com/acme-inc/acme-gitops-1794447136
+kakt tenant add-cluster --name acme-stg-02 --environment stg --mgmt-cluster acme-mgmt-02
 ```
+
+`--mgmt-cluster` is named here, and only here. The command normally reads the management cluster from your box declaration, which still names the one you are replacing — so this is the one case where you have to say which cluster creates the new clusters.
 
 The environment's applications are deployed to it because it declares that environment — no application declaration is edited. Supply each one's secrets against the new cluster, and restore any data you need, as in [Replace a managed cluster](/guides/clusters/replace-a-managed-cluster#step-3-let-the-replacement-receive-the-environment).
 

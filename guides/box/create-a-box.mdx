@@ -14,7 +14,7 @@ You create it once per box. A second box is a second GitOps repository, with its
 
 - **Your accounts and credentials** are ready: see [Prerequisites](/quickstart/prerequisites).
 - **Your escrow** exists: see [Get started](/quickstart/get-started). `kakt box init` refuses without it, because an escrow cannot be added afterwards.
-- **The provider suits the environment.** `hybrid` is supported for `dev` only.
+- **The provider suits the box.** `hybrid` runs on your own premises, so it may only be declared on a box that is itself `hybrid`. Any environment name is allowed on either provider.
 
 <Note>
 Day-0 creates cloud servers, billed to your account, and runs for a few hours. It runs only when you start it, never because a file changed.

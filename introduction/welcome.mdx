@@ -7,14 +7,14 @@ thumbnail:
 keywords: ["kamarkat", "cloud platform", "platform installer", "kakt", "byoc", "gitops", "kubernetes", "business-owned infrastructure", "platform OS"]
 ---
 
-Kamarkat brings the cloud-native infrastructure and application services your product needs together in one integrated platform. You install it with one CLI, `kakt`, in your own cloud account.
+Kamarkat is an agentic cloud-native platform OS for businesses. It brings the infrastructure, application services and agent runtime your product needs together in one integrated platform, and you install it with one executable, `kakt`, in your own cloud account.
 
 One installer. One tested platform. Your infrastructure, credentials and data remain yours.
 
-Kamarkat is built for startups and engineering teams that want a production-capable cloud foundation without assembling and maintaining an internal platform from scratch.
+Kamarkat is built for startups and engineering teams that want a production-capable cloud foundation without assembling and maintaining an internal platform from scratch, and without hiring a platform team to run it.
 
 <Info>
-**Where it runs today:** Hetzner Cloud (`hetzner`). A `hybrid` mode, with worker nodes on your own machines, is supported for development boxes only. See [Supported topology](/introduction/architecture#supported-topology).
+**Where it runs:** Hetzner Cloud (`hetzner`). A box created as `hybrid` can also run worker nodes on your own machines. See [Supported topology](/introduction/architecture#supported-topology).
 </Info>
 
 <CardGroup cols={2}>
@@ -30,24 +30,20 @@ Kamarkat is built for startups and engineering teams that want a production-capa
 
 <Steps>
   <Step title="Download">
-    Get the `kakt` executable for your machine. It carries the platform version your box starts on.
+    Get the `kakt` executable. It carries the platform version your box starts on.
   </Step>
   <Step title="Connect">
-    Sign in to your escrow and authorize your cloud and git accounts. `kakt box init` asks for each credential in turn and opens the page that issues it. It keeps what you enter in a local credential store on your machine, and sets the ones your CI needs as encrypted CI secrets on your repository.
+    Authorize your cloud and git accounts. `kakt` asks for each credential in turn and opens the page that issues it.
   </Step>
   <Step title="Initialize">
-    `kakt` creates your GitOps repository and declares your management cluster. Day-0 then builds that cluster from your repository's own CI, and the platform comes up on it.
+    `kakt` creates your GitOps repository and declares your management cluster, and your own CI builds it. The platform comes up in your cloud account.
   </Step>
   <Step title="Build">
-    Declare a managed cluster and your applications. Your management cluster provisions the cluster and deploys your apps with their routing, login, database and secrets already wired.
+    Declare your clusters, applications and agents. The platform provisions them with routing, login, database, secrets and isolation already wired.
   </Step>
 </Steps>
 
-Your GitOps repository contains declarations, not plaintext credentials.
-
-<Note>
-`kakt` is the one entry point, but installing is not a single command today. You run a handful of `kakt` commands, commit once, and start the Day-0 workflow, which runs for a few hours. [Get started](/quickstart/overview) walks through every step.
-</Note>
+`kakt` leads the installation, but it is not a single command: you run a few `kakt` commands, commit once, and start the Day-0 build, which runs for a few hours. [How Kamarkat works](/introduction/approach) explains what each step does, and [Get started](/quickstart/overview) walks through them.
 
 | You provide | The platform supplies |
 | :- | :- |
@@ -95,7 +91,7 @@ The first two columns describe representative operating models, not every produc
 | **Secrets** | A secret store, delivery into workloads, and recovery material held outside the box |
 | **Networking, DNS, certificates** | Gateway routing, network policy, DNS records, certificates issued and renewed |
 | **Observability** | Metrics, logs, dashboards and alert routing across the box. *Selectable, on by default* |
-| **Agentic operations** | *In development.* Platform agents, a registry of the tools they may use, and reusable skills that carry the platform's own conventions |
+| **Agentic operations** | A runtime for your agents: isolated sandboxes on your managed clusters, workspaces that persist between turns, and governed collaboration between agents. Engineers and agents operate the platform through the same contracts |
 
 Packaging these would be a distribution. **Pre-integrating them is the product:** the gateway knows about your identity provider, an application's chart gets its database and its secrets, a new cluster arrives with its networking and delivery already configured, and one version moves them together.
 
@@ -111,9 +107,9 @@ Before you go further, these pages hold the details an evaluation needs:
 Architecturally, Kamarkat is a platform OS: three layers of one product, not three things to buy.
 
 ```text
-┌─ Agentic operations (in development) ─────────────────────────────────┐
-│  Agents · MCP registry · Skills registry                              │
-│  How engineers and AI agents inspect, investigate and operate         │
+┌─ Agentic operations ──────────────────────────────────────────────────┐
+│  Agent runtime · Sandboxes · Workspaces · Agent collaboration         │
+│  Engineers and agents, working through the same contracts             │
 └───────────────────────────────────────────────────────────────────────┘
 ┌─ Integrated cloud-native platform OS ─────────────────────────────────┐
 │  GitOps · Identity · Secrets · Databases · Gateway · Networking       │
@@ -126,7 +122,7 @@ Architecturally, Kamarkat is a platform OS: three layers of one product, not thr
 └───────────────────────────────────────────────────────────────────────┘
 ```
 
-The agentic layer is designed not to sit beside the platform with its own view of the world. Agents are to read the same platform state engineers do, and change desired state through the same declarative contracts the platform reconciles. [How Kamarkat works](/introduction/approach#one-agentic-operating-experience) describes the design.
+The agentic layer does not sit beside the platform with its own view of the world. Agents run on your managed clusters, read the same platform state engineers do, and change desired state only through the declarations the platform reconciles. [Agentic operations](/documentation/agentic/overview) describes the runtime.
 
 ## Where to go next
 

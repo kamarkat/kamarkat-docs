@@ -46,8 +46,8 @@ Kamarkat's side is small: a release pipeline publishes bundle versions to a regi
 
 ```text
 ┌─ Agentic operations ──────────────────────────────────────────────────┐
-│  Agents · MCP registry · Skills registry                              │
-│  Engineers and AI agents, working through the same contracts          │
+│  Agent runtime · Sandboxes · Workspaces · Agent collaboration         │
+│  Engineers and agents, working through the same contracts             │
 └───────────────────────────────────────────────────────────────────────┘
 ┌─ Integrated cloud-native platform OS ─────────────────────────────────┐
 │  GitOps · Identity · Secrets · Databases · Gateway · Networking       │
@@ -127,7 +127,7 @@ A box is two kinds of cluster, and every cluster has two kinds of node.
       <span className="arch-cl-detail">with the local services they need: gateways, databases, agents</span>
     </a>
     <a className="arch-cl-node arch-cl-node-opt" href="/features/capabilities/cluster-lifecycle">
-      <span className="arch-label">On-premises worker nodes · dev only</span>
+      <span className="arch-label">On-premises worker nodes · hybrid boxes</span>
       <span className="arch-cl-detail">Your own machines, joining over your tailnet</span>
     </a>
   </div>
@@ -164,13 +164,12 @@ The platform's services are grouped into capabilities. What each one gives you, 
 
 ## Supported topology
 
-| Environment | `hetzner` | `hybrid` |
-| :- | :- | :- |
-| `dev` | Supported | Supported |
-| `stg` | Supported | Not supported |
-| `prod` | Supported | Not supported |
+| Provider | Where a cluster may be declared |
+| :- | :- |
+| `hetzner` | Any environment, on any box |
+| `hybrid` | Any environment, on a box that is itself `hybrid` |
 
-`hybrid` runs cloud control-plane nodes with worker nodes on your own machines, joining over your tailnet, and it is supported for `dev` only. Staging rehearses production, and production runs on `hetzner`. Supported environment/provider combinations are defined by the platform's workload topology policy. `kakt tenant add-cluster` validates each workload-cluster declaration and refuses unsupported combinations before provisioning begins. The shared management cluster does not declare a workload environment — see [Providers per environment](/features/workloads/environments#providers-per-environment).
+`hybrid` runs cloud control-plane nodes with worker nodes on your own machines, joining over your tailnet. Its capacity is your premises, so it may only be declared on a box that has them. The environment a cluster serves is a name you choose and does not restrict the provider. `kakt tenant add-cluster` refuses an unsupported declaration before provisioning begins. The shared management cluster does not declare a workload environment — see [Providers, not environment names](/features/workloads/environments#providers-not-environment-names).
 
 ## Connectivity model
 

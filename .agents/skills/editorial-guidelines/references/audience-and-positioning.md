@@ -71,6 +71,12 @@ Kamarkat integrates three conceptual layers into a single coherent product:
 
 *These are conceptual layers of one unified product, not three separately installed, purchased, or configured products.*
 
+### Message Order on Adoption Pages
+- **The headline carries the North Star outcome**: installed, not assembled, in infrastructure the customer owns.
+- **The category follows immediately**: the opening paragraph names Kamarkat an agentic cloud-native platform OS for businesses. The category is stated, never hidden, and never replaces the outcome as the headline.
+- **Agentic operations is one of the three layers, not a separate pitch**: describe it by what it gives a team (a runtime for their agents, under the same contracts as everything else), after the business problem and the integrated platform value.
+- **Outcomes before commands**: the welcome page describes the installation journey as outcomes; commands belong to the pages that own them.
+
 ### The Agentic Boundary
 - Engineers and authorized agents operate against the **same platform concepts, capabilities, permissions, and authoritative sources of truth**.
 - Agentic functionality must **never** be presented as an independent control plane or an autonomous authority over infrastructure. Agents are authorized participants operating within explicit platform contracts and guardrails.

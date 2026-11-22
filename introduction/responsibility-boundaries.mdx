@@ -53,16 +53,14 @@ Each row links to the page that describes it in detail.
 
 ## Agentic operations layer
 
-<Note>
-The agentic layer is in development. This table records how responsibility is designed to divide once it ships.
-</Note>
-
 | | Kamarkat | You |
 | :- | :- | :- |
-| **Platform agents** | Ships the agents and the platform model they operate against | Decide which run in your box, and remain accountable for what they do |
-| **MCP registry** | Publishes the tools and integrations agents may discover | Authorize what is available in your box |
-| **Skills registry** | Ships reusable skills carrying the platform's conventions | Add your own, and decide which apply |
-| **What an agent may reach** | Exposes capability through authorized, standardized platform contracts | Decide what is authorized in your box, and own the credentials and policy behind it |
+| **[Agent runtime](/documentation/agentic/overview)** | Ships the serving runtime, the execution engine and the sandboxes your agents run in | Own your agents: their prompts, tools, skills and topologies |
+| **[Workspaces](/documentation/agentic/workspace-persistence)** | Checkpoints and restores agent workspaces at turn boundaries | Own the object storage they are kept in, and the data in it |
+| **[Agent collaboration](/documentation/agentic/agent-collaboration)** | Routes and authenticates requests between agents | Declare which applications and agents may collaborate |
+| **What an agent may reach** | Exposes capability through authorized, standardized platform contracts | Decide what is authorized in your box, and remain accountable for what your agents do |
+
+The full division is in [Agentic operations](/documentation/agentic/overview#who-does-what).
 
 Agentic operations do not add a second authority. An agent works through the same platform contracts and within the same permissions as anyone else operating the box, so nothing in the table above moves a boundary that exists elsewhere on this page.
 

@@ -120,29 +120,22 @@ The box id is minted once and never changes. Your escrow is keyed by it, so ever
 Declares an additional managed cluster. It renders the cluster template your GitOps repository carries; the management cluster provisions the cluster from your commit. No Day-0 run is involved. For the whole task, see [Add a managed cluster](/guides/clusters/add-a-managed-cluster).
 
 ```bash
-kakt tenant add-cluster \
-  --mgmt-cluster acme-mgmt-1794447136 \
-  --name acme-02 \
-  --tenant acme \
-  --bundle-version <version> \
-  --gitops-repo-url https://github.com/acme-inc/acme-gitops-1794447136
+kakt tenant add-cluster --name acme-02 --environment dev
 ```
+
+Two flags, because everything else is in your repository's own box declaration and is read from it. The command prints each value it read, so nothing arrives silently, and a flag you pass wins over the declaration.
 
 | Flag | Meaning |
 | :- | :- |
-| `--mgmt-cluster` | The management cluster that creates this one. Required |
 | `--name` | The managed cluster's name, and what applications name to run on it. Required |
-| `--tenant` | The tenant that owns it. Required |
-| `--bundle-version` | The platform version this cluster is declared at, recorded in its values file. Required. A managed cluster receives the management cluster's platform, so this does not pin one of its own |
-| `--gitops-repo-url` | Your GitOps repository's URL. Required |
-| `--provider`, `--region` | Where and what it is, if it differs from the defaults |
 | `--environment` | The stage this cluster serves. Several clusters may serve one stage, which is how a replacement runs beside the cluster it replaces |
 | `--workers` | Cloud worker nodes it starts with. Defaults to 2 on `hetzner` |
 | `--public-tls-issuer` | The ACME issuer for public certificates. Defaults to `letsencrypt-prod` |
 | `--gitops-dir` | Your GitOps repository. Defaults to the current directory |
+| `--mgmt-cluster`, `--tenant`, `--provider`, `--region`, `--bundle-version`, `--gitops-repo-url` | Read from your box declaration. Pass one only to override what it says |
 
 <Note>
-`--bundle-version` on `bootstrap-mgmt` must already be published, in the registry your `bundle.yaml` files pull from, and pullable without credentials: the box cannot converge on a version its registry does not hold. On `add-cluster` it is a record, since the managed cluster runs the management cluster's platform.
+`--bundle-version` on `bootstrap-mgmt` must already be published, in the registry your `bundle.yaml` files pull from, and pullable without credentials: the box cannot converge on a version its registry does not hold. On `add-cluster` it is a record, since the managed cluster runs the management cluster's platform — which is why it is read from your box rather than asked for.
 </Note>
 
 <Warning>

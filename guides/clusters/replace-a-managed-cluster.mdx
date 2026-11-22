@@ -22,13 +22,7 @@ Both clusters serve the same environment while you do this. Several clusters may
 Declare it exactly as you would any managed cluster, with a new name and the **same** `--environment` as the one it replaces:
 
 ```bash
-kakt tenant add-cluster \
-  --mgmt-cluster acme-mgmt-1794447136 \
-  --name acme-stg-02 \
-  --environment stg \
-  --tenant acme \
-  --bundle-version <version> \
-  --gitops-repo-url https://github.com/acme-inc/acme-gitops-1794447136
+kakt tenant add-cluster --name acme-stg-02 --environment stg
 ```
 
 Commit it and wait for it to converge, as in [Add a managed cluster](/guides/clusters/add-a-managed-cluster). Nothing moves yet: no app names `acme-stg-02`, so nothing is generated onto it.

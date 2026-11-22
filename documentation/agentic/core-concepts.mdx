@@ -1,0 +1,67 @@
+---
+title: "Core concepts"
+description: "The foundational vocabulary of the agentic layer: Agent Packs, Topologies, Sandboxes, Workspaces, Turn Sync, and A2A."
+keywords: ["agent pack", "topology", "sandbox", "workspace", "turn sync", "stateful specialist", "A2A"]
+---
+
+> Agent execution is grounded in declarative contracts, isolated compute, and durable storage.
+
+This page defines the core concepts governing agentic workloads in Kamarkat. Managed clusters, applications, and tenants are defined in [Platform core concepts](/documentation/core-concepts) and are not repeated here.
+
+## Agent Pack
+
+An **agent pack** is the declarative content of an agent application: its graph definition, system prompts, tools, procedural skills, and tool binaries.
+
+A pack is **pure data**, not a service or an application image. It contains no server entrypoint, no bespoke deployment scripts, and no container build logic. The platform provides a standard runtime that resolves the pack's definitions, hydrates its prompt templates, and serves its content to execution sandboxes.
+
+## Graph Topologies
+
+A pack declares its execution graph topology in `definition.json`. The platform runtime supports three distinct topologies:
+
+| Topology | Architecture | Best for |
+| :--- | :--- | :--- |
+| **Star** | A central orchestrator coordinating one or more specialists. | Simple delegations where specialists need no conversational history between calls. |
+| **Composite** | An orchestrator delegating to stateful deep-agent specialists. | Complex, multi-turn tasks where specialists retain their own thread histories across turns. |
+| **Acrylic** | A deterministic, code-enforced DAG with conditional edges between nodes. | Fixed pipelines where execution paths follow explicit conditions without an orchestrator LLM. |
+
+### Stateful Specialist
+
+In a composite topology, a **stateful specialist** is a deep agent compiled as an independent subgraph. It maintains its own isolated conversation history in the session's checkpointer. 
+
+When a user interacts with a specialist across multiple turns (for example, choosing options, reviewing drafts, or awaiting job outcomes), the specialist preserves its earlier context and verified facts without polluting the orchestrator's history or sharing state with other specialists.
+
+## Sandbox
+
+A **sandbox** is an on-demand, isolated compute pod running on a managed cluster that hosts an active agent session. 
+
+Sandboxes run under restricted Kubernetes security contexts. They drop all elevated Linux capabilities, execute as non-root users, and mount read-only root filesystems where appropriate. A sandbox lives only as long as its active lease; when a session remains idle beyond its configured timeout, the platform gracefully terminates the pod.
+
+### Sandbox Identity
+
+Every sandbox receives a pod-bound identity token minted for the platform SDK audience. When the sandbox requests definitions, reports job progress, or connects to cross-agent endpoints, the platform validates the token via cluster TokenReview to verify the exact pod name, sandbox name, and namespace.
+
+## Workspaces
+
+Agents read and write files using dedicated workspace directories mounted inside their sandbox:
+
+| Workspace | Mount path | Scope | Description |
+| :--- | :--- | :--- | :--- |
+| **Session Workspace** | `/workspace` | Per session | The active scratchpad for one user session. Retained across container restarts via sidecar snapshots. |
+| **App-Shared Workspace** | `/workspace/.global` | Per application | Shared domain state (such as brand assets, schemas, or preferences) accessible across all sessions of an application. |
+
+Workload containers never hold cloud credentials or talk directly to object storage. Instead, platform sync sidecars run on loopback inside the pod, managing uploads and downloads securely.
+
+## Turn Sync
+
+**Turn sync** is the coordination of workspace durability at turn boundaries:
+
+- **Turn-End Checkpoint (Writers)**: When an agent finishes its turn (or pauses to ask the user a question), the runtime calls the local sidecar to snapshot `/workspace`. Answers and notifications are released only after the save is safely confirmed in customer object storage.
+- **Turn-Start Refresh (Readers)**: When a session opens or starts a new turn against a shared workspace, the runtime triggers a local refresh. The sidecar downloads the newest checkpoint into an alternate directory and atomically repoints the `/workspace/.global` symlink. The agent sees a consistent, updated view without mid-turn file mutation.
+
+## Agent-to-Agent (A2A)
+
+**Agent-to-Agent (A2A)** is the open protocol (A2A 1.0) governing communication between different agent packs:
+
+- **Agent Card**: A structured metadata document published by an agent pack advertising its available skills, input/output schemas, and access constraints.
+- **Task**: A tracked unit of work initiated by one agent and fulfilled by another, progressing through formal states (`SUBMITTED`, `WORKING`, `INPUT_REQUIRED`, `COMPLETED`, `FAILED`, `CANCELED`).
+- **A2A Gateway**: The platform service that authenticates requests, tracks task records in the database, wakes sleeping sandboxes, and routes streaming push notifications back to the requesting session.

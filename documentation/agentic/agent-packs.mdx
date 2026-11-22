@@ -1,0 +1,114 @@
+---
+title: "Agent packs"
+description: "The content contract for declarative agent products: pack layout, topology configuration, prompt hydration, procedural skills, and local tools."
+keywords: ["agent pack", "definition.json", "topologies", "star", "composite", "acrylic", "instructions", "skills", "tools"]
+---
+
+> An agent pack is content: declarations, prompts, and tools. The platform provides the runtime that serves and executes it.
+
+In traditional development, building a multi-agent application means authoring server code: HTTP routers, prompt-rendering templates, tool-loading scripts, Dockerfiles, and Helm charts. When multiple teams build agents, this infrastructure forks, leading to inconsistent prompt hydration, duplicated runtime logic, and configuration drift.
+
+Kamarkat treats an **agent pack** as pure data. You author the definition, the agent prompts, the local tools, and the procedural skills in a standard directory structure. The platform validates your pack, builds an immutable content image, and serves the hydrated definitions directly to execution sandboxes.
+
+## Filesystem layout
+
+Every agent pack conforms to a single, standardized directory structure:
+
+```text
+definition.json            # Agent-DAG definition and topology
+agents/<node-id>/
+  instructions/*.md        # Prompt fragments concatenated in lexical order
+  tools/                   # Executables the agent invokes via run_tool
+  skills/                  # Procedural Markdown skills loaded on demand
+agents/shared/             # Shared prompt sections imported by other agents
+agents/shared/tools/       # Shared tools merged into every agent's run_tool
+bin/                       # Shared binaries available to all tools
+sandbox/Dockerfile         # Optional: only when custom OS dependencies are required
+```
+
+There is no server entrypoint and no application framework code. The platform builds this structure into an immutable content image based on a minimal utility layer (`busybox`) with `ENTRYPOINT ["/bin/false"]`. The content is extracted by the platform serving runtime before sessions begin.
+
+### Shared prompts and tools
+
+The `agents/shared/` directory serves two specific purposes:
+
+- **Shared prompt fragments**: Common instructions (such as company tone guidelines, security policies, or output formats) that specialist agents import. An agent imports shared fragments using an `<inputs> imports:` declaration in an `inputs.md` file.
+- **Shared tools**: Common tool scripts placed in `agents/shared/tools/` that the platform automatically merges into every agent's available tool list.
+
+`agents/shared/` is not an agent node: it contains no instructions of its own and routes no traffic.
+
+## Topologies in depth
+
+The `topology` declared in `definition.json` defines how the execution engine builds the LangGraph state machine:
+
+### 1. Star topology
+
+A **star** topology consists of one central orchestrator surrounded by specialist agents:
+
+- The user communicates directly with the orchestrator.
+- The orchestrator delegates specific sub-tasks to specialists using an internal task dispatch tool.
+- Specialists are stateless: each delegation starts with fresh context and returns its completed response back to the orchestrator.
+- Best suited for straightforward triage, classification, or single-step specialist execution.
+
+### 2. Composite topology
+
+A **composite** topology also uses a central orchestrator, but its specialists are stateful deep agents:
+
+- Each specialist is compiled as an independent stateful subgraph with its own dedicated checkpointer (`tools|<specialist-name>`).
+- When an interaction requires multiple turns with the same specialist (such as answering follow-up questions, clarifying parameters, or processing asynchronous job notices), the specialist maintains its own conversational history across turns.
+- Specialists cannot see or mutate each other's conversation histories.
+- The orchestrator maintains the overarching user conversation and tracks asynchronous jobs through a unified pending jobs queue.
+
+### 3. Acrylic topology
+
+An **acrylic** topology is a code-enforced, deterministic directed acyclic graph (DAG):
+
+- Edges carry explicit routing conditions based on state attributes.
+- Execution flows from node to node according to declared logic without requiring an orchestrator model to decide the next step.
+- Nodes achieve strict message isolation: each node receives only the messages explicitly routed to it, preventing context window bloat.
+- Best suited for deterministic data pipelines, multi-stage approval flows, and structured verification sequences.
+
+## Prompt hydration and composition
+
+Prompts are never maintained as massive, monolithic text files. The platform hydrates system prompts dynamically from your pack layout:
+
+1. **Lexical concatenation**: Inside each `agents/<node-id>/instructions/` directory, markdown files are read in alphabetical order and concatenated into a single system instruction. Prefixing files with numbers (such as `00.role.md`, `10.boundaries.md`, `20.workflow.md`) ensures consistent composition.
+2. **Model name injection**: The platform automatically replaces the token `__INJECT_MODEL_NAME__` across prompts with the model identifier configured in `definition.json`.
+3. **Contract hashing**: The platform computes a cryptographic hash of specialist prompt contracts and injects it into execution frames, ensuring specialists adhere to the exact boundary expectations declared by the orchestrator.
+4. **Nested subagent recursion**: If a specialist declares nested subagents in its configuration, the resolver recurses through the hierarchy, hydrating each child agent according to the same rules.
+
+## Procedural skills and tools
+
+Agent packs distinguish between always-on prompt instructions and on-demand capabilities:
+
+### Procedural skills
+
+A **skill** is a standardized Markdown document (`SKILL.md`) describing a complex procedure, operational workflow, or reference guide. 
+
+Instead of cluttering the agent's base system prompt with rarely used instructions, skills are placed in `agents/<node-id>/skills/<skill-name>/`. The agent discovers available skills at startup and loads full instructions into its working memory on demand using a built-in `load_skill` tool.
+
+### Local tools and binaries
+
+Executable tools are placed in `agents/<node-id>/tools/`. When an agent calls a tool, the runtime executes the binary or script within the sandbox container. 
+
+Tool executables can call shared utility binaries packaged in the pack's `bin/` directory, which the platform automatically adds to the system path (`AGENT_SDK_TOOLS_BIN_DIR`).
+
+## Standing Pack Servers
+
+Pack definitions and content are served by a standing, stateless cluster deployment (such as `builders-serve` or `code-builders-serve`):
+
+- **Always running**: The pack server runs continuously in the cluster to answer discovery requests, serve the pack catalog, and hydrate definitions.
+- **Serves definitions and tools**: Answers `GET /packs/:pack/session/:id/definition` with the hydrated agent graph and streams pack files via `GET /packs/:pack/content`.
+- **Zero user code execution**: The pack server never executes user code, runs no Python agent runtime, and holds no user sessions. Execution is strictly decoupled and delegated to on-demand [Sandboxes](/documentation/agentic/sandboxes-and-execution) created when a user submits a prompt.
+
+## Validation gates
+
+The platform validates every pack before it can be built or served. A pack build fails immediately if:
+
+- An agent directory is declared with no `instructions/` directory.
+- An `instructions/` directory contains no Markdown files.
+- `definition.json` contains no nodes or is missing a required `name`.
+- A graph edge references a target node that does not exist in the definition.
+- An `inputs.md` file declares an import from `agents/shared/` that does not exist on disk.
+
+Catching these structural errors at build time prevents broken agent sessions from launching in your production sandboxes.

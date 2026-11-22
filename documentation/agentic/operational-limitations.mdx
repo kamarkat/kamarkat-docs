@@ -1,0 +1,52 @@
+---
+title: "Operational limitations"
+description: "Explicit boundaries of the agentic layer: GitOps authority, scratch persistence limits, credential containment, and collaboration deadlines."
+keywords: ["limitations", "agentic boundaries", "gitops authority", "scratch files", "deadlines", "idle timeout"]
+---
+
+> Seven operating boundaries of the agentic runtime. Each one protects system stability, security, and customer ownership.
+
+## Agents cannot mutate platform infrastructure directly
+
+Software agents in Kamarkat have no authority to create cloud resources, modify cluster networking, or bypass your GitOps repository. 
+
+When an agent proposes an infrastructure change, it generates a pull request or updates a declarative manifest in your GitOps repository. Your standard review policies, approval gates, and platform controllers reconcile the change. The platform provides no backchannel for agents to mutate infrastructure imperatively.
+
+## Files outside the declared workspaces are ephemeral
+
+A sandbox pod mounts its root filesystem as ephemeral storage. Only files written inside the explicitly designated workspace directories are captured by the platform's sync sidecars:
+
+- Files in `/workspace` are preserved in your session checkpoint.
+- Files in `/workspace/.global` are preserved in the app-shared checkpoint.
+
+Any tool, script, or binary that writes temporary files outside these paths (such as `/tmp`, `/root`, or `/var`) will lose those files when the pod terminates or restarts.
+
+## Reader scratch files in shared workspaces do not survive refreshes
+
+When an agent pack declares `shared_workspace: "read-only"`, its container mounts `/workspace/.global` as an atomic generation link. 
+
+If a reader process writes local scratch files into `/workspace/.global`, those writes exist only in the active generation directory. The next time the runtime triggers a turn refresh, the sidecar downloads the newer checkpoint and atomically repoints the symlink, cleanly discarding any uncommitted reader scratch writes.
+
+## Workloads cannot call cloud provider APIs directly
+
+Workload containers running inside sandboxes hold zero cloud provider credentials. They have no AWS IAM roles, GCP service account keys, or object storage access tokens. 
+
+An agent cannot make direct API calls to provision S3 buckets, alter security groups, or access customer databases outside declared platform capabilities. All storage operations must route through the platform's loopback sync sidecars.
+
+## A2A routing resolves to the newest active session
+
+When an agent calls another pack over the A2A protocol, the platform gateway routes the task to the **newest active session** of the target pack for that user. 
+
+If multiple sessions of a target pack exist simultaneously, the task does not fan out across all sessions. It delivers to the latest active session. If an application requires isolated, parallel task workers, each worker should be declared as an independent specialist or dynamic subagent within the pack.
+
+## Inactive tasks expire after 24 hours
+
+Tasks coordinated across packs are not indefinite background queues. If a task remains in `WORKING` or `INPUT_REQUIRED` for more than 24 hours without an update, the platform gateway automatically cancels the task with a deadline expiration code and notifies the requester. 
+
+Workloads requiring multi-day batch processing should be declared as standard application workloads rather than interactive agent sessions.
+
+## Content changes require pack re-deployment
+
+Agent packs are immutable data images. Modifying a system prompt, adding a skill, or updating a tool script in your source repository does not hot-reload active sandbox pods.
+
+To deploy prompt or tool updates to your box, you commit the changes, build the new content image, and update the pack reference in your GitOps repository. Running sandboxes continue executing on their existing definition until their lease expires.

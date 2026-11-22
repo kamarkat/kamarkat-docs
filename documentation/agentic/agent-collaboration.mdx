@@ -1,0 +1,78 @@
+---
+title: "Agent collaboration"
+description: "Cross-pack collaboration over the open A2A protocol: Agent Cards, Task lifecycles, gateway routing, and push-based notifications."
+keywords: ["agent collaboration", "A2A", "Agent Card", "Task lifecycle", "A2A gateway", "push notifications", "cross-pack"]
+---
+
+> Cross-pack collaboration uses the open Agent-to-Agent (A2A 1.0) standard. The platform gateway routes tasks, manages state, and wakes sleeping sandboxes.
+
+In complex platforms, no single agent handles every operational concern. A code-building agent may need database credentials from an infrastructure agent, or a deployment specialist may require brand guidelines from a marketing agent.
+
+Kamarkat coordinates cross-pack collaboration using the open **Agent-to-Agent (A2A 1.0)** protocol. Instead of maintaining proprietary messaging APIs or direct point-to-point network links between sandboxes, the platform acts as an authorized A2A Gateway and centralized Task Store.
+
+## The A2A architecture
+
+```
+[Requesting Sandbox] (Pack A)
+     │
+     │ 1. SendMessage(Task, PushConfig)
+     ▼
+[Platform A2A Gateway] (Central Gateway & Task Store)
+     │
+     │ 2. Validates access & records Task (SUBMITTED)
+     │ 3. Wakes target sandbox if idle
+     ▼
+[Target Sandbox] (Pack B)
+     │
+     │ 4. Executes requested skill (WORKING)
+     │ 5. Saves changes to shared workspace
+     │ 6. Posts completion update to Gateway
+     ▼
+[Platform A2A Gateway]
+     │
+     │ 7. Updates Task (COMPLETED)
+     │ 8. Pushes notification to Requesting Session's inbox
+     ▼
+[Requesting Sandbox] (Woken and resumes with completed Artifact)
+```
+
+## Agent Cards and declarations
+
+An agent pack publishes its available collaboration capabilities by declaring an `a2a` block in its `definition.json`:
+
+- **Card metadata**: Declares the public name, description, and protocol version of the agent.
+- **Skills (`AgentSkill`)**: Explicitly enumerates the callable skills the pack exposes to other agents, including input parameters, output schemas, tags, and illustrative usage examples.
+- **Access control**: Declares which other application packs within your tenant are permitted to discover and invoke its skills.
+
+The platform automatically compiles this block into a standardized **Agent Card** (`agent-card.json`) served at `/a2a/apps/{appId}/packs/{pack}/agent-card.json`. Cards are assembled deterministically from the pack's versioned declaration, preventing documentation drift.
+
+## The Task lifecycle
+
+A collaboration request represents a tracked unit of work called a **Task**. Tasks progress through standard A2A state transitions:
+
+| Task State | Description |
+| :--- | :--- |
+| `SUBMITTED` | The request has been validated and recorded by the gateway; awaiting target execution. |
+| `WORKING` | The target agent has accepted the task and is actively executing the skill. |
+| `INPUT_REQUIRED` | The target agent paused to ask a clarifying question or request additional user input. |
+| `COMPLETED` | The target finished the work and produced the requested artifacts. |
+| `FAILED` | Execution encountered an unrecoverable error; includes the diagnostic reason. |
+| `CANCELED` | The task was cancelled by the requester or expired due to the platform deadline. |
+
+Because task state is managed centrally by the platform gateway in PostgreSQL, task lifecycles survive container restarts, node rebalancing, and sleeping sandboxes.
+
+## Routing and sandbox wake-up
+
+Sandboxes execute in isolated namespaces and cannot directly address each other over the network. The platform gateway mediates all cross-pack interactions:
+
+1. **Sub-path routing**: The requesting agent sends a standard JSON-RPC `SendMessage` call to the gateway endpoint.
+2. **Authorization check**: The gateway verifies that the requester holds permission to invoke the requested skill.
+3. **Session discovery and wake**: The gateway identifies the newest active session for the target pack. If the target sandbox is asleep (terminated due to idle timeout), the platform provisions a fresh sandbox, restores its workspace, and delivers the task.
+4. **Push notifications**: Rather than requiring the requesting agent to poll continuously, the gateway accepts a push notification configuration. When the target agent updates the task, the gateway pushes the update directly into the requesting session's inbox.
+5. **Turn save coordination**: If the target agent wrote shared files during task execution, the gateway releases the task answer to the requester **only after** the target's workspace checkpoint has confirmed in object storage. The requesting agent never wakes up before the data it asked for is safely durable.
+
+## Task deadlines
+
+To prevent orphaned or abandoned tasks from consuming platform resources indefinitely, the gateway enforces a strict **24-hour deadline**. 
+
+If a task remains in `WORKING` or `INPUT_REQUIRED` for more than 24 hours without progress, the gateway issues a formal `CancelTask` command, marks the task as `CANCELED`, and pushes the cancellation notice back to the requester.

@@ -107,6 +107,18 @@
               "documentation/upgrades/rollback-and-reversibility",
               "documentation/upgrades/operational-limitations"
             ]
+          },
+          {
+            "group": "Agentic operations",
+            "pages": [
+              "documentation/agentic/overview",
+              "documentation/agentic/core-concepts",
+              "documentation/agentic/agent-packs",
+              "documentation/agentic/sandboxes-and-execution",
+              "documentation/agentic/workspace-persistence",
+              "documentation/agentic/agent-collaboration",
+              "documentation/agentic/operational-limitations"
+            ]
           }
         ]
       },

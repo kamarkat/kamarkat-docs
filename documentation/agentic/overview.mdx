@@ -1,0 +1,90 @@
+---
+title: "Overview"
+description: "Agentic execution inside your own cloud infrastructure. How Kamarkat runs declared agent packs in isolated sandboxes with durable workspaces and protocol-based collaboration."
+keywords: ["agentic", "agent packs", "sandboxes", "ephemeral compute", "workspace persistence", "A2A"]
+---
+
+> Software agents are participants in your platform, not an independent control plane.
+
+Running software agents in production requires more than an LLM API key. Real agentic workflows write files, run tools, call specialists, and retain memory across multi-turn interactions. Without a platform foundation, engineering teams assemble brittle custom scaffolding: unmanaged container runners, manual storage synchronization, and loose credential exposure.
+
+Kamarkat provides a native execution runtime for agentic workloads directly inside your cloud infrastructure. You declare agent definitions, system instructions, and tools as versioned content; your platform provisions isolated sandboxes, manages turn-by-turn workspace persistence, and coordinates cross-agent collaboration over open protocols.
+
+## What this solves
+
+Building custom infrastructure for software agents introduces four operational failures:
+
+- **State loss across turns**: Containers restart, scale down, or crash between turns. Scratch files, compiled artifacts, and tool outputs disappear unless teams build custom persistence hooks into application logic.
+- **Credential leakage into sandboxes**: Granting agents direct access to cloud object storage or databases risks accidental credential exfiltration through model execution or third-party tools.
+- **Fragmented delivery and runtime forks**: When each agent product writes its own serving endpoints, Dockerfiles, and deployment scripts, runtime fixes and prompt improvements fragment across multiple repositories.
+- **Unmanaged agent-to-agent communication**: As agents multiply, they need to request data from specialists across different applications without ad-hoc HTTP endpoints, custom polling, or unauthenticated backchannels.
+
+Kamarkat resolves these challenges by making agent execution a native platform capability, governed by the same declarative contracts that manage your applications and clusters.
+
+## Three platform invariants
+
+The agentic layer adheres strictly to three architectural boundaries:
+
+1. **Declarative desired state remains authoritative**: Agents read platform state and propose changes through version control declarations. Agents never bypass GitOps to mutate cloud infrastructure directly.
+2. **Agent content is separated from the serving runtime**: An agent pack is pure data—declarations, prompt fragments, tools, and skills. The platform ships and maintains the serving runtime and execution engine.
+3. **Business ownership and credential containment**: Sandboxes execute on your managed clusters. Workload containers never receive cloud provider or object storage credentials; platform sidecars mediate storage and egress.
+
+## How it works
+
+```
+[Agent Pack] (Immutable content: definition, prompts, tools, skills)
+     │
+     ▼
+[Standing Pack Server] (Always running: hydrates definitions, streams tools)
+     │
+     │ On Prompt Submission (Strictly on demand)
+     ▼
+[Managed Cluster Sandbox] (Isolated pod with pod-bound identity)
+     ├── Execution Engine (Runs Star, Composite, or Acrylic graph)
+     ├── Tool Binaries & Procedural Skills
+     └── Loopback Persistence (7070 / 7071)
+             │
+             ▼
+     [Sync Sidecar] ──► Customer Object Storage (Checkpoints & Atomic Refreshes)
+```
+
+1. **You author an agent pack**: You organize agent topologies, prompts, and tools into a standardized pack directory and commit it to your repository.
+2. **Standing pack servers serve the catalog**: Standing stateless deployments inside the cluster (such as `code-builders-serve` or `builders-serve`) run continuously to serve definitions, agent DAGs, and tool binaries. They do not run user code or hold user sessions.
+3. **Sandboxes provision strictly on demand**: Attaching a pack in the UI attaches its badge without consuming cluster compute. When you submit your prompt, the platform provisions an isolated Sandbox Pod, mounts your persistent workspace, pulls tools from the pack server, and executes the turn.
+4. **Platform sidecars persist workspace state**: As agents execute turns, native sidecars capture file changes to your object storage and provide zero-downtime atomic refreshes for shared workspaces.
+5. **Idle sandboxes clean up and resurrect transparently**: After 15 minutes of inactivity, the platform terminates the pod after a teardown checkpoint. Sending a new message later spins up a fresh sandbox and mounts your persistent workspace right back up.
+6. **The platform routes agent collaboration**: When agents need capabilities from another pack, the platform coordinates requests over the open A2A protocol.
+
+## Who does what
+
+| Responsibility | Kamarkat | You |
+| :--- | :---: | :---: |
+| Ship and update the agent execution engine and serving runtime | ✅ | |
+| Define agent prompts, tools, skills, and graph topologies | | ✅ |
+| Provision ephemeral sandboxes and enforce pod security contexts | ✅ | |
+| Own the cloud account, compute capacity, and storage buckets | | ✅ |
+| Synchronize session and shared workspaces at turn boundaries | ✅ | |
+| Declare which applications and agents may collaborate | | ✅ |
+
+## The pages that follow
+
+<CardGroup cols={2}>
+  <Card title="Core concepts" icon="book" href="/documentation/agentic/core-concepts">
+    The essential vocabulary: Agent Packs, Sandboxes, Stateful Specialists, Turn Sync, and A2A.
+  </Card>
+  <Card title="Agent packs" icon="box-archive" href="/documentation/agentic/agent-packs">
+    Separation of content from runtime, declarative topologies (Star, Composite, Acrylic), and prompt hydration.
+  </Card>
+  <Card title="Sandboxes and execution" icon="cube" href="/documentation/agentic/sandboxes-and-execution">
+    Ephemeral compute lifecycle, lease-based routing, identity tokens, and isolation boundaries.
+  </Card>
+  <Card title="Workspace persistence" icon="floppy-disk" href="/documentation/agentic/workspace-persistence">
+    Session scratchpads, app-shared workspaces, sidecar checkpointing, and atomic turn refreshes.
+  </Card>
+  <Card title="Agent collaboration" icon="network-wired" href="/documentation/agentic/agent-collaboration">
+    Open A2A protocol integration, Agent Cards, Task lifecycles, and gateway routing.
+  </Card>
+  <Card title="Operational limitations" icon="shield-halved" href="/documentation/agentic/operational-limitations">
+    Runtime limits, lease expirations, retention policies, and architectural boundaries.
+  </Card>
+</CardGroup>

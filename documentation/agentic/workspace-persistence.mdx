@@ -1,0 +1,111 @@
+---
+title: "Workspace persistence"
+description: "Turn-based workspace durability: session scratchpads, app-shared workspaces, sidecar checkpointing, and atomic zero-downtime refresh."
+keywords: ["workspace persistence", "workspace-sync", "session workspace", "shared workspace", "turn sync", "checkpoints", "atomic refresh"]
+---
+
+> Workloads never touch object storage credentials. Platform sidecars synchronize files on loopback at turn boundaries.
+
+When an agent edits source code, downloads documentation, or produces reports, those files live in the sandbox filesystem. If the sandbox pod is evicted, rebalanced, or shut down for idle timeout, any unpersisted files disappear.
+
+Kamarkat provides automated, credential-safe workspace persistence. Files written by agents are captured and stored in your customer-owned object storage, allowing a later sandbox session to resume exactly where the previous session ended.
+
+## The dual workspace model
+
+Inside every sandbox, the filesystem separates active task scratchpads from application-wide domain data:
+
+```text
+/workspace/                # Session Workspace: the active task scratchpad
+└── .global/               # App-Shared Workspace: shared domain and brand data
+└── .builder/
+    └── scratch/           # Ephemeral scratchpad for compaction and evicted tool outputs
+```
+
+### 1. Session workspace (`/workspace`)
+
+The **session workspace** is the scratchpad for a single user task. 
+
+When you enable persistence for a session, the platform mounts a durable volume at `/workspace`. Changes are captured to your object storage under the application and session prefix. When the user returns to the same session, the platform restores the latest checkpoint before the first agent turn begins.
+
+### 2. App-shared workspace (`/workspace/.global`)
+
+The **app-shared workspace** holds data shared across all sessions of an application (such as brand assets, templates, shared database schemas, or common configuration files).
+
+- **Writers**: An agent pack can declare `shared_workspace: true` to author shared state.
+- **Readers**: Other agent packs declare `shared_workspace: "read-only"` to consume this data without risking accidental modification or corruption.
+
+## Credential-safe sidecar architecture
+
+Directly injecting cloud storage credentials (such as AWS S3 or MinIO access keys) into an agent container introduces serious security risks. An agent executing arbitrary code or untrusted tools could inadvertently log, leak, or exfiltrate storage keys.
+
+To eliminate this vulnerability, Kamarkat isolates storage credentials inside a dedicated **sync sidecar** container (`workspace-sync`):
+
+```
+┌────────────────────────────────────────────────────────┐
+│ Sandbox Pod                                            │
+│                                                        │
+│  ┌───────────────────────┐   HTTP Loopback             │
+│  │ Workload Container    │   (127.0.0.1:7070 / 7071)   │
+│  │ (Agent Engine & Tools)│ ──────────────────────────┐ │
+│  │ Holds NO credentials  │                           │ │
+│  └───────────────────────┘                           ▼ │
+│                                         ┌─────────────────────┐
+│                                         │ Sync Sidecar        │
+│                                         │ Holds storage keys  │
+│                                         └──────────┬──────────┘
+└────────────────────────────────────────────────────┼───┘
+                                                     │ S3 API
+                                                     ▼
+                                      [Customer Object Storage]
+```
+
+- The workload container holds **zero object storage credentials**.
+- The sync sidecar holds the cloud storage secret and listens strictly on loopback interfaces (`127.0.0.1:7070` for session storage and `127.0.0.1:7071` for shared storage).
+- The agent runtime issues local HTTP requests (`POST /checkpoint` or `POST /refresh`) to request saves and updates.
+
+## Turn synchronization (Turn Sync)
+
+A persistent workspace must not change underneath an agent while it is executing a turn, and an agent should not release answers to users before its file changes are securely stored.
+
+When a pack enables `shared_workspace_turn_sync`, the platform synchronizes state at explicit turn boundaries:
+
+### Writer turn-end checkpoint
+
+When an agent completes a turn (or pauses to ask the user a question):
+
+1. The execution engine issues `POST /checkpoint` to the local sync sidecar on port `7071`.
+2. The sidecar computes a cryptographic manifest of files in the workspace.
+3. If files have changed, the sidecar compresses the delta, uploads the archive to your object storage, and updates the `LATEST` pointer. If the tree is unchanged, the sidecar immediately reports `skipped: "unchanged"`.
+4. The agent runtime releases its message or response to the user **only after** the checkpoint confirmation is received.
+
+### Reader turn-start atomic refresh
+
+When an agent session acts as a reader of the shared workspace, it must observe updates made by writer sessions without experiencing torn reads or mid-turn file mutation:
+
+1. Before an agent turn begins, the runtime issues `POST /refresh` to the sidecar.
+2. The sidecar inspects the `LATEST` pointer in object storage. If a newer checkpoint exists, it restores the archive into an adjacent generation directory (`.global-gen/<n+1>`).
+3. The sidecar adjusts filesystem ownership to UID 1000 (the workload user).
+4. The sidecar atomically repoints the `/workspace/.global` symlink to the new generation directory using an atomic `rename(2)` system call.
+5. The agent executes its turn against the updated generation. Files opened by prior processes continue reading from the previous generation until closed, ensuring zero downtime and zero mid-turn file corruption.
+
+## Teardown checkpoints
+
+When a sandbox receives a termination signal (`SIGTERM`) due to idle timeout reclamation or cluster rebalancing:
+
+1. The platform gives the pod a graceful shutdown window.
+2. The sync sidecar immediately stops accepting new requests.
+3. The sidecar executes a final **teardown checkpoint**, uploading all uncommitted workspace changes to object storage.
+4. The container exits cleanly.
+
+Because teardown persistence is bounded by a dedicated timeout budget, work completed by the agent is preserved even during node drains and cluster maintenance.
+
+## Context compaction and evicted artifacts
+
+Large agent runs can produce voluminous tool outputs (such as massive test logs, raw API dumps, or multi-megabyte files) that exceed model context windows.
+
+The execution engine automatically evicts oversized tool outputs and summarizes older conversation threads. Evicted data is written to a designated artifacts root inside the sandbox (`/workspace/.builder/scratch/`):
+
+- **`conversation_history/`**: Offloaded prior turns that have been summarized.
+- **`large_tool_results/`**: Truncated tool outputs stored safely on disk.
+
+Agents retain pointers to these files and can inspect specific slices on demand using standard file tools (`read_file`, `grep`), preventing context window overflow while preserving complete diagnostic history.

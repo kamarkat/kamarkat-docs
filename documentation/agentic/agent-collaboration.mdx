@@ -12,29 +12,20 @@ Kamarkat coordinates cross-pack collaboration using the open **Agent-to-Agent (A
 
 ## The A2A architecture
 
-```
-[Requesting Sandbox] (Pack A)
-     │
-     │ 1. SendMessage(Task, PushConfig)
-     ▼
-[Platform A2A Gateway] (Central Gateway & Task Store)
-     │
-     │ 2. Validates access & records Task (SUBMITTED)
-     │ 3. Wakes target sandbox if idle
-     ▼
-[Target Sandbox] (Pack B)
-     │
-     │ 4. Executes requested skill (WORKING)
-     │ 5. Saves changes to shared workspace
-     │ 6. Posts completion update to Gateway
-     ▼
-[Platform A2A Gateway]
-     │
-     │ 7. Updates Task (COMPLETED)
-     │ 8. Pushes notification to Requesting Session's inbox
-     ▼
-[Requesting Sandbox] (Woken and resumes with completed Artifact)
-```
+<Steps>
+  <Step title="Request">
+    The requesting agent's sandbox sends a task to the platform's A2A gateway, with where to deliver the result.
+  </Step>
+  <Step title="Validate and record">
+    The gateway checks that the requester may call the skill, records the task as `SUBMITTED`, and wakes the target sandbox if it is idle.
+  </Step>
+  <Step title="Execute">
+    The target agent runs the requested skill (`WORKING`), saves its changes to the shared workspace, and posts its completion to the gateway.
+  </Step>
+  <Step title="Deliver">
+    The gateway marks the task `COMPLETED` and pushes a notification to the requesting session's inbox. The requesting sandbox wakes and resumes with the completed artifact.
+  </Step>
+</Steps>
 
 ## Agent Cards and declarations
 

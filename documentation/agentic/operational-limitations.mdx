@@ -29,9 +29,9 @@ If a reader process writes local scratch files into `/workspace/.global`, those 
 
 ## Workloads cannot call cloud provider APIs directly
 
-Workload containers running inside sandboxes hold zero cloud provider credentials. They have no AWS IAM roles, GCP service account keys, or object storage access tokens. 
+Workload containers running inside sandboxes hold zero cloud provider credentials. They have no cloud provider roles, service account keys, or object storage access tokens. 
 
-An agent cannot make direct API calls to provision S3 buckets, alter security groups, or access customer databases outside declared platform capabilities. All storage operations must route through the platform's loopback sync sidecars.
+An agent cannot make direct API calls to provision storage buckets, alter security groups, or access customer databases outside declared platform capabilities. All storage operations must route through the platform's loopback sync sidecars.
 
 ## A2A routing resolves to the newest active session
 

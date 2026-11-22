@@ -1,7 +1,7 @@
 ---
 title: "Workspace persistence"
 description: "Turn-based workspace durability: session scratchpads, app-shared workspaces, sidecar checkpointing, and atomic zero-downtime refresh."
-keywords: ["workspace persistence", "workspace-sync", "session workspace", "shared workspace", "turn sync", "checkpoints", "atomic refresh"]
+keywords: ["workspace persistence", "sync sidecar", "session workspace", "shared workspace", "turn sync", "checkpoints", "atomic refresh"]
 ---
 
 > Workloads never touch object storage credentials. Platform sidecars synchronize files on loopback at turn boundaries.
@@ -36,28 +36,29 @@ The **app-shared workspace** holds data shared across all sessions of an applica
 
 ## Credential-safe sidecar architecture
 
-Directly injecting cloud storage credentials (such as AWS S3 or MinIO access keys) into an agent container introduces serious security risks. An agent executing arbitrary code or untrusted tools could inadvertently log, leak, or exfiltrate storage keys.
+Directly injecting cloud storage credentials (such as object storage access keys) into an agent container introduces serious security risks. An agent executing arbitrary code or untrusted tools could inadvertently log, leak, or exfiltrate storage keys.
 
-To eliminate this vulnerability, Kamarkat isolates storage credentials inside a dedicated **sync sidecar** container (`workspace-sync`):
+To eliminate this vulnerability, Kamarkat isolates storage credentials inside a dedicated **sync sidecar** container:
 
-```
-┌────────────────────────────────────────────────────────┐
-│ Sandbox Pod                                            │
-│                                                        │
-│  ┌───────────────────────┐   HTTP Loopback             │
-│  │ Workload Container    │   (127.0.0.1:7070 / 7071)   │
-│  │ (Agent Engine & Tools)│ ──────────────────────────┐ │
-│  │ Holds NO credentials  │                           │ │
-│  └───────────────────────┘                           ▼ │
-│                                         ┌─────────────────────┐
-│                                         │ Sync Sidecar        │
-│                                         │ Holds storage keys  │
-│                                         └──────────┬──────────┘
-└────────────────────────────────────────────────────┼───┘
-                                                     │ S3 API
-                                                     ▼
-                                      [Customer Object Storage]
-```
+<div className="arch-sys not-prose">
+  <div className="arch-group arch-group-managed">
+    <span className="arch-label">Sandbox pod</span>
+    <div className="arch-row">
+      <div className="arch-box"><span className="arch-icon"><Icon icon="gears" /></span><span><strong>Workload container</strong><span className="arch-muted">Agent engine and tools. Holds no credentials</span></span></div>
+    </div>
+    <div className="arch-inline-wire"><span className="arch-wire"></span><span className="arch-wire-label">Loopback HTTP: checkpoint and refresh, on ports 7070 and 7071</span></div>
+    <div className="arch-row">
+      <div className="arch-box"><span className="arch-icon"><Icon icon="rotate" /></span><span><strong>Sync sidecar</strong><span className="arch-muted">Holds the object storage credential</span></span></div>
+    </div>
+  </div>
+  <div className="arch-inline-wire"><span className="arch-wire"></span><span className="arch-wire-label">Object storage API</span></div>
+  <div className="arch-group">
+    <span className="arch-label">Your object storage</span>
+    <div className="arch-row">
+      <div className="arch-box"><span className="arch-icon arch-icon-neutral"><Icon icon="floppy-disk" /></span><span><strong>Workspace checkpoints</strong><span className="arch-muted">Under the application and session prefix</span></span></div>
+    </div>
+  </div>
+</div>
 
 - The workload container holds **zero object storage credentials**.
 - The sync sidecar holds the cloud storage secret and listens strictly on loopback interfaces (`127.0.0.1:7070` for session storage and `127.0.0.1:7071` for shared storage).

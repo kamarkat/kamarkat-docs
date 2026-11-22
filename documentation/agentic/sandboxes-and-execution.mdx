@@ -1,7 +1,7 @@
 ---
 title: "Sandboxes and execution"
 description: "Ephemeral compute lifecycle on managed clusters: lease-based session routing, pod security contexts, cryptographic identity tokens, and the in-pod execution engine."
-keywords: ["sandboxes", "ephemeral compute", "lease-based routing", "pod security context", "identity review", "agent runtime", "LangGraph"]
+keywords: ["sandboxes", "ephemeral compute", "lease-based routing", "pod security context", "identity review", "agent runtime"]
 ---
 
 > Sandboxes provide isolated, ephemeral compute for agent sessions with strict credential containment and lease-based lifecycles.
@@ -16,50 +16,36 @@ Kamarkat strictly separates the static catalog and definition service from dynam
 
 | Layer | Component | Lifecycle | Responsibility |
 | :--- | :--- | :--- | :--- |
-| **Pack Server** | `builders-serve`, `code-builders-serve` | **Always running** (Standing deployment) | Serves the pack catalog, tool definitions, agent DAGs (`definition.json`), and prompt files. Does **not** run user code and holds no user sessions. |
+| **Pack Server** | Standing deployment | **Always running** | Serves the pack catalog, tool definitions, agent DAGs (`definition.json`), and prompt files. Does **not** run user code and holds no user sessions. |
 | **Session Sandbox** | Ephemeral Pod | **Provisioned strictly on demand** | Executes agent code, tools, the Python runtime, and mounts `/workspace`. Reclaimed on inactivity. |
 
 ### The on-demand execution lifecycle
 
-```
-1. User clicks "Attach Pack" (UI)
-   └── Attaches badge ([Code Builder]), focuses Preview tab
-   └── NO Pod is provisioned (zero idle compute consumption)
-         │
-         ▼
-2. User submits prompt (or pack router delegates)
-         │
-         ▼
-3. Platform checks database registry (sandbox_registry)
-   ├── [Pod Alive & Lease Valid?] ──YES──► 5. Route directly to existing Pod
-   └── NO
-         │
-         ▼
-4. Dynamically provision Sandbox Pod
-   ├── Provisions via platform Kubernetes client
-   ├── Mounts app's persistent /workspace volume
-   ├── Pulls tools and definition from standing Pack Server
-   ├── Registers Pod in database registry
-   └── Starts workspace-sync sidecars and execution engine
-         │
-         ▼
-5. Route message to in-pod execution engine (SSE stream)
-   └── Subsequent turns in conversation reuse running Pod
-         │
-         ▼
-6. Inactivity cleanup (15-minute lease expiration)
-   ├── Takes final teardown workspace checkpoint
-   └── Terminates Pod cleanly
-         │
-         ▼
-7. User returns later and sends message ──► Loops back to Step 3 (Resurrection)
-   └── Fresh Pod provisioned; persistent workspace remounted seamlessly
-```
+<Steps>
+  <Step title="Attach a pack">
+    Attaching a pack to a session provisions nothing, so no compute is used while a user reads or composes a prompt.
+  </Step>
+  <Step title="Submit a prompt">
+    When a prompt arrives, or an orchestrator delegates to the pack, the platform looks up the session's sandbox in its registry.
+  </Step>
+  <Step title="Route or provision">
+    A live sandbox with a valid lease receives the message directly. Otherwise the platform provisions one: it mounts the application's persistent `/workspace` volume, pulls tools and the definition from the pack server, registers the pod, and starts the sync sidecars and the execution engine.
+  </Step>
+  <Step title="Run turns">
+    The message streams to the in-pod execution engine. Later turns in the same conversation reuse the running pod.
+  </Step>
+  <Step title="Release when idle">
+    When the lease expires, typically after 15 minutes without a message, the platform takes a final workspace checkpoint and terminates the pod.
+  </Step>
+  <Step title="Resume">
+    A later message starts again from the registry lookup. A fresh sandbox is provisioned and the persistent workspace is remounted.
+  </Step>
+</Steps>
 
 ### 1. Attaching a pack vs. submitting a prompt
 
-- **Selecting a pack in the UI**: When you click an action like "Attach Code Builder", the interface attaches the pack badge (`[App Builder]` or `[Code Builder]`) to your chat input and brings the corresponding preview tab into focus. Crucially, **no Kubernetes Pod is provisioned at this moment**. This avoids consuming cluster CPU and memory while a user reads or composes a prompt.
-- **Submitting a prompt**: The moment you submit your message (or when an orchestrator delegates to that pack), the platform SDK checks `sandbox_registry` in the database. Only then is compute provisioned.
+- **Attaching a pack**: Attaching a pack to a session marks which pack will handle its prompts. **No Kubernetes Pod is provisioned at this moment**, which avoids consuming cluster CPU and memory while a user reads or composes a prompt.
+- **Submitting a prompt**: The moment you submit your message (or when an orchestrator delegates to that pack), the platform SDK checks its sandbox registry. Only then is compute provisioned.
 
 ### 2. On-demand provisioning and workspace remounting
 
@@ -74,7 +60,7 @@ If no active sandbox is found for the session:
 
 Sandboxes do not run indefinitely:
 - **Idle timeout**: If a session sits idle without new messages (governed by the lease expiration, typically 15 minutes), the platform controller initiates a graceful shutdown.
-- **Teardown preservation**: The `workspace-sync` sidecar captures a final teardown snapshot of `/workspace` before the pod terminates, ensuring no uncommitted files are lost.
+- **Teardown preservation**: The sync sidecar captures a final teardown snapshot of `/workspace` before the pod terminates, ensuring no uncommitted files are lost.
 - **Transparent resurrection**: If you return to the conversation hours or days later and send another message, the SDK detects the expired lease, spins up a fresh Sandbox Pod, and mounts your persistent workspace right back up. The agent resumes with full access to previously generated files.
 
 ## Security contexts and containment
@@ -85,7 +71,7 @@ Sandboxes execute on your managed clusters under restricted security contexts:
 | :--- | :--- | :--- |
 | **User privilege** | `runAsNonRoot: true` (UID 1000) | Prevents in-sandbox processes from executing as root or escalating privileges. |
 | **Linux capabilities** | `capabilities: { drop: ["ALL"] }` | Strips all Linux capabilities from the container. |
-| **Credential containment** | No cloud credentials injected | Workload containers hold zero AWS, GCP, Azure, or object storage keys. |
+| **Credential containment** | No cloud credentials injected | Workload containers hold no cloud provider or object storage keys. |
 | **Storage isolation** | Mediated loopback sidecars | Access to object storage is mediated exclusively through local sidecars on loopback. |
 | **Egress gating** | Strict network boundaries | Outbound network requests pass through platform egress proxies, restricting traffic to declared endpoints. |
 
@@ -112,7 +98,7 @@ Requests with missing, forged, or mismatched tokens are rejected immediately.
 
 ## The in-pod execution engine
 
-Inside the sandbox, a dedicated Python LangGraph execution engine manages the agent lifecycle:
+Inside the sandbox, a dedicated Python graph execution engine manages the agent lifecycle:
 
 - **Graph execution**: Builds the state machine declared by the pack's topology (Star, Composite, or Acrylic).
 - **Tool invocation**: Executes local tools and procedural skills against the real filesystem or in-memory state.

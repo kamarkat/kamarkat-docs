@@ -31,25 +31,38 @@ The agentic layer adheres strictly to three architectural boundaries:
 
 ## How it works
 
-```
-[Agent Pack] (Immutable content: definition, prompts, tools, skills)
-     │
-     ▼
-[Standing Pack Server] (Always running: hydrates definitions, streams tools)
-     │
-     │ On Prompt Submission (Strictly on demand)
-     ▼
-[Managed Cluster Sandbox] (Isolated pod with pod-bound identity)
-     ├── Execution Engine (Runs Star, Composite, or Acrylic graph)
-     ├── Tool Binaries & Procedural Skills
-     └── Loopback Persistence (7070 / 7071)
-             │
-             ▼
-     [Sync Sidecar] ──► Customer Object Storage (Checkpoints & Atomic Refreshes)
-```
+<div className="arch-sys not-prose">
+  <div className="arch-group">
+    <span className="arch-label">Your repositories</span>
+    <div className="arch-row">
+      <div className="arch-box"><span className="arch-icon arch-icon-neutral"><Icon icon="box-archive" /></span><span><strong>Agent pack</strong><span className="arch-muted">Definition, prompts, tools and skills, as a versioned content image</span></span></div>
+    </div>
+  </div>
+  <div className="arch-inline-wire"><span className="arch-wire"></span><span className="arch-wire-label">Referenced from your GitOps repository</span></div>
+  <div className="arch-group arch-group-managed">
+    <span className="arch-label">Your managed cluster</span>
+    <div className="arch-row">
+      <div className="arch-box"><span className="arch-icon"><Icon icon="server" /></span><span><strong>Pack server</strong><span className="arch-muted">Always running. Serves definitions and tools; runs no user code</span></span></div>
+    </div>
+    <div className="arch-inline-wire"><span className="arch-wire"></span><span className="arch-wire-label">On each prompt, strictly on demand</span></div>
+    <span className="arch-label">Sandbox</span>
+    <div className="arch-row">
+      <div className="arch-box"><span className="arch-icon"><Icon icon="gears" /></span><span><strong>Execution engine</strong><span className="arch-muted">Runs the pack's Star, Composite or Acrylic graph</span></span></div>
+      <div className="arch-box"><span className="arch-icon"><Icon icon="screwdriver-wrench" /></span><span><strong>Tools and skills</strong><span className="arch-muted">Pulled from the pack server</span></span></div>
+      <div className="arch-box"><span className="arch-icon"><Icon icon="rotate" /></span><span><strong>Sync sidecar</strong><span className="arch-muted">Holds the storage credential; the workload holds none</span></span></div>
+    </div>
+  </div>
+  <div className="arch-inline-wire"><span className="arch-wire"></span><span className="arch-wire-label">Checkpoints and refreshes at turn boundaries</span></div>
+  <div className="arch-group">
+    <span className="arch-label">Your object storage</span>
+    <div className="arch-row">
+      <div className="arch-box"><span className="arch-icon arch-icon-neutral"><Icon icon="floppy-disk" /></span><span><strong>Workspaces</strong><span className="arch-muted">Session and app-shared checkpoints</span></span></div>
+    </div>
+  </div>
+</div>
 
 1. **You author an agent pack**: You organize agent topologies, prompts, and tools into a standardized pack directory and commit it to your repository.
-2. **Standing pack servers serve the catalog**: Standing stateless deployments inside the cluster (such as `code-builders-serve` or `builders-serve`) run continuously to serve definitions, agent DAGs, and tool binaries. They do not run user code or hold user sessions.
+2. **Standing pack servers serve the catalog**: A standing, stateless pack server inside the cluster runs continuously to serve definitions, agent DAGs, and tool binaries. They do not run user code or hold user sessions.
 3. **Sandboxes provision strictly on demand**: Attaching a pack in the UI attaches its badge without consuming cluster compute. When you submit your prompt, the platform provisions an isolated Sandbox Pod, mounts your persistent workspace, pulls tools from the pack server, and executes the turn.
 4. **Platform sidecars persist workspace state**: As agents execute turns, native sidecars capture file changes to your object storage and provide zero-downtime atomic refreshes for shared workspaces.
 5. **Idle sandboxes clean up and resurrect transparently**: After 15 minutes of inactivity, the platform terminates the pod after a teardown checkpoint. Sending a new message later spins up a fresh sandbox and mounts your persistent workspace right back up.

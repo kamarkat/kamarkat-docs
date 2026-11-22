@@ -39,7 +39,7 @@ The `agents/shared/` directory serves two specific purposes:
 
 ## Topologies in depth
 
-The `topology` declared in `definition.json` defines how the execution engine builds the LangGraph state machine:
+The `topology` declared in `definition.json` defines how the execution engine builds the graph's state machine:
 
 ### 1. Star topology
 
@@ -95,7 +95,7 @@ Tool executables can call shared utility binaries packaged in the pack's `bin/` 
 
 ## Standing Pack Servers
 
-Pack definitions and content are served by a standing, stateless cluster deployment (such as `builders-serve` or `code-builders-serve`):
+Pack definitions and content are served by a standing, stateless cluster deployment, the pack server:
 
 - **Always running**: The pack server runs continuously in the cluster to answer discovery requests, serve the pack catalog, and hydrate definitions.
 - **Serves definitions and tools**: Answers `GET /packs/:pack/session/:id/definition` with the hydrated agent graph and streams pack files via `GET /packs/:pack/content`.

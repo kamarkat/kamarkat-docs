@@ -30,6 +30,8 @@ Run it once per box, as the box's administrator, right after you push the manage
 | `--cluster` | The management cluster, when the repository declares more than one |
 | `--renew` | Issue a new intermediate over a new key, even though the current one is valid |
 | `--validity` | The new intermediate's lifetime. Defaults to five years, and is always cut short to the root's remaining lifetime |
+| `--compromised` | The serial number (hex) of an intermediate whose key is compromised. Runs the compromise rollover below instead of signing |
+| `--leaf-wait` | With `--compromised`: how long to wait for every certificate and the workloads using it to move to the new root. Defaults to 30 minutes |
 
 ### What it checks before it signs
 
@@ -57,3 +59,35 @@ A re-run with nothing to do prints:
 ```text
 The issuing intermediate is already signed by this box's root (valid until 2031-11-24T10:02:11Z). Nothing to do.
 ```
+
+## Recovering from a compromised intermediate
+
+Every service in the box trusts the **root**, not the intermediate. A new intermediate alone would therefore not stop them accepting certificates signed with a stolen key. The root itself is replaced instead:
+
+```bash
+kakt pki sign-intermediate --compromised 4f:1a:...:9c
+```
+
+The serial is the compromised intermediate's, as `openssl x509 -noout -serial` prints it. Naming it makes the rollover deliberate: a serial this box does not have is refused, and nothing changes.
+
+It needs the same authority as signing: you, signed in as the box's administrator, reading the root from your custody project. A machine identity is refused, and no CI or cluster identity can run it.
+
+### What it does
+
+1. **Creates a new root** in your custody project, replacing the old one, and publishes its certificate to the box escrow. The old root's key is not kept.
+2. **Signs a new intermediate** under the new root, over a new key, and makes it the issuer.
+3. **Destroys** every other issuer and its key in the box's secret store, including the compromised one.
+4. **Reissues every certificate** the secret store issued, on the management cluster and on every workload cluster, until each one trusts the new root only.
+5. **Restarts every workload** whose running pods use one of those certificates and started before it was reissued, so no running process keeps trusting the old root.
+6. **Checks** that no Secret or ConfigMap on any cluster still holds the old root.
+
+No trust in the old root is kept for compatibility.
+
+### Expect an interruption
+
+Connections between two services fail while one of them is on the new root and the other is not. That lasts until every certificate is reissued and every workload restarted, on every cluster. Run it in a maintenance window.
+
+### If it stops part-way
+
+Run the same command, with the same serial, again. It continues from where it stopped, with the same new root: it never creates a second one. While anything is still on the old root, the command lists what remains and exits with status 2. A run that has nothing left to do changes nothing.
+

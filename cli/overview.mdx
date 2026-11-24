@@ -62,13 +62,8 @@ Reading the escrowed kubeconfig gives you **cluster-admin**, because that is wha
 | `kakt tenant add-cluster` | Declare an additional managed cluster |
 | `kakt tenant set-gitops-token` | Publish the credential your application builds use |
 | `kakt bootstrap-mgmt` | Create the management cluster, as one step rather than a whole box |
-| `kakt init-secrets` | Generate the bootstrap secrets the secret store starts from |
 | `kakt configure-github-access` | Give the GitOps engine access to your repositories |
 | `kakt configure-tailscale` | Supply the auth key nodes on your own premises join with |
-
-<Warning>
-`kakt --help` also lists `configure-eso`. It is deprecated and does not belong in any procedure: running it replaces the machine identity your box authenticates with and stops every platform operator. `kakt init-secrets` creates that identity, and nothing else should write it.
-</Warning>
 
 [Boxes and clusters →](/cli/boxes-and-clusters)
 
@@ -121,7 +116,7 @@ Removing an **application** is not a command. Delete its directory under `enviro
 
 | Command | What it does |
 | :- | :- |
-| `kakt escrow init` | Create the escrow project your boxes keep their master keys in |
+| `kakt escrow init` | Create the escrow project your boxes keep their recovery material in, and the administrator-only custody project that holds the box's root CA |
 | `kakt escrow bind-destination` | Record which escrow project this box's recovery material belongs to |
 | `kakt escrow enroll-provider-credential` | Escrow the cloud credential this box was built with |
 | `kakt escrow verify` | Report which escrow artefacts exist, by fingerprint |
@@ -133,6 +128,14 @@ Removing an **application** is not a command. Delete its directory under `enviro
 | `kakt encryption rotate` | Replace a cluster's at-rest encryption key, in two stages |
 
 [Escrow and encryption →](/cli/escrow-and-encryption)
+
+### Certificate authority
+
+| Command | What it does |
+| :- | :- |
+| `kakt pki sign-intermediate` | Sign the box's issuing certificate authority with the root held in your custody project |
+
+[Certificate authority →](/cli/pki)
 
 ### Support
 

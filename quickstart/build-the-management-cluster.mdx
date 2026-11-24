@@ -19,7 +19,7 @@ kakt tenant add-management
 
 It renders `registry/clusters/acme-mgmt-1794447136/` from the box's own declaration — your domain, your escrow, your provider and region — so there is nothing to retype and nothing that can disagree with the box.
 
-It also creates the one credential you are never asked for: this box's own Infisical administrator. The password is generated, written to your escrow, and set on the repository, in that order. A later run reads the escrowed one back rather than minting a second over the live instance.
+It also creates the one key you are never asked for: the seal key of this box's own secret store. It is generated and written to your escrow. A later run finds the escrowed one and keeps it rather than minting a second.
 
 ```text
 acme-gitops-1794716111 % kakt tenant add-management
@@ -32,7 +32,7 @@ declared management cluster acme-mgmt-1794716111:
   registry/clusters/acme-mgmt-1794716111/values.yaml
   registry/clusters/acme-mgmt-1794716111/workload-clusters.yaml
 
-[box] generated this box's Infisical administrator (you@acme.example) and escrowed it
+[box] generated this box's OpenBao seal key (generation 1) and escrowed it
 
 Commit and push to build it:
   git add registry/clusters && git commit -m "Declare acme-mgmt-1794716111" && git push
@@ -58,6 +58,14 @@ git push
 `main`, and it provisions real servers — it costs money and takes hours. Review
 the declaration before you push; it is a file, and nothing has been created yet.
 </Warning>
+
+Then sign the box's certificate authority, once, as the box's administrator:
+
+```bash
+kakt pki sign-intermediate
+```
+
+Start it right after the push. It waits for the new cluster's secret store, and the build waits for it, so the box's internal certificates can be issued. What it checks and signs is in the [CLI reference](/cli/pki).
 
 Git is the source of truth. The run reads this cluster's shape — its provider,
 region and worker count — from the

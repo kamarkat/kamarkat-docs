@@ -320,17 +320,9 @@ This gives you a reconciled management cluster and no assurance about anything e
 
 Notable flags: `--workers` (how many cloud workers the management cluster runs on), `--oidc-issuer-url` with `--oidc-client-id` to name the identity provider the API server accepts tokens from, `--dry-run` to validate prerequisites and render manifests without provisioning, and `--gating` to choose whether boundaries activate in phase order or reconcile concurrently.
 
-### kakt init-secrets
-
-Generates the bootstrap secrets the secret store starts from, and creates the machine identity the platform authenticates with afterwards. Aliased as `kakt bootstrap-secrets`.
-
-```bash
-kakt init-secrets
-```
-
 ### kakt configure-github-access
 
-Gives the GitOps engine access to your repositories, and supplies the pull credential for your private images. It runs before `init-secrets`, because the GitOps engine creates the namespaces that step writes into.
+Gives the GitOps engine access to your repositories, and supplies the pull credential for your private images.
 
 ```bash
 kakt configure-github-access --org-url https://github.com/acme-inc

@@ -254,6 +254,7 @@
               "cli/boxes-and-clusters",
               "cli/applications",
               "cli/escrow-and-encryption",
+              "cli/pki",
               "cli/support",
               "cli/releases"
             ]

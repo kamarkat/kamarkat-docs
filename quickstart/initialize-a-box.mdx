@@ -97,7 +97,7 @@ kakt box init --resume ./acme-gitops-1794447136
 ```
 
 <Note>
-Two credentials are never asked for. The administrator of your box's own Infisical takes its address from the session you created in [Get started](/quickstart/get-started#step-1-sign-in-and-create-your-escrow-account), and its password is generated and written to your escrow in step 3 — there is nothing to invent or remember.
+Nothing secret is invented or remembered by hand. Your box's own secret store gets its seal key when the management cluster is declared, and it is written to your escrow. Its root certificate authority was placed in your administrator-only custody project by `kakt escrow init`.
 </Note>
 
 ## Step 2: The box

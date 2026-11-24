@@ -1,0 +1,59 @@
+---
+title: "Certificate authority"
+description: "Sign your box's issuing certificate authority with the root only you hold."
+keywords: ["kakt pki", "sign-intermediate", "certificate authority", "root CA", "intermediate", "custody"]
+---
+
+> Your box issues its internal certificates from an intermediate certificate authority inside its own secret store. That intermediate is signed by a root CA that never enters the cluster or CI: it is held in your administrator-only custody project, and you sign with it here.
+
+## How the trust is split
+
+`kakt escrow init` creates two things for each box. The first is the box escrow project. The second is a separate **custody project** that only you, the box's administrator, are a member of. It also generates the box's **root CA** and stores it in the custody project. The root's certificate goes to the box escrow, where anything that needs to check the chain can read it.
+
+The intermediate's private key is generated inside the box's secret store and never leaves it. Signing is the one moment the two meet. You, under your own session, read the root from custody and sign the intermediate's request. Only the signed certificate chain goes back into the box.
+
+No automation identity is a member of the custody project. CI, the cluster and the platform's operators cannot read the root, and this command refuses to run as a machine identity.
+
+## kakt pki sign-intermediate
+
+Signs the box's issuing intermediate with the root held in custody.
+
+```bash
+kakt pki sign-intermediate
+```
+
+Run it once per box, as the box's administrator, right after you push the management cluster's declaration. It waits for the cluster's secret store to come up, so you can start it straight away. The bootstrap waits for it too. If no signature arrives within its bound, the bootstrap fails with **administrator signing pending** rather than finishing a box whose certificates cannot issue.
+
+| Flag | Meaning |
+| :- | :- |
+| `--gitops-dir` | The box's repository. Defaults to the working directory |
+| `--cluster` | The management cluster, when the repository declares more than one |
+| `--renew` | Issue a new intermediate over a new key, even though the current one is valid |
+| `--validity` | The new intermediate's lifetime. Defaults to five years, and is always cut short to the root's remaining lifetime |
+
+### What it checks before it signs
+
+- **You are the box's administrator**, signed in with [`kakt login`](/cli/signing-in), in the organisation the box declares. A machine identity is refused.
+- **The root is this box's.** It was bound to the box's escrow project when `kakt escrow init` created it. A root that belongs to another box is refused.
+- **The request is the one it should be.** The signing request must carry a valid signature, the box's intermediate name and no alternative names. It may only ask for the extensions an issuing CA needs. Anything else is refused, and nothing is signed.
+- **The existing hierarchy is this box's.** If the box already has an issuer that does not chain to this root, the command stops rather than replacing it.
+
+The intermediate it signs can issue certificates but cannot sign another CA (path length 0). Its lifetime never extends past the root's.
+
+### Running it again
+
+It is safe to re-run. If the box's intermediate is already signed by this root and more than two years from expiry, it reports that and changes nothing.
+
+Once the intermediate is within two years of expiry, a plain re-run issues its replacement. `--renew` does the same at any time, for a scheduled rotation. A replacement is signed over a **new** key and becomes the issuer for new certificates. Certificates already issued keep their own chain until they are renewed.
+
+### What it prints
+
+```text
+Signing box acme-1794716111's issuing intermediate as you@acme.example.
+```
+
+A re-run with nothing to do prints:
+
+```text
+The issuing intermediate is already signed by this box's root (valid until 2031-11-24T10:02:11Z). Nothing to do.
+```

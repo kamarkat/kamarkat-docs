@@ -1,0 +1,48 @@
+---
+title: "Secret store recovery"
+description: "Bring your box's secret store back to a trusted state after a database restore."
+keywords: ["kakt openbao recover", "recovery", "restore", "OpenBao", "ADR-092"]
+---
+
+> Restoring a database from backup brings back old state, including old access. `kakt openbao recover` finishes a restore: it puts the right seal key in place, withdraws every access the restore brought back, and re-establishes the database passwords your applications use. Each step is checked before it is recorded.
+
+## When you run it
+
+Only inside **recovery mode**. You enter it deliberately: point the restored database's descriptor at its `database-recovery` overlay. If the restored database is `openbao-db`, the secret store's own, also point the OpenBao component at its `openbao-recovery` overlay. That overlay keeps every consumer away from the restored store until recovery is complete.
+
+The command refuses to run outside recovery mode. It also refuses while consumers can still reach a restored secret store.
+
+## kakt openbao recover
+
+```bash
+kakt openbao recover
+```
+
+| Flag | Meaning |
+| :- | :- |
+| `--gitops-dir` | The box's repository. Defaults to the working directory |
+| `--cluster` | The management cluster, when the repository declares more than one |
+
+Run it as the box's administrator, signed in with [`kakt login`](/cli/signing-in).
+
+### What it does for a restored secret store
+
+1. **Unseals with the right key.** It reads, from your escrow, the seal configuration that was in force at the point the store was restored to. It delivers exactly that configuration and restarts the secret store onto the restored data. If the escrow has no configuration for that point, it stops: the key is never guessed.
+2. **Logs in afresh**, as the dedicated recovery identity. It never uses a token the restore brought back.
+3. **Waits for authorization to be re-applied.** The platform's operator re-applies the box's complete access configuration to the restored store: policies, roles, mounts and each managed cluster's verification key.
+4. **Revokes every restored token.** Only its own session and tokens issued since recovery began remain, and it checks that before recording the step.
+5. **Re-establishes application database passwords.** For each application, it waits until that application's own database is serving, if it is also being restored. It then has the secret store set a new password, and proves a login with it.
+
+### What it does for an application database restored on its own
+
+Step 5 only, for that application.
+
+### Interruption and completion
+
+Each step is recorded per restored database, in the secret store, after its effect is verified. If the command is interrupted, or something it waits on is not ready, run it again: it resumes where it stopped and does not repeat completed steps.
+
+It exits non-zero until every database in recovery mode is completely recovered, and lists what is still pending. Once everything is recovered, it tells you to settle the descriptors. Settling restores consumer access to the secret store, and the preflight then proves no recovery mode remains.
+
+<Note>
+Seal-key rotation is not exposed as an operation in this release. Every box runs on the seal key generated when its management cluster was declared. Your escrow keeps the full history of seal configurations, which is what a restore selects from.
+</Note>

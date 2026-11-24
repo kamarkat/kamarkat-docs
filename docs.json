@@ -255,6 +255,7 @@
               "cli/applications",
               "cli/escrow-and-encryption",
               "cli/pki",
+              "cli/openbao",
               "cli/support",
               "cli/releases"
             ]

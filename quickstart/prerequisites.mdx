@@ -106,7 +106,7 @@ a second copy there could drift from the real one with nothing able to detect it
 
 | Secret | What it is for |
 | :- | :- |
-| `GRAFANA_IRM_ALERTMANAGER_URL`, `GRAFANA_IRM_HEARTBEAT_URL` | Where critical and warning alerts page you, and a heartbeat that pages when the management cluster stops reporting. Metrics, logs and dashboards run in the box without them. |
+| `GRAFANA_IRM_ALERTMANAGER_URL`, `GRAFANA_IRM_HEARTBEAT_URL` | Where the management cluster's critical and warning alerts page you, and a heartbeat that pages when it stops reporting. These are the hub's: a managed cluster emails its own alerts and is watched by the hub, so you supply these once and nothing per cluster. Metrics, logs and dashboards run in the box without them. |
 | `IDENTITY_PROVIDER_SMTP_URL` | Outbound mail for identity messages and alert email. |
 | `TS_AUTHKEY` | Only if a managed cluster of this box accepts nodes on your own premises, which join over your tailnet. |
 

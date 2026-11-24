@@ -53,6 +53,14 @@ kakt verify --cluster acme-01
 
 It waits for the cluster to converge and reports anything outstanding. For a further cluster later, see [Add a managed cluster](/guides/clusters/add-a-managed-cluster).
 
+<Note>
+  **You supply no secrets for a managed cluster.** Its own secrets project is created
+  for it, the credentials it needs are copied in, and its monitoring, alert rules and
+  alert delivery are configured as part of creating it. The alert destinations you
+  gave once at `kakt box init` stay with the management cluster; a managed cluster
+  emails its own alerts and is watched by the hub.
+</Note>
+
 ## Next
 
 <Card title="Declare an app" icon="cube" href="/quickstart/declare-an-app">

@@ -42,7 +42,7 @@ Alerts are evaluated where the data is, so a cluster keeps alerting even if the 
 
 ### The pipeline reports its own failure
 
-Each cluster sends a heartbeat to an external check, so a silent observability stack is noticed from outside the cluster.
+The hub sends a heartbeat to an external check, so a silent box is noticed from outside it. Every other cluster is watched by the hub, which alerts when that cluster's alert path stops reporting — the observer is outside the cluster it watches either way, and no managed cluster depends on a third-party service.
 
 ### Sending telemetry elsewhere is additive
 

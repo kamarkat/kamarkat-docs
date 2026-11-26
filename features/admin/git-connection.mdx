@@ -73,7 +73,7 @@ Two things are worth separating out, and both are deliberate:
 
 `GITHUB_ORG_SETUP_TOKEN` — the credential that creates the repository. It stays on your own machine, under `~/.kamarkat/`, because it can create repositories across your whole organization and it is yours rather than the box's. A box never holds it, and nothing in a box needs it.
 
-The box's own Infisical administrator is not asked for at all: the address comes from your `kakt login` session, and the password is generated and written to your escrow when the management cluster is declared. The pair is then set on the repository like any other secret.
+The box's own secret store needs no credential at all. It has no administrator account, initializes itself, and revokes its own root token. Its seal key is generated and escrowed when the management cluster is declared, and is delivered from the escrow, never from the repository.
 
 ## What you need to know
 

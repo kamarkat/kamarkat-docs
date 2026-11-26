@@ -22,6 +22,6 @@ Your domain and its DNS zone; see [Cloud account](/features/admin/cloud-account)
 | :- | :- | :- |
 | **cert-manager** | Issues and renews certificates | Both cluster types |
 | **cert-manager DNS-01 webhook** | Proves domain ownership through the provider's DNS | Both cluster types |
-| **Infisical PKI issuer** | Issues internal certificates from the secret store's certificate authority | Both cluster types |
+| **OpenBao PKI** | The box's issuing intermediate. Its key is generated inside the secret store, and you sign it once with your box's root, held in your custody project. cert-manager issues internal certificates through it | Management cluster, issuing for both cluster types |
 
 Versions are not listed here: each release lists the exact version of every component it installs, under [Versions](/versions/overview) › **Releases**.

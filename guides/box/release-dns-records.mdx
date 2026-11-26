@@ -1,0 +1,44 @@
+---
+title: "Release DNS records another box left"
+description: "Free your box's hostnames when a box that no longer exists still holds their DNS records."
+keywords: ["dns", "hostnames", "dns-only", "kakt teardown", "dns owner", "bootstrap"]
+---
+
+> Your box updates only the DNS records it created. A record another box created keeps pointing at that box until its owner is released.
+
+Every DNS record your box publishes carries an ownership marker naming the box that wrote it. Your box never changes a record that names another owner. A box torn down without releasing its records therefore leaves your hostnames pointing at an address that no longer serves them, and nothing on your box can reach them.
+
+Every build of a management cluster checks for this before it creates anything. When a hostname is held, the run stops at once and names the owner:
+
+```text
+hostnames this box publishes under acme.example are held by another DNS owner, not this box (acme-1794447136).
+This box never updates a record another owner holds, so they keep pointing at the other box's address and nothing can reach this box by them:
+  owner acme-1790000000: id.acme.example, console.acme.example
+```
+
+## Step 1: Confirm the owner is gone
+
+The owner is a box id. Make sure that box no longer exists before you release its records: releasing a live box's records takes its hostnames offline until its own DNS controller writes them again.
+
+## Step 2: Release its records
+
+Run this from your GitOps repository:
+
+```bash
+kakt teardown --dns-only --dns-owner acme-1790000000 --dns-zone acme.example --gitops-dir . --confirm
+```
+
+It deletes only records whose ownership marker names exactly that owner, in that zone. It touches no cluster and no server. It reaches your DNS zone with your box's cloud credential, read from your escrow under your own session. If your zone is hosted in a different cloud account, set `HETZNER_DNS_API_TOKEN` to that account's token.
+
+## Step 3: Build again
+
+Start the **Bootstrap cluster** workflow in your GitOps repository again. The check passes, and your box publishes its records within a minute of its gateway becoming ready.
+
+<Note>
+A teardown releases its box's records as part of tearing it down, and reports the teardown as incomplete when it cannot. Records are left behind only when that report was not acted on. See [`kakt teardown`](/cli/boxes-and-clusters#kakt-teardown).
+</Note>
+
+## Related topics
+
+- [Build the management cluster](/quickstart/build-the-management-cluster)
+- [Delete a box](/guides/box/delete-a-box)

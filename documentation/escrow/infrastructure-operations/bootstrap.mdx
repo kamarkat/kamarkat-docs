@@ -92,7 +92,7 @@ In CI the provider credential is enrolled from a repository secret on **stdin**,
 
 ## What is written back
 
-During bootstrap the box escrows its own recovery material: master keys, the identity provider's key, its admin kubeconfig and its at-rest encryption key. That is the platform operator's doing, using a machine identity — not your session. See [Artifacts and scopes](/documentation/escrow/artifacts-and-scopes).
+During bootstrap the box escrows its own recovery material: the secret store's encrypted recovery key, the identity provider's key, its admin kubeconfig and its at-rest encryption key. Day-0 and the platform operator write them with the box's automation identity, not your session. The secret store's seal key is escrowed earlier, under your session, when you declare the management cluster. See [Artifacts and scopes](/documentation/escrow/artifacts-and-scopes).
 
 ## Related topics
 

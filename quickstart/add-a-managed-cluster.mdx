@@ -26,7 +26,7 @@ Read from this box's declaration:
   --mgmt-cluster       acme-mgmt-1794447136
   --tenant             acme
   --provider           hetzner
-  --region             hel1
+  --region             fsn1
   --bundle-version     0.3.40
   --gitops-repo-url    https://github.com/acme-inc/acme-gitops-1794447136
 ```
@@ -54,9 +54,11 @@ kakt verify --cluster acme-01
 It waits for the cluster to converge and reports anything outstanding. For a further cluster later, see [Add a managed cluster](/guides/clusters/add-a-managed-cluster).
 
 <Note>
-  **You supply no secrets for a managed cluster.** Its own secrets project is created
-  for it, the credentials it needs are copied in, and its monitoring, alert rules and
-  alert delivery are configured as part of creating it. The alert destinations you
+  **You supply no secrets for a managed cluster.** The management cluster gives it its
+  own identity in the box's secret store, which can read only that cluster's secrets and
+  issue only that cluster's certificates. The credentials it needs are generated or
+  copied there, and its monitoring, alert rules and alert delivery are configured as
+  part of creating it. Its database backups go to your box's bucket, in your box's region. The alert destinations you
   gave once at `kakt box init` stay with the management cluster; a managed cluster
   emails its own alerts and is watched by the hub.
 </Note>

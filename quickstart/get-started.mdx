@@ -1,14 +1,21 @@
 ---
 title: "Get started"
-description: "Sign in, create the escrow your box's master keys and admin credential are kept in, and note the administrator identity your box will declare."
-keywords: ["escrow", "master keys", "machine identity", "kakt login", "platform administrator", "break-glass"]
+description: "Sign in, create the escrow and custody projects your box's keys and certificate authority are kept in, and note the administrator identity your box will declare."
+keywords: ["escrow", "custody", "openbao", "seal key", "recovery key", "root CA", "machine identity", "kakt login", "platform administrator", "break-glass"]
 ---
 
 This is the first thing you do, and all of it happens before any infrastructure exists: you sign in, you create the escrow your box will depend on, and you note the one identity the box will accept as its administrator.
 
-Your box's secret store is encrypted by master keys. The box cannot keep them itself: they are what decrypts it, so they would be unreachable exactly when you need them. The escrow keeps a copy outside the box, in a secret manager you control and Kamarkat does not.
+Your box runs its own secret store on its management cluster. The secret store is sealed by a key the box cannot keep itself: that key is what opens the store, so it would be unreachable exactly when you need it. The escrow keeps it outside the box, in a secret manager you control and Kamarkat does not. The escrow secret manager is [Infisical Cloud](https://infisical.com); it holds keys and break-glass material only, never your application's secrets.
 
-The escrow also holds each cluster's admin kubeconfig, which you use only for [break-glass access](/quickstart/access-the-box#break-glass-access), and the cloud credential your box's infrastructure is built and destroyed with.
+The escrow also holds:
+
+- the secret store's **recovery key**, encrypted so that only you can decrypt it. It is the break-glass for the secret store, because no permanent root token exists.
+- each cluster's admin kubeconfig, which you use only for [break-glass access](/quickstart/access-the-box#break-glass-access)
+- the cloud credential your box's infrastructure is built and destroyed with
+- the object-storage credential its database backups are written with
+
+Your box's **root certificate authority** is kept in a second, administrator-only project, its **custody** project, which no automation can read.
 
 You reach it as **yourself**. Step 1 signs you in, and from then on every command that touches the escrow uses your own session rather than a credential copied onto your machine.
 
@@ -52,9 +59,10 @@ That is the whole step. It runs as you, and it:
 - creates the escrow project, **with you as its admin** — because you created it
 - creates your organisation's automation identity if it does not have one, configures its authentication, and issues one client secret
 - gives that identity access to this project
+- creates the box's **custody project**, `acme-escrow-custody`, with **you as its only member**. It generates the box's root certificate authority and a PGP key pair for the secret store's recovery key, and keeps both private keys there. Only their public halves go into the escrow project, so the box's automation can encrypt to the recovery key but never decrypt it, and can never read the root
 - writes the `ESCROW_PROVIDER_*` values to `~/.kamarkat/infisical/`, once for this machine — including `ESCROW_PROVIDER_ORG_ID`, the organisation your session belongs to, which your box declares so that the administrator it names can be checked inside the organisation that issued them
 
-Nothing to do in the Infisical dashboard, and no roles to choose. The identity gets the organisation role `no-access`, because it performs no organisation action, and the project role `member`, which is what reading and writing secrets and creating folders needs — not `admin`.
+Nothing to do in the Infisical dashboard, and no roles to choose. The automation identity is never added to the custody project: the root and the recovery key's private key are reachable only through your own session, when you [sign the box's certificate authority](/cli/pki) or break glass. The identity gets the organisation role `no-access`, because it performs no organisation action, and the project role `member`, which is what reading and writing secrets and creating folders needs — not `admin`.
 
 The identity it creates for you is an Infisical **machine identity**: an account that belongs to a program rather than a person, authenticating with **Universal Auth** — a client ID and a client secret — instead of a password and a browser. Infisical's own [Machine identities](https://infisical.com/docs/documentation/platform/identities/machine-identities) page describes the mechanism in full; what the platform configures is exactly the part described here, and it is yours afterwards. [Operating the machine identity](/documentation/escrow/platform-administrator#operating-the-machine-identity) covers what that means — what holds its credential, how rotation works, and what the one-per-organisation choice costs.
 

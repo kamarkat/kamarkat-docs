@@ -4,7 +4,7 @@ description: "Create and check the escrow your box depends on, retrieve break-gl
 keywords: ["kakt escrow", "kakt kubeconfig", "kakt encryption", "break-glass", "at-rest encryption"]
 ---
 
-> Your [escrow](/features/admin/escrow) is a secret manager you control, outside the box, holding its master keys and each cluster's break-glass admin kubeconfig. These commands create it, report what it actually holds, and use it.
+> Your [escrow](/features/admin/escrow) is a secret manager you control, outside the box, holding its master keys, its root certificate authority and each cluster's break-glass admin kubeconfig. These commands create it, report what it actually holds, and use it.
 
 ## Conventions
 
@@ -27,7 +27,7 @@ These commands report fingerprints and never values.
 
 ### kakt escrow init
 
-Creates the project your boxes escrow to, and the automation identity they authenticate with. Run it after `kakt login`, as an organisation admin.
+Creates the project your boxes escrow to, and the automation identity they authenticate with. It also creates the box's custody project, `<name>-custody`, with you as its only member, and generates the box's root certificate authority and the recovery key's PGP key pair in it. Only the public halves are written to the escrow project. A re-run finds both projects and both keys and keeps them. Run it after `kakt login`, as an organisation admin.
 
 ```bash
 kakt escrow init --name acme-escrow
@@ -80,7 +80,7 @@ What the binding does and does not establish, who may reach an escrow, and why n
 
 ### kakt escrow verify
 
-Reports which artefacts your box cannot be rebuilt without are actually present, by fingerprint — so a missing one is visible before a recovery rather than during one.
+Reports which artefacts your box cannot be rebuilt without are actually present, by fingerprint, so a missing one is visible before a recovery rather than during one. Under `--management` that includes the secret store's seal key, its encrypted recovery key, the recovery key's public key, the root certificate and the custody record. The custody project's private keys are never read. [Artifacts and scopes](/documentation/escrow/artifacts-and-scopes) lists every artefact.
 
 ```bash
 kakt escrow verify --box acme-1794447136 --cluster acme-mgmt-1794447136 --management

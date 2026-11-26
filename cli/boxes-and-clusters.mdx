@@ -24,7 +24,7 @@ kakt box init
 
 Values are read without echo and staged under `~/.kamarkat/` with mode `0600`, and the same run then creates the box with them. Re-running is normal: anything already present is skipped, and an answer left empty is reported as outstanding — in which case **nothing is created** and the next run asks only for what is missing. In automation, set the variables and pass `--no-prompt`.
 
-It does not create the escrow, which is [`kakt escrow init`](/cli/escrow-and-encryption#kakt-escrow-init), and it never asks for the box Infisical administrator, which is generated and escrowed when the management cluster is declared. See [Initialize a box](/quickstart/initialize-a-box).
+It does not create the escrow, which is [`kakt escrow init`](/cli/escrow-and-encryption#kakt-escrow-init). The box's secret store needs no administrator credential. Its seal key is generated and escrowed when the management cluster is declared. See [Initialize a box](/quickstart/initialize-a-box).
 
 Once the credential set is complete, the same command creates the box's repository, renders it from the platform template **with no clusters**, and stores your credentials on it as repository secrets.
 
@@ -68,8 +68,8 @@ A continuation reads that checkout's `registry/box.yaml` and reuses its exact na
 
 <Note>
 **The management cluster takes no `--environment`.** It is environment-independent: it
-has its own identity (`boxId`), its own secret scope
-(`management.infisicalEnvironmentSlug`) and its own capacity policy. A `dev`, `stg`
+has its own identity (`boxId`), its own paths in the box's secret store and its own
+capacity policy. A `dev`, `stg`
 or `prod` stage is a property of each **workload** cluster, declared with
 `kakt tenant add-cluster --environment`, and one management cluster manages clusters
 in all of them.
@@ -178,9 +178,9 @@ directory that declares no box says so.
 
 **The first cluster** is rendered from `templates/mgmt` using what the box
 declared: its name, your domain, your escrow, your provider and region. It is also the
-moment this box's own Infisical administrator is created — the password is
-generated, written to your escrow, and set on the repository, and a later run
-reads the escrowed one back rather than minting a second over the live instance.
+moment this box's secret store gets its seal key. The key is generated and written
+to your escrow, and a later run finds the escrowed one and keeps it rather than
+minting a second over the live instance.
 
 **A replacement** is rendered from the management cluster already declared here,
 so it inherits this box's domain, provider, region and escrow coordinates along
@@ -545,9 +545,15 @@ The clusters named on the flag are the ones this run destroys, **in order**: eac
 If anything could not be done, the command says what and exits non-zero — including a provider deletion that failed. "Teardown completed" means completed.
 </Note>
 
+### DNS records
+
+A teardown releases the DNS records the box published, after its infrastructure is gone. It reads the owner and zone from the cluster's DNS controller, and when the cluster cannot answer, from the box's own declaration (`dns.ownerId`, `domain` and `subdomain` in `registry/clusters/<cluster>/values.yaml`), using your cloud token.
+
+Records it could not release make the teardown **incomplete**, and the report prints the `--dns-only` command that releases them. A later box on the same domain cannot update a record another box owns; see [Release DNS records another box left](/guides/box/release-dns-records).
+
 | Flag | Meaning |
 | :- | :- |
-| `--name` | The management cluster to destroy. Required |
+| `--name` | The management cluster to destroy. Required, except with `--dns-only` |
 | `--confirm` | Confirm deletion. Required |
 | `--gitops-dir` | The box's repository, which declares its escrow and its box id |
 | `--destroy-managed` | Also destroy these managed clusters first, through the management cluster, before it is destroyed itself (comma-separated) |
@@ -555,7 +561,7 @@ If anything could not be done, the command says what and exits non-zero — incl
 | `--kubeconfig` | Use this kubeconfig instead of the escrowed one, for a box that never finished bootstrapping and so escrowed none. The provider credential still comes from the escrow, which holds it from the moment the box was initialized |
 | `--infrastructure-only` | Destroy the provider infrastructure of a box whose Kubernetes API cannot be reached, naming the clusters to destroy. The workload clusters named are destroyed first and the management cluster last. The cluster's own cleanup is reported as not done |
 | `--managed-cluster` | A managed cluster this box declares, repeatable. For when the management cluster can no longer be asked for its list. It feeds the ordering check; it does not authorize deleting that cluster |
-| `--dns-only` | Release this box's DNS records and nothing else |
+| `--dns-only` | Release one owner's DNS records and nothing else. Needs `--dns-owner`, `--dns-zone` and `--confirm`, and touches no cluster and no server. With `--gitops-dir`, the DNS credential is the box's escrowed cloud credential; `HETZNER_DNS_API_TOKEN` overrides it |
 | `--dns-owner`, `--dns-zone` | Which records, and the zone they live in, when the cluster can no longer be read |
 
 <Warning>

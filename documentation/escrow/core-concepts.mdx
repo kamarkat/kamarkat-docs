@@ -1,7 +1,7 @@
 ---
 title: "Core concepts"
 description: "Two secret stores with different jobs, three identity scopes, and the reason escrow is still readable when the cluster that wrote it is gone."
-keywords: ["escrow", "operational secret store", "box scope", "cluster scope", "recovery", "self-hosted Infisical"]
+keywords: ["escrow", "operational secret store", "box scope", "cluster scope", "custody", "recovery"]
 ---
 
 > One store is for running. The other is for rebuilding. Keeping them apart is the whole design.
@@ -12,7 +12,7 @@ This page covers the ideas escrow rests on. Boxes, management clusters, `boxId` 
 
 | | Operational store | Recovery escrow |
 |---|---|---|
-| Where | self-hosted, inside your box | Infisical's hosted service, a project you own |
+| Where | inside your box, on its management cluster | Infisical's hosted service, a project you own, and a custody project only you can read |
 | Holds | application secrets, database credentials, controller values | a short allowlist of recovery material |
 | Read by | the platform's controllers and your workloads, continuously | people and automation, rarely, and mostly during recovery |
 | Available when the cluster is down | no | **yes** |

@@ -1,7 +1,7 @@
 ---
 title: "Artifacts and scopes"
 description: "The exact allowlist of what a box escrows, grouped by identity scope, with the reason each one must survive losing the management cluster — and what is deliberately excluded."
-keywords: ["escrow artifacts", "allowlist", "master keys", "admin kubeconfig", "spoke PKI", "encryption key", "backup credential", "scopes"]
+keywords: ["escrow artifacts", "allowlist", "openbao", "seal key", "recovery key", "custody", "root CA", "admin kubeconfig", "spoke PKI", "encryption key", "backup credential", "scopes"]
 ---
 
 > A short list, and it stays short. Each entry is here because a box cannot be rebuilt without it.
@@ -18,13 +18,11 @@ cannot read an escrow.
 
 Path: `/boxes/<boxId>`. Permanent, shared by every management cluster the box ever has, because they belong to the box rather than to any cluster in it.
 
-The root is `boxes` because one escrow project serves every box in your organization, and because these artifacts are the **box's** — not any component's. It used to be `/hub-operator/`, which named one of the readers: a controller that is not installed yet when the cloud token, the master keys and the store credential are written, and that reads only some of them afterwards.
+The root is `boxes` because these artifacts are the **box's**, not any component's. Several of them are written before any component of the box is running.
 
 | Artifact | What it protects | Why it must outlive the cluster |
 |---|---|---|
-| `infisical-master-keys` | the box's own secret store | the store is encrypted with them, and its database is restored from backups the store holds the credential for. Inside the box, that is a circle |
 | `zitadel-masterkey` | the box's identity provider | without it, a restored identity database is unreadable and nobody can log in to the box they just rebuilt |
-| `infisical-admin-credential` | the administrator of the box's own secret store | it is generated once, and a rebuilt box restores a database that already holds that account — a successor needs the password its predecessor was created with |
 | `backup-ssec-key` | the management-state backups | the archive is encrypted with it. Kept outside the box because a key stored in what it protects protects nothing |
 | `backup-store-credential` | reaching the backup bucket, and archiving to it | the credential that reaches the backups cannot live in the database those backups restore. One authority, two renderings: `kakt escrow deliver-backup-credentials` writes it as the keys CloudNativePG archives with and the INI Velero restores with |
 | `registry-credential` | pulling your own private images | a first bootstrap pulls your images before it has a secret store to read a credential from. The platform's own images are public, so a box without this one still builds |
@@ -33,6 +31,29 @@ The root is `boxes` because one escrow project serves every box in your organiza
 | `tailnet-authkey` | admitting nodes on your own premises | the control plane joins the tailnet during its own first boot, from cloud-init, with no cluster yet to read a Secret from |
 | `provider-credential-hetzner` | your cloud account | first bootstrap has no cluster yet, and teardown and inventory must work when the cluster cannot be reached |
 | `escrow-destination` | the box's binding to this escrow | records which project this box was established in, so a declaration and its escrow can be checked against each other |
+
+## The secret store and the box's trust
+
+Path: `/openbao`, in the box's escrow project. These belong to the box's secret store and its certificate authority.
+
+| Artifact | What it protects | Why it must outlive the cluster |
+|---|---|---|
+| `openbao-seal` | the box's secret store | the secret store is sealed with this key, and every generation of it is kept with the history of which was delivered when. A restored database opens only with the key that was in force when it was backed up. Inside the box, that is a circle |
+| `openbao-recovery-key-encrypted` | break-glass into the secret store | the recovery key, encrypted to the PGP key in custody. No permanent root token exists, so this is the only way in when everything else fails. The box's automation can read only the ciphertext |
+| `openbao-recovery-pgp-public` | encrypting the recovery key | the public half, which Day-0 encrypts the recovery key to |
+| `pki-root-certificate` | trusting the box's certificates | the root's public certificate, which `kakt pki sign-intermediate` checks the secret store's chain against |
+| `custody-project-id` | finding custody | which project is this box's custody project |
+
+## Custody project
+
+A second project, `<escrow project>-custody`, whose only member is the box's administrator. No automation identity, CI run or cluster can read it. `kakt escrow init` creates it and generates both keys in it.
+
+| Artifact | What it protects | Who reads it |
+|---|---|---|
+| `pki-root` | the box's root certificate authority, private key included | `kakt pki sign-intermediate`, under your own session, to sign the secret store's intermediate. It never enters CI or a cluster |
+| `openbao-recovery-pgp-private` | decrypting the recovery key | you, when you break glass into the secret store |
+
+The issuing intermediate's private key is not escrowed anywhere: it is generated inside the secret store and never leaves it.
 
 ## Cluster-incarnation-scoped
 
@@ -65,8 +86,8 @@ Most of your secrets are not here, and that is the design. Escrow holds a fixed 
 
 | Not escrowed | Where it lives | Why it does not belong in escrow |
 |---|---|---|
-| Application secrets, API keys, tokens | the box's self-hosted Infisical, delivered as Kubernetes Secrets | needed only while the box runs. Mirroring them would copy your whole secret estate to a second place for no recovery benefit |
-| Application database credentials | the same | recreated by their own authority when the application is redeployed |
+| Application secrets, API keys, tokens | the box's secret store, delivered as Kubernetes Secrets. The secret store's database is backed up to your object storage | needed only while the box runs. Mirroring them would copy your whole secret estate to a second place for no recovery benefit |
+| Application database credentials | the same. The secret store rotates the platform databases' login passwords itself | recreated by their own authority when the application is redeployed |
 | The cloud credential the in-cluster controllers use | a Kubernetes Secret the platform maintains | an operational **projection** of the escrowed copy, not a second source |
 | Node encryption-key material | file content Cluster API reads at provisioning | a projection of the escrowed key |
 | Per-application backup credentials | the operational store | separate from the box's recovery authority on purpose: compromising one must not yield the other |

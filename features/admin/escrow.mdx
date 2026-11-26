@@ -1,18 +1,20 @@
 ---
 title: "Escrow"
-description: "A secret manager you control, outside the box, holding your box's master keys and each cluster's break-glass kubeconfig."
-keywords: ["escrow", "ESCROW_PROVIDER", "master keys", "break-glass", "kubeconfig"]
+description: "A secret manager you control, outside the box, holding your box's master keys, its root certificate authority and each cluster's break-glass kubeconfig."
+keywords: ["escrow", "ESCROW_PROVIDER", "master keys", "seal key", "recovery key", "custody", "root CA", "break-glass", "kubeconfig"]
 ---
 
 > The escrow is the one copy of your box's keys that survives losing the box.
 
 ## What it is
 
-Your box's secret store is encrypted by master keys. The box cannot keep its only copy of them, because they would be unreachable exactly when you need them. The escrow holds a copy outside the box, in a secret manager you control.
+Your box's secret store is sealed by a key. The box cannot keep its only copy of it, because it would be unreachable exactly when you need it. The escrow holds it outside the box, in a secret manager you control.
 
 | The escrow holds | Used for |
 | :- | :- |
-| **Secret-store master keys** | Restoring every secret when a cluster is rebuilt |
+| **The secret store's seal key** | Opening the secret store, and its restored database, when a cluster is rebuilt |
+| **The secret store's recovery key**, encrypted to a key only you hold | Break-glass into the secret store, which keeps no permanent root credential |
+| **The root certificate authority**, in a custody project only you can read | Signing the box's issuing certificate authority, under your own session |
 | **Admin kubeconfig, one per cluster** | Break-glass access when ordinary sign-in has failed |
 
 It is reached with four values, stored as secrets on your GitOps repository: `ESCROW_PROVIDER_URL`, `ESCROW_PROVIDER_PROJECT_ID`, `ESCROW_PROVIDER_CLIENT_ID` and `ESCROW_PROVIDER_CLIENT_SECRET`.
@@ -25,7 +27,7 @@ Create the escrow before you create the box. Creating a box refuses without it, 
 
 ### Rebuilds restore secrets, not re-enter them
 
-The secret store's data is backed up outside the box, and the escrow holds the keys that decrypt it. A rebuilt cluster restores both, so every secret is present before any workload starts. If you find yourself re-entering secrets after a rebuild, the escrow or the backup is broken.
+The secret store's database is backed up outside the box, and the escrow holds the key that opens it. A rebuilt cluster restores both, so every secret is present before any workload starts. If you find yourself re-entering secrets after a rebuild, the escrow or the backup is broken.
 
 ### Break-glass access
 

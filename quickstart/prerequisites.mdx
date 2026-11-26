@@ -13,8 +13,8 @@ Everything below belongs to you. Kamarkat never receives any of it: the credenti
 | **Cloud account** | Where your clusters run, and what you are billed for. The `hetzner` provider is the default. |
 | **Git organization** | Holds your GitOps repository and your application repositories, runs Day-0 in its CI, and hosts your application charts and images in its package registry. |
 | **Domain** | Every hostname in your box sits under it. Its DNS zone must be hosted with your cloud provider's DNS service, because the box creates records and proves domain ownership there for its certificates. |
-| **Escrow secret manager** | Holds your box's master keys and admin credential outside the box. See [Get started](/quickstart/get-started). |
-| **Object storage** (recommended) | Destination for database backups. A production box without it has no backups. |
+| **Escrow secret manager** | An [Infisical Cloud](https://infisical.com) account. Holds your box's seal key, recovery material and break-glass credentials outside the box, and its certificate authority in a project only you can read. See [Get started](/quickstart/get-started). |
+| **Object storage** (recommended) | Destination for database backups, including the secret store's own database. Buckets are created in your box's region. A production box without it has no backups. |
 
 ## Step 2: Install the tools
 
@@ -88,18 +88,19 @@ One exception is worth doing first, because it is needed before the repository e
 
 ### Handled for you, and not stored here
 
-Your box runs its own secret store, separate from your escrow, and it has an
-administrator account. You are never asked for it and there is no repository
-secret to set.
+Your box runs its own secret store, separate from your escrow. It has no
+administrator account and no password, so there is nothing to supply and no
+repository secret to set:
 
-`kakt box init` creates that account for the address you signed in with, with a
-generated password, and writes both to your escrow. Every bootstrap — including
-a re-run, and a rebuild after you lose a management cluster — reads that same
-credential back from the escrow, which is what lets a second run re-enter a
-secret store the first one created.
+- **Its seal key** is generated when you declare the management cluster and
+  written to your escrow. Every bootstrap, including a re-run and a rebuild after
+  you lose a management cluster, delivers that same key back from the escrow.
+- **It initializes itself** on first start and revokes its own root token, so no
+  permanent root credential exists anywhere.
+- **Its recovery key** is created during Day-0, encrypted to the PGP key in your
+  custody project, and written to your escrow. It is the break-glass, and only
+  your own session can decrypt it.
 
-It is kept only in your escrow because a repository secret cannot be read back:
-a second copy there could drift from the real one with nothing able to detect it.
 `kakt escrow verify` reports what your escrow holds.
 
 ### Optional
@@ -132,5 +133,5 @@ Export each value as an environment variable of the same name in the shell you w
 ## Next
 
 <Card title="Get started" icon="vault" href="/quickstart/get-started">
-  Sign in, and create the project your box's master keys are escrowed to.
+  Sign in, and create the escrow and custody projects your box's keys are kept in.
 </Card>

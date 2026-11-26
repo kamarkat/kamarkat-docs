@@ -134,6 +134,7 @@
               "guides/box/rotate-the-build-credential",
               "guides/box/replace-a-management-cluster",
               "guides/box/repair-a-box",
+              "guides/box/release-dns-records",
               "guides/box/delete-a-box"
             ]
           },

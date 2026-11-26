@@ -70,7 +70,7 @@ reporting a teardown that deleted nothing; enrol it first with
 
 Between the two the provider is asked again. If anything of `acme-stg-01` survived, `acme-mgmt-1794447136` is left standing deliberately — it is the only thing that could still finish the job — and the run exits non-zero saying what remains.
 
-A recovery run reports the cluster's own cleanup as not performed: load balancers the in-cluster controller owns, finalizers, and the DNS records whose owner id only the cluster knows. To release those records afterwards, pass `--dns-only` with `--dns-owner` and `--dns-zone`.
+A recovery run reports the cluster's own cleanup as not performed: load balancers the in-cluster controller owns, and finalizers. It still releases the box's DNS records, reading their owner from your GitOps repository. If any are left, the run reports the teardown as incomplete and prints the command that releases them; see [Release DNS records another box left](/guides/box/release-dns-records).
 
 ## What stays behind
 

@@ -65,7 +65,9 @@ Then sign the box's certificate authority, once, as the box's administrator:
 kakt pki sign-intermediate
 ```
 
-Start it right after the push. It waits for the new cluster's secret store, and the build waits for it, so the box's internal certificates can be issued. What it checks and signs is in the [CLI reference](/cli/pki).
+Start it right after the push. It waits for the new cluster's secret store to ask for its intermediate certificate, and the build waits for the signature, so the box's internal certificates can be issued. The intermediate's private key is generated inside the secret store and never leaves it. The root is read from your custody project under your own session and never enters CI or the cluster. What it checks and signs is in the [CLI reference](/cli/pki).
+
+If the build's wait runs out first, it fails with *administrator signing pending*. Sign, then start the workflow again: it resumes where it stopped.
 
 Git is the source of truth. The run reads this cluster's shape — its provider,
 region and worker count — from the
@@ -118,8 +120,11 @@ The run takes a few hours. It works through these stages, and each must succeed 
   <Step title="Check the declaration">
     Validates your repository before anything is created.
   </Step>
+  <Step title="Check your hostnames">
+    Before anything else, confirms that no hostname your box will publish is held in DNS by another box. If one is, the run stops at once and prints the owner and the command that releases its records. See [Release DNS records another box left](/guides/box/release-dns-records).
+  </Step>
   <Step title="Build the management cluster">
-    Creates the cluster and builds its foundation in phases: secret store, PKI, bootstrap secrets, GitOps engine, platform. Each phase records its state, so a re-run resumes rather than starting over.
+    Creates the cluster and builds its foundation in phases: the cluster itself, the GitOps engine, the databases, then the secret store. The secret store initializes itself and revokes its own root token. The run then creates its recovery key, encrypted to the PGP key in your custody project, writes it to your escrow, and waits for you to sign the intermediate. The remaining platform services follow. Each phase records its state, so a re-run resumes rather than starting over.
   </Step>
   <Step title="Verify it converges">
     Waits for every platform boundary to become healthy, within a fixed budget.

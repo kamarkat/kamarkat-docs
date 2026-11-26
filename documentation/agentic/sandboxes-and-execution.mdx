@@ -106,8 +106,8 @@ To maintain strict credential isolation, two platform sidecars run inside the sa
    - Holds the cloud object storage secret directly and signs S3 SigV4 requests.
    - Saves snapshots and executes atomic directory generation swaps when the agent triggers `/checkpoint` or `/refresh`.
 2. **Vault proxy (`agent-vault`)**:
-   - Listens on local port `14321` as an authenticated egress MITM proxy (`HTTP_PROXY` / `HTTPS_PROXY`).
-   - Reads secrets delivered by the platform (such as LLM gateway keys, GitHub tokens, or search credentials).
+   - Runs entirely inside the pod. It reaches no secret store at runtime: its credentials are the ones the platform delivers to the pod, such as LLM gateway keys, GitHub tokens, or search credentials.
+   - Serves the authenticated egress proxy on local port `14322` (`HTTP_PROXY` / `HTTPS_PROXY`), and its control interface, used only by the sandbox's entrypoint, on `14321`.
    - Dynamically injects `Authorization: Bearer <token>` and tenant telemetry headers (`X-Scope-OrgID`) into outbound requests before they leave the pod, keeping raw secrets completely hidden from the agent code.
 
 ### Startup validation

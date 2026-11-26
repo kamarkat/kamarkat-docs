@@ -16,7 +16,7 @@ Escrow breaks that circle by keeping a small number of artifacts somewhere the b
 
 ## What belongs there
 
-Only what satisfies one test: **it must be readable when the management cluster is unavailable, or does not exist yet.** That is master keys, the identity provider's key, admin kubeconfigs, at-rest encryption keys, your workload clusters' certificate authorities, the key your management-state backups are encrypted with, and the credentials that reach your cloud account and your backup bucket.
+Only what satisfies one test: **it must be readable when the management cluster is unavailable, or does not exist yet.** That is the secret store's seal key and recovery key, the box's root certificate authority, the identity provider's key, admin kubeconfigs, at-rest encryption keys, your workload clusters' certificate authorities, the key your management-state backups are encrypted with, and the credentials that reach your cloud account and your backup bucket.
 
 The second half of that test — *or does not exist yet* — is what the credentials a box is **built** with answer to. A first bootstrap has no cluster and therefore no secret store, so the values it needs cannot come from the store it is about to create: the cloud token that provisions the servers, the object-storage key the databases archive to, the registry credential that pulls your images, where alerts page you, and outbound mail. Those are escrowed for the same reason recovery material is, one step earlier. They used to be repository secrets, and a repository secret cannot be read back — so the copy nobody could compare was also the copy nobody could verify.
 

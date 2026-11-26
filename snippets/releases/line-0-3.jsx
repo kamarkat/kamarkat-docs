@@ -2,10 +2,21 @@ export const line = {
   "line": "0.3",
   "releases": [
     {
+      "version": "0.3.61",
+      "released": "26 Nov 2026",
+      "href": "/versions/releases/0-3-61",
+      "latest": true,
+      "prerelease": false,
+      "components": 143,
+      "behind": 83,
+      "previous": "0.3.60",
+      "changed": 0
+    },
+    {
       "version": "0.3.47",
       "released": "24 Nov 2026",
       "href": "/versions/releases/0-3-47",
-      "latest": true,
+      "latest": false,
       "prerelease": false,
       "components": 146,
       "behind": 79,

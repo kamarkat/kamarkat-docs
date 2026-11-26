@@ -7,7 +7,7 @@ keywords: ["kakt box init", "initialize a box", "gitops repository", "box identi
 A box outlives every cluster in it, so the box is what you initialize and a cluster is a declaration you add to it afterwards. This page is the first half: the box, with no clusters.
 
 ```bash
-kakt box init --tenant acme --git-org acme-inc --domain acme.example --region hel1
+kakt box init --tenant acme --git-org acme-inc --domain acme.example --region fsn1
 ```
 
 | Argument | Example | What it is |
@@ -15,7 +15,7 @@ kakt box init --tenant acme --git-org acme-inc --domain acme.example --region he
 | `--tenant` | `acme` | Your tenant identifier. It names the box and its repository, and it is the one value you choose. Required |
 | `--git-org` | `acme-inc` | The **git organization** the repository is created in. Optional — see below |
 | `--domain` | `acme.example` | The domain every hostname in your box sits under. Its DNS zone must be hosted with your cloud provider |
-| `--region` | `hel1` | Where the box's clusters are created. Defaults to your provider's; `--help` lists what else can be overridden |
+| `--region` | `fsn1` | Where the box's clusters are created. Defaults to your provider's; `--help` lists what else can be overridden |
 
 `--tenant` and `--git-org` are different things and are not renamed to match each
 other: `acme` is who the box belongs to, `acme-inc` is where its repository
@@ -32,7 +32,7 @@ The box names itself. One timestamp, taken when it is initialized, gives the box
 Before anything is created, the command shows you every credential your box needs and asks for the ones it does not have. Each one gets a numbered step: what it is for, the page that issues it, a browser opened on that page, and a prompt that waits while you create it.
 
 ```text
-[box] platform administrator: arun4devinfra@gmail.com (f17e4648-497a-4f41-859d-3d105d72c964)
+[box] platform administrator: you@acme.example (6e1f2a90-3b7c-4d18-9c55-0a1b2c3d4e5f)
 
 What this box is built with. Present values are left alone.
   ✓ GITHUB_ORG_SETUP_TOKEN         present    yours, creates the repository in the tenant's organisation
@@ -42,8 +42,8 @@ What this box is built with. Present values are left alone.
   ✓ S3_SECRET_ACCESS_KEY           present    backups of the platform database
   ✓ GRAFANA_IRM_ALERTMANAGER_URL   present    paging on this box's critical and warning alerts through your IRM
   ✓ GRAFANA_IRM_HEARTBEAT_URL      present    being paged when this box's hub stops reporting (ADR-078 add.10 §4)
-  ✓ IDENTITY_PROVIDER_SMTP_URL               present    the identity provider sending verification and password-reset mail
-  ✓ ESCROW_PROVIDER_* (4)         present    where this box's master keys are kept (4/4)
+  ✓ IDENTITY_PROVIDER_SMTP_URL     present    the identity provider sending verification and password-reset mail
+  ✓ ESCROW_PROVIDER_* (4)          present    where this box's seal key and recovery key are kept (4/4)
 [box] template: manifests/tenants/gitops-template (the working directory)
 [box] rendered acme-gitops-1794447136 into acme-gitops-1794447136
 [box] authenticating as the platform (personal access token)
@@ -97,7 +97,7 @@ kakt box init --resume ./acme-gitops-1794447136
 ```
 
 <Note>
-Nothing secret is invented or remembered by hand. Your box's own secret store gets its seal key when the management cluster is declared, and it is written to your escrow. Its root certificate authority was placed in your administrator-only custody project by `kakt escrow init`.
+Nothing secret is invented or remembered by hand. Your box's secret store gets its seal key when the management cluster is declared, and it is written to your escrow. Its root certificate authority and the PGP key its recovery key is encrypted to were placed in your administrator-only custody project by `kakt escrow init`.
 </Note>
 
 ## Step 2: The box
@@ -133,7 +133,7 @@ That same write **binds your box to its escrow**: it is the box's first privileg
 | Flag | Meaning |
 | :- | :- |
 | `--tenant` | Your tenant identifier, lower-case. It names the repository and your box. |
-| `--box` | The git organization the repository is created in. Not the box's name, which is generated. |
+| `--git-org` | The git organization the repository is created in. Optional when your platform credential reaches exactly one. |
 | `--domain` | Your base domain. |
 | `--platform-admin` | The one human this box accepts for escrow-backed operations. Defaults to the signed-in session; pass it only to name somebody else. |
 | `--subdomain` | Optional. A DNS label every hostname sits under; empty publishes on the apex. |

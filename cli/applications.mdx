@@ -28,8 +28,12 @@ kakt tenant add-app \
 | `--owner-email` | Who is paged for it |
 | `--workload` | A deployable inside it. Repeat for each; an application may start with none |
 | `--gitops-dir` | Your GitOps repository. Defaults to the current directory |
+| `--charts` | `public` or `private`: how the application's charts are published. Needed only when the registry cannot tell yet, for example before the first build |
+| `--images` | `public` or `private`: how the application's images are published, under the same condition |
 
-The cluster is checked before anything is written. It must be a cluster your repository declares, it must be a managed cluster rather than the management one, and it must serve the environment you named — several clusters may serve one environment, so the application says which. A name that fails any of those is refused with the reason, and no file is created.
+The application has no cluster to name: it runs on every managed cluster serving its environment.
+
+**Registry access.** The command checks each workload's chart, and the images a published chart deploys, against the registry. A public package needs nothing and nothing is asked. A private one is read with the box's registry credential when it works; when there is none, or it cannot read the package, the command asks for a GitHub token with `read:packages`, checks it against the package before saving it, and keeps it in your escrow. A package that is not published yet cannot be checked, so its visibility comes from `--charts` and `--images`, or from a question in the terminal; access to it is never reported as verified. If the registry cannot be reached, the command stops and writes nothing. The result is recorded under `registry:` in the application's `values.yaml`, and the box delivers the credential only to applications that declare private packages. To replace the credential, use [`kakt escrow enroll-registry-credential --rotate`](/cli/escrow-and-encryption#kakt-escrow-enroll-registry-credential-enroll-alert-destination-enroll-mail-transport-enroll-tailnet-authkey).
 
 It then regenerates the hostname aggregate, so the one check that could be forgotten is not left to be remembered. Fill in the quota, hostnames and secret declarations it wrote, then commit.
 

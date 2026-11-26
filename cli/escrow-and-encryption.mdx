@@ -193,6 +193,8 @@ The credential is yours and is never generated here. It arrives on stdin, so it 
 
 The remaining credentials a box is built with, each read from stdin and preserved in the escrow under the box.
 
+You rarely enrol the registry credential by hand: [`kakt tenant add-app`](/cli/applications#kakt-tenant-add-app) asks for it the first time you declare an app with private packages. Use `enroll-registry-credential --rotate` to replace it, for example after revoking a token. The management cluster picks up the new value on its next pass, and every app that declares private packages receives it.
+
 ```bash
 printf 'username=%s\ntoken=%s\n' "$GHCR_USER" "$GHCR_PAT" |
   kakt escrow enroll-registry-credential --box acme-1794447136

@@ -39,10 +39,6 @@ kakt tenant set-gitops-token --org acme-inc
 
 The token is read from stdin, so it stays out of your shell history. Every repository in that git organization inherits it, including ones you create later.
 
-### 4. Let your clusters pull your private images
-
-Store `GHCR_USERNAME` and `GHCR_TOKEN` on your GitOps repository. The platform's own images are public; these are for yours.
-
 ## Where the secrets live
 
 Every credential your box is built with becomes a **GitHub Actions secret on the box's own repository**. `kakt box init` sets them there, and the platform keeps none of them.

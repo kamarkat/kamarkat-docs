@@ -84,7 +84,6 @@ One exception is worth doing first, because it is needed before the repository e
 | Secret | What it is for |
 | :- | :- |
 | `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Backups of the platform database — an object-storage key for the region your box runs in. Escrowed, not stored on the repository. |
-| `GHCR_USERNAME`, `GHCR_TOKEN` | Pulling your own private images **and your own private chart packages**. The platform's images are public. The token needs the `read:packages` scope, which neither `repo` nor `workflow` implies — without it your application's pods report `ImagePullBackOff` with a `401` from the registry's token endpoint, and a chart published to your organization fails to download with `403: denied`. A package your organization published after the token was issued is also refused until the package grants that token's owner read access. Escrowed, not stored on the repository. |
 
 ### Handled for you, and not stored here
 
@@ -119,7 +118,7 @@ Worth being exact about, because it decides what a rebuilt box can still reach.
 
 | Kept on the repository | Kept in the escrow |
 | :- | :- |
-| `ESCROW_PROVIDER_URL`, `ESCROW_PROVIDER_PROJECT_ID`, `ESCROW_PROVIDER_CLIENT_ID`, `ESCROW_PROVIDER_CLIENT_SECRET` — where the escrow is. CI has to know this much before it can read anything else | everything else your box runs on: the cloud token, the object-storage key, your registry credential, the alert destinations, outbound mail, the tailnet key |
+| `ESCROW_PROVIDER_URL`, `ESCROW_PROVIDER_PROJECT_ID`, `ESCROW_PROVIDER_CLIENT_ID`, `ESCROW_PROVIDER_CLIENT_SECRET` — where the escrow is. CI has to know this much before it can read anything else | everything else your box runs on: the cloud token, the object-storage key, the alert destinations, outbound mail, the tailnet key |
 | `GITOPS_REPO_WRITE_TOKEN` — your application builds read it from your organization, and they cannot read an escrow | |
 
 A repository secret cannot be read back once set, so a copy there is a copy nothing

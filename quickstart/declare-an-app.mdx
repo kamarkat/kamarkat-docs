@@ -27,10 +27,13 @@ kakt tenant add-app \
 ```
 
 This writes the file below from the template your repository keeps, with the
-tenant, app, environment and cluster already filled in. It refuses a cluster your
-box has not declared, or one that does not serve `dev`, before writing anything —
-so a name that would have generated nothing is caught here rather than at your
-first secret.
+tenant, app and environment already filled in. The app runs on every managed
+cluster serving `dev`.
+
+If your app's charts or images are private, the command asks for a GitHub token
+with `read:packages` the first time, and reuses it for every later private app.
+Public apps are never asked. Before your first build the registry cannot say
+which yours are, so the command asks whether they will be public or private.
 
 ```yaml environments/dev/shop/values.yaml
 tenantId: acme          # the tenant that owns the box, the same in every app

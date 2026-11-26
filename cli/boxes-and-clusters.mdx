@@ -19,7 +19,6 @@ kakt box init
 | Flag | Meaning |
 | :- | :- |
 | `--provider` | Which credentials this box needs: `hetzner` (default), or `hybrid`, which also needs a tailnet key |
-| `--private-registry` | This box runs your own private images, which needs a registry credential |
 | `--no-browser` | Print the address of each page instead of opening it. Also `KAKT_NO_BROWSER` |
 
 Values are read without echo and staged under `~/.kamarkat/` with mode `0600`, and the same run then creates the box with them. Re-running is normal: anything already present is skipped, and an answer left empty is reported as outstanding — in which case **nothing is created** and the next run asks only for what is missing. In automation, set the variables and pass `--no-prompt`.
@@ -92,7 +91,6 @@ Initializing a box happens once. Every change after it is a commit or a pull req
 | `--resume` | Continue the box in this checkout, reusing the identity it declares. Mints nothing and renames nothing |
 | `--workers` | Cloud worker nodes a cluster of this box starts with. Defaults to 2. A management cluster runs on its cloud workers, so it needs at least one: a box with none is refused before anything is provisioned, because the control plane keeps its taint and no platform workload can schedule |
 | `--private` | Create the repository private. Default `true` |
-| `--private-registry` | Your applications run private images, which makes a registry credential required |
 | `--bundle-version` | The platform version the box starts on. A released CLI defaults to the version it carries; an unreleased build has none and refuses rather than guess. `development` reads charts from your current branch |
 | `--dry-run` | Render only; create and push nothing |
 | `--out` | The checkout to leave behind. Defaults to `./<repository>`, and the next command runs inside it. Must be empty or absent |

@@ -122,18 +122,24 @@ Presence is not recovery. `escrow verify` reports that a key exists; this report
 Retrieves a cluster's admin kubeconfig from the escrow.
 
 ```bash
-kakt login
-kakt kubeconfig --cluster acme-mgmt-1794447136 --gitops-dir . --out acme-mgmt-1794447136.kubeconfig
-kubectl --kubeconfig acme-mgmt-1794447136.kubeconfig get nodes
+kakt kubeconfig --out admin.kubeconfig
+kakt kubeconfig --cluster acme-01 --out acme-01.kubeconfig
 ```
 
-With `--gitops-dir`, the box's own declaration names its escrow and the read is performed with your identity ([Signing in](/cli/signing-in)) — so this works from any authorized workstation. Without it, pass `--box` and the four `ESCROW_PROVIDER_*` values in the environment, which is what automation does.
+Inside the box's GitOps repository it needs no other flag. The repository names the box's escrow and its management cluster, and the read is performed with your identity ([Signing in](/cli/signing-in)), so it works from any authorized workstation with a checkout. Outside a checkout, pass `--box` and `--cluster`, with the four `ESCROW_PROVIDER_*` values in the environment, which is what automation does.
+
+| Flag | Meaning |
+| :- | :- |
+| `--out` | Write the kubeconfig to this file, readable only by you. Without it, the kubeconfig is printed to stdout |
+| `--cluster` | The cluster whose kubeconfig to retrieve. Inside the box's repository it defaults to the management cluster; required outside it |
+| `--gitops-dir` | The box's repository. Defaults to the working directory when it is one |
+| `--box` | The box id the escrow is keyed by. Required outside a checkout; inside one it overrides the declaration |
 
 <Warning>
 This is break-glass access. Normal access is through your own identity provider, where each person authenticates as themselves. Use this when that is not available: the identity provider is down, the cluster is broken, or nobody can sign in. The credential is cluster-admin, is not tied to a person, and must never be committed.
 </Warning>
 
-The escrow holds one kubeconfig per cluster, so pass the cluster you need. Without `--out` it prints to stdout. `--box` overrides the declaration, which matters for a successor management cluster: it reads its predecessor's artefacts under the box they share, while the declaration names only the current cluster.
+The escrow holds one kubeconfig per cluster. `--box` overrides the declaration, which matters for a successor management cluster: it reads its predecessor's artefacts under the box they share, while the declaration names only the current cluster.
 
 ### kakt escrow clean
 

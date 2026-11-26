@@ -14,16 +14,14 @@ Your box publishes its platform interfaces under your domain, including the clus
 
 Use the admin kubeconfig only when ordinary sign-in is not available: the identity provider is down, the cluster is broken, or nobody can sign in.
 
-From your box's GitOps repository, which declares the escrow that holds it:
+Run this from your box's GitOps repository:
 
 ```bash
-kakt kubeconfig --cluster acme-mgmt-1794447136 --gitops-dir . --out acme-mgmt-1794447136.kubeconfig
-kubectl --kubeconfig acme-mgmt-1794447136.kubeconfig get nodes
+kakt kubeconfig --out admin.kubeconfig
+kubectl --kubeconfig admin.kubeconfig get nodes
 ```
 
-The read runs with your own [`kakt login`](/cli/signing-in) session, so it is attributed to you and needs no credential copied onto your machine. Elsewhere, pass `--box acme-1794447136` with the four `ESCROW_PROVIDER_*` values in the environment.
-
-The escrow holds one kubeconfig per cluster, so pass the cluster you need.
+The repository tells `kakt` which escrow holds the credential and which cluster is your management cluster, so there is nothing else to pass. The read runs with your own [`kakt login`](/cli/signing-in) session, so it is attributed to you and needs no credential copied onto your machine. For a managed cluster, add `--cluster` with its name; see [`kakt kubeconfig`](/cli/escrow-and-encryption#kakt-kubeconfig).
 
 <Warning>
 The credential is cluster-admin and is not tied to a person. Use it, then discard it. Never commit it: your GitOps repository ignores the paths Day-0 writes credentials to, and they must stay out of git.

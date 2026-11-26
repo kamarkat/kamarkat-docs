@@ -31,11 +31,7 @@ The secret store's database is backed up outside the box, and the escrow holds t
 
 ### Break-glass access
 
-```bash
-kakt kubeconfig --cluster acme-mgmt-1794447136 --out acme-mgmt-1794447136.kubeconfig
-```
-
-The credential is cluster-admin and not tied to a person. Use it, then discard it.
+When ordinary sign-in is unavailable, [`kakt kubeconfig`](/cli/escrow-and-encryption#kakt-kubeconfig), run in your box's GitOps repository, returns the management cluster's admin kubeconfig from the escrow under your own session. The credential is cluster-admin and not tied to a person. Use it, then discard it.
 
 ### Keep the four values outside the box
 
